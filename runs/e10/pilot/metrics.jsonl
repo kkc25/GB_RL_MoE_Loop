@@ -1,0 +1,5 @@
+{"time": 1792864654.8676643, "phase": "predictor", "predictor": "additive", "parameters": 28728, "best_validation_mse": 35.66745376586914}
+{"time": 1792864655.072255, "phase": "predictor", "predictor": "lowrank", "parameters": 143640, "best_validation_mse": 14.643842697143555}
+{"time": 1792864655.1117296, "phase": "predictor", "predictor": "mlp", "parameters": 143584, "best_validation_mse": 24.530208587646484}
+{"time": 1792864655.1200664, "phase": "heldout", "policy_baseline": 5.406886100769043, "policy_random": 5.406199932098389, "policy_additive": 5.41971492767334, "policy_lowrank": 5.419137001037598, "policy_mlp": 5.4062042236328125}
+{"time": 1792864655.1201577, "phase": "heldout_oracle", "mean_cost": 5.360438823699951, "oracle_gap": 0.046447522938251495, "oracle_gap_se": 0.01099507324397564, "mean_oracle_pair_is_baseline": 0.0, "deployable": false}

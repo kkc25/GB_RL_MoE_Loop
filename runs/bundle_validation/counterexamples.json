@@ -1,0 +1,70 @@
+{
+  "spectral_radius_A": 0.5,
+  "spectral_radius_B": 0.5,
+  "spectral_radius_BA": 4.48606797749979,
+  "top1_h4_leaf_paths": 4096,
+  "top1_h4_all_stopping_prefixes": 4681,
+  "top1_h4_expert_evaluations_shared_tree": 4680,
+  "top2_pair_h4_leaf_paths": 614656,
+  "oracle_random_target_nll": 0.01005033585350145,
+  "deploy_fixed_extreme_nll": 2.307610260920796,
+  "deploy_uniform_nll": 0.6931471805599453,
+  "seqtopk_counterexample_calls": [
+    1,
+    2
+  ],
+  "seqtopk_prefix_budget": 2,
+  "offline_prefix_calls_with_different_suffixes": [
+    2,
+    3
+  ],
+  "suboptimal_strict_equilibrium_potential": 8,
+  "better_equilibrium_potential": 10,
+  "pigou_equilibrium_social_cost": 4,
+  "pigou_optimal_social_cost": 3.5,
+  "delayed_gain_greedy_reward": 6.1,
+  "delayed_gain_optimal_reward": 10.0,
+  "price_cycle": [
+    {
+      "load": [
+        2,
+        0
+      ],
+      "updated_prices": [
+        1,
+        0
+      ]
+    },
+    {
+      "load": [
+        0,
+        2
+      ],
+      "updated_prices": [
+        0,
+        1
+      ]
+    },
+    {
+      "load": [
+        2,
+        0
+      ],
+      "updated_prices": [
+        1,
+        0
+      ]
+    },
+    {
+      "load": [
+        0,
+        2
+      ],
+      "updated_prices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "executed_checks": "Exact finite examples and algebra only; no language-model training."
+}

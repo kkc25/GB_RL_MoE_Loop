@@ -1,0 +1,38 @@
+{
+  "status": "analytic_only_not_measured",
+  "assumptions": [
+    "MHA with four d-by-d projections",
+    "SwiGLU three matrices",
+    "no linear biases",
+    "shared parameters across FFN loops",
+    "two RMSNorm vectors per layer and one final vector",
+    "one router per layer",
+    "tied embedding and LM head",
+    "one output-head evaluation per token",
+    "multiply-add counted as 2 FLOPs",
+    "normalization, nonlinearities, softmax, indexing, communication excluded"
+  ],
+  "parameter_parts": {
+    "tied_embedding": 16777216,
+    "attention_projections": 12582912,
+    "expert_weights": 75497472,
+    "router_weights": 49152,
+    "rmsnorm_weights": 12800
+  },
+  "parameters_total": 104919552,
+  "model_state_gib_16_bytes_per_parameter": 1.5634231567382812,
+  "ffn_passes_across_all_layers": 15.0,
+  "forward_flops_per_token_parts": {
+    "attention_projections": 25165824,
+    "expert_matmuls": 47185920.0,
+    "router_matmuls": 122880.0,
+    "one_lm_head": 33554432,
+    "attention_scores_values_ideal_causal": 12595200
+  },
+  "forward_flops_per_token_ideal_causal": 118624256.0,
+  "forward_flops_per_token_full_square_attention": 131194880.0,
+  "training_flops_per_token_3x_forward_approx": 355872768.0,
+  "extra_final_block_topk_step_forward_flops": 3153920,
+  "each_extra_full_vocab_readout_flops": 33554432,
+  "training_flops_total_approx": 3.55872768e+17
+}

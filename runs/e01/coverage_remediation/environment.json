@@ -1,0 +1,9 @@
+{
+  "python": "3.12.15",
+  "torch": "2.12.1+cu130",
+  "cuda": "13.0",
+  "device": "cpu",
+  "parameters": 67170816,
+  "checkpoint": "runs/e00/debug67_b2/latest.pt",
+  "backbone_hash": "55622a25939d63797bf8ac19375241b83f40172a01697056152d398782c8a513"
+}

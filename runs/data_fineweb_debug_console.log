@@ -1,0 +1,21 @@
+{
+  "document_list_sha256": "542f45c25c41e2689835e1044fa0fb56a36d7d82ea40bc21a5ea3a703711ec11",
+  "n_documents": 726000,
+  "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+  "sequences": {
+    "test": 4883,
+    "train": 4883,
+    "validation": 4883
+  },
+  "split_documents": {
+    "test": 12946,
+    "train": 700087,
+    "validation": 12967
+  },
+  "tokenizer_sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+  "tokens": {
+    "test": 5000000,
+    "train": 5000000,
+    "validation": 5000000
+  }
+}

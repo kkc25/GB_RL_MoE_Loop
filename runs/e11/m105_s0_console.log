@@ -1,0 +1,47 @@
+{
+  "tau": -0.004153502614874598,
+  "scope": "single_last_ffn_S0_shared_GPU_not_isolated",
+  "quality": {
+    "1": {
+      "nll": 5.070967296450481,
+      "ppl": 159.32835388183594,
+      "supervised_tokens": 16342,
+      "depth": 1
+    },
+    "4": {
+      "nll": 5.070393710894474,
+      "ppl": 159.2369842529297,
+      "supervised_tokens": 16342,
+      "depth": 4
+    },
+    "dynamic": {
+      "nll": 5.070467780727956,
+      "mean_rounds": 1.8521600783257863,
+      "supervised_tokens": 16342
+    }
+  },
+  "profile": {
+    "1": {
+      "step_ms_mean": 221.84428244130686,
+      "step_ms_p50": 226.21480002999306,
+      "step_ms_p95": 436.1104380222969,
+      "steps": 100,
+      "peak_memory_bytes": 2098431488
+    },
+    "4": {
+      "step_ms_mean": 277.51079607056454,
+      "step_ms_p50": 279.90170498378575,
+      "step_ms_p95": 450.06077003199607,
+      "steps": 100,
+      "peak_memory_bytes": 2098431488
+    },
+    "dynamic": {
+      "step_ms_mean": 119.57659702980891,
+      "step_ms_p50": 62.12498201057315,
+      "step_ms_p95": 447.1307820058428,
+      "steps": 100,
+      "peak_memory_bytes": 2098431488
+    }
+  },
+  "dynamic_vs_r4_latency_ratio": 0.43088989229595004
+}

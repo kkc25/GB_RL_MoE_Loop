@@ -1,0 +1,99 @@
+# 研究配置说明，不是已实现训练器的CLI配置。
+version: "2026-10-25"
+status: planned_not_gpu_executed
+model:
+  layers: 12
+  hidden_size: 512
+  attention_heads: 8
+  experts_per_layer: 8
+  expert_intermediate_size: 512
+  activation: swiglu
+  top_k: 2
+  vocabulary_including_special_tokens: 32768
+  tie_embeddings: true
+  attention_bias: false
+  expert_bias: false
+  norm: rmsnorm
+  position: rope
+  exact_backbone_parameters: 104919552
+  extra_controller_parameters: separately_counted
+recurrence:
+  loop_blocks: 1
+  position: last_ffn
+  max_loops: 4
+  attention_runs_per_block: 1
+  sharing: within_layer_across_loops
+  depth_training: uniform_batch_depth_1_2_3_4
+  heads_per_training_forward: 1
+  repeated_experts_allowed: true
+  residual_scale_pilot: [0.5, 1.0]
+  residual_scale_after_pilot: must_lock_before_comparison
+training:
+  precision: bf16_autocast_if_supported
+  reductions: fp32
+  sequence_length: 1024
+  pilot_sequence_length: 512
+  global_effective_tokens: 32768
+  pilot_global_effective_tokens: 8192
+  microbatch_sequences_initial: 1
+  optimizer: adamw
+  learning_rate_candidates: [0.0003, 0.0006]
+  betas: [0.9, 0.95]
+  epsilon: 0.00000001
+  weight_decay: 0.1
+  gradient_clip: 1.0
+  smoke_tokens_in_debug: [5000000, 20000000]
+  debug_tokens_cumulative: 50000000
+  pilot_tokens_in_screen: 100000000
+  screen_tokens_cumulative_per_model: 300000000
+  confirmation_tokens_cumulative_per_seed_max: 1000000000
+  backbone_seeds: [17, 29, 43]
+controller:
+  input_fields: [hidden_state, loop_index, remaining_budget]
+  optional_fields: [history, layer_index]
+  hidden_size: 128
+  output_actions: 28
+  regression_loss: mse
+  target: terminal_nll_after_action_and_frozen_causal_tail
+  target_is_not: hindsight_min_over_label_conditioned_paths
+  candidate_count: 4
+  includes_baseline_action: true
+  continuation_policy: frozen_deterministic_pi0_with_fixed_tie_break
+  optional_two_step_combinations: 16
+  optional_two_step_total_terminal_scores_max: 17
+  training_states_initial: 100000
+  validation_states_initial: 20000
+  test_states_initial: 20000
+  learning_rate_candidates: [0.001, 0.0003]
+  maximum_epochs: 10
+  dataset_aggregation_rounds_max: 2
+  mixing_weights_main_control: frozen_baseline_logits_renormalized_on_selected_set
+  epo_original_weight_update: separate_strong_baseline
+data:
+  primary: HuggingFaceFW/fineweb-edu
+  source_revision: must_pin_on_execution
+  tokenizer: custom_byte_level_bpe_trained_on_backbone_train_only
+  split_unit: deduplicated_document_group
+  split_manifest: protocols/02_data_and_evaluation.md
+  external_eval: Salesforce/wikitext:wikitext-103-raw-v1
+  contamination_audit: required_before_claiming_ood
+evaluation:
+  primary: paired_nll_at_equal_expert_calls
+  report_token_ppl: true
+  report_total_forward_flops: true
+  report_real_latency: true
+  bootstrap_unit: document
+  bootstrap_replicates: 1000
+  confirmation_backbone_seeds: 3
+  practical_delta_nll_starting_threshold: 0.01
+  halting_nll_tolerance: 0.005
+  systems_speedup_goal: 0.05
+  thresholds_are: planning_choices_not_observed_results
+resources:
+  gpu: RTX_A6000_48GB_Ampere
+  usual_cards: [3, 4, 5]
+  maximum_cards: 8
+  default_parallelism: independent_single_gpu_jobs
+  performance_measurement: required_E00
+  no_assumed_nvlink_mesh: true
+  world_size_change: checkpoint_at_complete_optimizer_step

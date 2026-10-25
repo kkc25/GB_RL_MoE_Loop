@@ -1,0 +1,554 @@
+{
+  "version": 1,
+  "updated_at": "2026-10-24T17:48:52.984211+00:00",
+  "experiments": {
+    "E00": {
+      "run_id": "E00_feasibility_and_baselines",
+      "title": "feasibility_and_baselines",
+      "status": "running",
+      "precondition": "none",
+      "components": {
+        "recovery_c0": {
+          "status": "finished",
+          "evidence": [
+            "runs/recovery/c0_identity_dense/stage_result.json",
+            "runs/recovery/c0_fixed_dense/stage_result.json"
+          ],
+          "metrics": {
+            "identity_accuracy": 1.0,
+            "fixed_affine_accuracy": 1.0
+          },
+          "gpu_hours": 0.0203,
+          "updated_at": "2026-10-24T16:58:52.073940+00:00"
+        },
+        "correctness_and_hardware": {
+          "status": "finished",
+          "evidence": [
+            "runs/bundle_validation/hardware_inventory.json",
+            "runs/e00a/p0_profile_shared.json",
+            "runs/recovery/smoke_resume_verified/stage_result.json"
+          ],
+          "metrics": {
+            "selected_unit_tests": 188,
+            "profile_scope": "shared_teacher_forced_smoke_not_isolated",
+            "resume_verified": true
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:02:00.945678+00:00"
+        },
+        "lm_backbone": {
+          "status": "running",
+          "evidence": [],
+          "metrics": {},
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:03:55.406257+00:00"
+        },
+        "recovery_c1": {
+          "status": "running",
+          "evidence": [
+            "runs/recovery/c1_all_comparison.json"
+          ],
+          "metrics": {
+            "c0_pass": true,
+            "c1_gate_pass": false,
+            "dense_best_late_iid_accuracy": 0.5714,
+            "moe_final_iid_accuracy": 0.5714,
+            "moe_full_iid_accuracy": 0.4176
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:14:38.148572+00:00"
+        },
+        "fineweb_debug_data_and_smoke": {
+          "status": "running",
+          "evidence": [
+            "runs/data/fineweb_edu_debug/manifest.json",
+            "runs/e00/debug67_smoke/run_summary.json"
+          ],
+          "metrics": {
+            "train_tokens": 5000000,
+            "validation_tokens": 5000000,
+            "test_tokens": 5000000,
+            "parameters": 67170816,
+            "top2_tests": 19,
+            "packed_lm_tests": 30
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:28:58.128154+00:00"
+        },
+        "m105_resource": {
+          "status": "running",
+          "evidence": [
+            "runs/e00/m105_forward_resource.json"
+          ],
+          "metrics": {
+            "parameters": 104919552,
+            "forward_peak_bytes": 529754112,
+            "scope": "random_weight_resource_check"
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:33:25.429830+00:00"
+        },
+        "dense_baselines_and_100m_data": {
+          "status": "running",
+          "evidence": [
+            "runs/e00/dense_b3/run_summary.json",
+            "runs/e00/dense_b4/run_summary.json",
+            "runs/data/fineweb_edu_100m/manifest.json"
+          ],
+          "metrics": {
+            "b3_parameters": 48247296,
+            "b4_parameters": 104870400,
+            "train_tokens_100m": 100000000
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:39:26.622042+00:00"
+        },
+        "debug67_b2_5m": {
+          "status": "running",
+          "evidence": [
+            "runs/e00/debug67_b2/run_summary.json"
+          ],
+          "metrics": {
+            "updates": 4883,
+            "input_tokens": 5000000,
+            "nll_depth1": 6.2047555,
+            "nll_depth4": 6.2033808,
+            "peak_bytes": 2423953920
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:48:52.984147+00:00"
+        }
+      },
+      "evidence": [
+        "runs/bundle_validation/hardware_inventory.json",
+        "runs/data/fineweb_edu_100m/manifest.json",
+        "runs/data/fineweb_edu_debug/manifest.json",
+        "runs/e00/debug67_b2/run_summary.json",
+        "runs/e00/debug67_smoke/run_summary.json",
+        "runs/e00/dense_b3/run_summary.json",
+        "runs/e00/dense_b4/run_summary.json",
+        "runs/e00/m105_forward_resource.json",
+        "runs/e00a/p0_profile_shared.json",
+        "runs/recovery/c0_fixed_dense/stage_result.json",
+        "runs/recovery/c0_identity_dense/stage_result.json",
+        "runs/recovery/c1_all_comparison.json",
+        "runs/recovery/smoke_resume_verified/stage_result.json"
+      ],
+      "metrics": {
+        "identity_accuracy": 1.0,
+        "fixed_affine_accuracy": 1.0,
+        "selected_unit_tests": 188,
+        "profile_scope": "shared_teacher_forced_smoke_not_isolated",
+        "resume_verified": true,
+        "c0_pass": true,
+        "c1_gate_pass": false,
+        "dense_best_late_iid_accuracy": 0.5714,
+        "moe_final_iid_accuracy": 0.5714,
+        "moe_full_iid_accuracy": 0.4176,
+        "train_tokens": 5000000,
+        "validation_tokens": 5000000,
+        "test_tokens": 5000000,
+        "parameters": 104919552,
+        "top2_tests": 19,
+        "packed_lm_tests": 30,
+        "forward_peak_bytes": 529754112,
+        "scope": "random_weight_resource_check",
+        "b3_parameters": 48247296,
+        "b4_parameters": 104870400,
+        "train_tokens_100m": 100000000,
+        "updates": 4883,
+        "input_tokens": 5000000,
+        "nll_depth1": 6.2047555,
+        "nll_depth4": 6.2033808,
+        "peak_bytes": 2423953920
+      },
+      "gpu_hours": 0.0203,
+      "stop_reason": null,
+      "next_trigger": null
+    },
+    "E01": {
+      "run_id": "E01_oracle_and_learnability",
+      "title": "oracle_and_learnability",
+      "status": "stopped_by_evidence",
+      "precondition": "qualified_frozen_backbone",
+      "components": {
+        "pilot": {
+          "status": "running",
+          "evidence": [
+            "runs/e01/pilot/e01_summary.json"
+          ],
+          "metrics": {
+            "oracle_gap": 0.0411254801,
+            "student_q_improvement": 0.0013955542,
+            "student_q_se": 0.0035202731,
+            "gate_pass": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:43:59.470155+00:00"
+        },
+        "coverage_remediation": {
+          "status": "stopped_by_evidence",
+          "evidence": [
+            "runs/e01/coverage_remediation/e01_summary.json"
+          ],
+          "metrics": {
+            "oracle_gap": 0.0406095833,
+            "student_q_improvement": -0.0001907495,
+            "student_immediate_improvement": 2.9731e-05,
+            "gate_pass": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:45:15.540270+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e01/coverage_remediation/e01_summary.json",
+        "runs/e01/pilot/e01_summary.json"
+      ],
+      "metrics": {
+        "oracle_gap": 0.0406095833,
+        "student_q_improvement": -0.0001907495,
+        "student_q_se": 0.0035202731,
+        "gate_pass": false,
+        "student_immediate_improvement": 2.9731e-05
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": "deployable_students_below_0.01_after_one_remediation",
+      "next_trigger": "new_backbone_or_state_representation_evidence"
+    },
+    "E02": {
+      "run_id": "E02_counterfactual_rollout_distillation",
+      "title": "counterfactual_rollout_distillation",
+      "status": "blocked_by_precondition",
+      "precondition": "E01_deployable_learnability_pass",
+      "components": {
+        "main": {
+          "status": "blocked_by_precondition",
+          "evidence": [],
+          "metrics": {},
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:45:15.587643+00:00"
+        }
+      },
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": "E01_deployable_learnability_failed",
+      "next_trigger": "E01_positive_on_qualified_backbone"
+    },
+    "E03": {
+      "run_id": "E03_value_calibrated_halting",
+      "title": "value_calibrated_halting",
+      "status": "planned",
+      "precondition": "usable_multi_depth_backbone",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "usable_multi_depth_backbone"
+    },
+    "E04": {
+      "run_id": "E04_memory_and_transition_graph",
+      "title": "memory_and_transition_graph",
+      "status": "blocked_by_precondition",
+      "precondition": "E02_same_hash_labels",
+      "components": {
+        "neural_memory": {
+          "status": "blocked_by_precondition",
+          "evidence": [
+            "runs/e08_ab/e08_ab_results.json"
+          ],
+          "metrics": {
+            "synthetic_sufficiency_checks": "completed"
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:46:37.632246+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e08_ab/e08_ab_results.json"
+      ],
+      "metrics": {
+        "synthetic_sufficiency_checks": "completed"
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": "E02_same_hash_history_labels_unavailable",
+      "next_trigger": "E02_labels_or_new_backbone"
+    },
+    "E05": {
+      "run_id": "E05_prices_and_congestion_games",
+      "title": "prices_and_congestion_games",
+      "status": "blocked_by_precondition",
+      "precondition": "measured_load_bottleneck_and_E02_values",
+      "components": {
+        "synthetic_potential_game": {
+          "status": "running",
+          "evidence": [
+            "runs/e05_e06/seed0.json"
+          ],
+          "metrics": {
+            "tests": 22,
+            "max_potential_identity_error": 4.4e-16,
+            "real_service_executed": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:10:20.508084+00:00"
+        },
+        "real_service": {
+          "status": "blocked_by_precondition",
+          "evidence": [],
+          "metrics": {},
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:46:37.724390+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e05_e06/seed0.json"
+      ],
+      "metrics": {
+        "tests": 22,
+        "max_potential_identity_error": 4.4e-16,
+        "real_service_executed": false
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": "no_measured_load_bottleneck_and_no_E02_values",
+      "next_trigger": "profiler_bottleneck_and_E02_values"
+    },
+    "E06": {
+      "run_id": "E06_causal_transport_assignment",
+      "title": "causal_transport_assignment",
+      "status": "blocked_by_precondition",
+      "precondition": "causal_service_window_and_scores",
+      "components": {
+        "synthetic_matching": {
+          "status": "running",
+          "evidence": [
+            "runs/e05_e06/seed0.json"
+          ],
+          "metrics": {
+            "tests": 22,
+            "capacity_violations": 0,
+            "real_service_executed": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:10:20.553313+00:00"
+        },
+        "real_service": {
+          "status": "blocked_by_precondition",
+          "evidence": [],
+          "metrics": {},
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:46:37.775402+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e05_e06/seed0.json"
+      ],
+      "metrics": {
+        "tests": 22,
+        "capacity_violations": 0,
+        "real_service_executed": false
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": "no_causal_service_trace_or_values",
+      "next_trigger": "causal_service_window_and_scores"
+    },
+    "E07": {
+      "run_id": "E07_budget_scheduling",
+      "title": "budget_scheduling",
+      "status": "running",
+      "precondition": "E03_calibrated_values_and_service_load",
+      "components": {
+        "synthetic_dp_and_ledger": {
+          "status": "running",
+          "evidence": [
+            "plans/loop_moe_research_plan_2026-10-25/results/e07_synthetic.json"
+          ],
+          "metrics": {
+            "synthetic_tests": 16,
+            "service_load_executed": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:02:00.984321+00:00"
+        }
+      },
+      "evidence": [
+        "plans/loop_moe_research_plan_2026-10-25/results/e07_synthetic.json"
+      ],
+      "metrics": {
+        "synthetic_tests": 16,
+        "service_load_executed": false
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E03_calibrated_values_and_service_load"
+    },
+    "E08": {
+      "run_id": "E08_stability_and_synthetic_mechanisms",
+      "title": "stability_and_synthetic_mechanisms",
+      "status": "finished",
+      "precondition": "none_for_synthetic",
+      "components": {
+        "cde": {
+          "status": "running",
+          "evidence": [
+            "runs/e08_cde_cde.json"
+          ],
+          "metrics": {
+            "tests": 29,
+            "capacity_instances": 18,
+            "budget_repaired_violations": 0,
+            "d2": "not_run_gated",
+            "scope": "synthetic_only"
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:19:37.199455+00:00"
+        },
+        "complete_synthetic": {
+          "status": "finished",
+          "evidence": [
+            "runs/e08_ab/e08_ab_results.json",
+            "runs/e08_cde_cde.json"
+          ],
+          "metrics": {
+            "ab_tests": 25,
+            "cde_tests": 29,
+            "gates_passed": 44,
+            "scope": "synthetic_only"
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:24:13.055707+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e08_ab/e08_ab_results.json",
+        "runs/e08_cde_cde.json"
+      ],
+      "metrics": {
+        "tests": 29,
+        "capacity_instances": 18,
+        "budget_repaired_violations": 0,
+        "d2": "not_run_gated",
+        "scope": "synthetic_only",
+        "ab_tests": 25,
+        "cde_tests": 29,
+        "gates_passed": 44
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": null
+    },
+    "E09": {
+      "run_id": "E09_router_only_policy_gradient",
+      "title": "router_only_policy_gradient",
+      "status": "running",
+      "precondition": "E01_positive_E02_student_and_credit_limit_evidence",
+      "components": {
+        "neural_lm": {
+          "status": "blocked_by_precondition",
+          "evidence": [],
+          "metrics": {},
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:45:15.632554+00:00"
+        },
+        "controlled_rl": {
+          "status": "running",
+          "evidence": [
+            "runs/e09/controlled.json"
+          ],
+          "metrics": {
+            "supervised_designed_recovery": 1.0,
+            "exact_designed_recovery": 0.6667,
+            "rloo_mean_objective": 0.2771,
+            "rloo_std_objective": 0.0713,
+            "budget_violations": 0,
+            "real_lm_rl": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:48:13.414709+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e09/controlled.json"
+      ],
+      "metrics": {
+        "supervised_designed_recovery": 1.0,
+        "exact_designed_recovery": 0.6667,
+        "rloo_mean_objective": 0.2771,
+        "rloo_std_objective": 0.0713,
+        "budget_violations": 0,
+        "real_lm_rl": false
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_positive_E02_student_for_neural_RL"
+    },
+    "E10": {
+      "run_id": "E10_ordered_complementarity",
+      "title": "ordered_complementarity",
+      "status": "planned",
+      "precondition": "E01_two_round_counterfactual_labels",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_two_round_counterfactual_labels"
+    },
+    "E11": {
+      "run_id": "E11_systems_and_scale_validation",
+      "title": "systems_and_scale_validation",
+      "status": "stopped_by_evidence",
+      "precondition": "last_layer_mechanism_pass",
+      "components": {
+        "scale_out": {
+          "status": "stopped_by_evidence",
+          "evidence": [
+            "runs/e01/coverage_remediation/e01_summary.json"
+          ],
+          "metrics": {},
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:46:37.680007+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e01/coverage_remediation/e01_summary.json"
+      ],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": "last_layer_deployable_mechanism_not_established",
+      "next_trigger": "last_layer_mechanism_pass"
+    },
+    "E12": {
+      "run_id": "E12_expert_self_bidding",
+      "title": "expert_self_bidding",
+      "status": "running",
+      "precondition": "E01_labels_and_equivalence_screen",
+      "components": {
+        "linear_equivalence": {
+          "status": "running",
+          "evidence": [
+            "runs/e12/equivalence.json"
+          ],
+          "metrics": {
+            "equivalent": true,
+            "max_absolute_difference": 7.105427357601002e-15
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:27:14.394750+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e12/equivalence.json"
+      ],
+      "metrics": {
+        "equivalent": true,
+        "max_absolute_difference": 7.105427357601002e-15
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_same_hash_labels_for_nonlinear_comparison"
+    }
+  }
+}

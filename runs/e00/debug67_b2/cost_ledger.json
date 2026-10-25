@@ -1,0 +1,9 @@
+{
+  "updates": 4883,
+  "input_tokens": 5000000,
+  "supervised_tokens": 4990364,
+  "expert_calls": 67504128,
+  "elapsed_seconds": 1336.666808851005,
+  "allocated_gpu_hours": 0.3712963357919458,
+  "peak_memory_bytes": 2423953920
+}

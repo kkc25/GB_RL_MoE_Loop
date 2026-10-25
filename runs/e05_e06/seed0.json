@@ -1,0 +1,244 @@
+{
+  "experiment": "E05 fixed-state potential game + E06 causal capacity assignment (synthetic)",
+  "scope": "synthetic_fixed_state_only",
+  "real_lm_serving_part": "not_executed",
+  "seed": 0,
+  "e05": {
+    "small_enumerated": {
+      "n_equilibria": 9,
+      "equilibrium_social_welfare_min": -0.8846903904900262,
+      "equilibrium_social_welfare_max": 0.5179457603132105,
+      "potential_optimum_actions": [
+        0,
+        2,
+        1,
+        1
+      ],
+      "potential_optimum_value": 0.7448142205575818,
+      "potential_optimum_is_equilibrium": true,
+      "potential_optimum_social_welfare": 0.5179457603132105,
+      "social_optimum_actions": [
+        0,
+        2,
+        1,
+        1
+      ],
+      "social_optimum_social_welfare": 0.5179457603132105,
+      "async_result_is_equilibrium": true,
+      "async_result_social_welfare": 0.5179457603132105,
+      "max_abs_utility_potential_delta_err": 4.440892098500626e-16
+    },
+    "medium_async_sweeps": {
+      "1": {
+        "converged": false,
+        "final_potential": -39.150891936155766,
+        "is_equilibrium": false
+      },
+      "2": {
+        "converged": false,
+        "final_potential": -37.43323995546965,
+        "is_equilibrium": false
+      },
+      "4": {
+        "converged": true,
+        "final_potential": -36.850783311818724,
+        "is_equilibrium": true
+      },
+      "8": {
+        "converged": true,
+        "final_potential": -36.850783311818724,
+        "is_equilibrium": true
+      }
+    },
+    "oscillation_gate": {
+      "sync": {
+        "cycle_detected": true,
+        "cycle_start_sweep": 0,
+        "cycle_length": 2,
+        "history": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "async": {
+        "actions": [
+          1,
+          0
+        ],
+        "potential_trace": [
+          -10.0,
+          0.0
+        ],
+        "converged": true,
+        "sweeps_used": 2,
+        "max_abs_utility_potential_delta_err": 0.0,
+        "social_welfare": 0.0
+      },
+      "equilibria": 2
+    }
+  },
+  "e06": {
+    "cost_table_generation_seconds": 0.0008556889952160418,
+    "window": {
+      "N": 16,
+      "E": 8,
+      "k": 2,
+      "capacity_per_expert": 5,
+      "total_slots": 40,
+      "candidates_per_token": 4
+    },
+    "additive_exact": {
+      "feasible": true,
+      "flow": 32,
+      "required_flow": 32,
+      "objective": 4.6795458964232575,
+      "assignment_violations": [],
+      "solve_seconds": 0.0022396650165319443
+    },
+    "tiny_crosscheck": {
+      "brute_force_objective": 1.908456659188258,
+      "min_cost_flow_objective": 1.908456659188258,
+      "match": true
+    },
+    "set_version": {
+      "feasible": true,
+      "objective": 3.9613298731394555,
+      "nodes_expanded": 303,
+      "optimal": true,
+      "optimality_gap_bound": null,
+      "solve_seconds": 0.004131894966121763
+    },
+    "additive_fit_residual": {
+      "rms_mean": 0.019151696803014175,
+      "max_abs_max": 0.05572692303258986
+    },
+    "pair_interaction_error": {
+      "additive_assignment_true_set_cost": 4.002510608658936,
+      "set_version_optimum": 3.9613298731394555
+    },
+    "soft_and_rounding": [
+      {
+        "eps_over_std": 0.01,
+        "iters": 5,
+        "max_row_residual": 0.3909707532912261,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 2.930784054201621,
+        "rounded_feasible": true,
+        "rounded_objective": 4.679545896423259,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 1.7763568394002505e-15
+      },
+      {
+        "eps_over_std": 0.01,
+        "iters": 10,
+        "max_row_residual": 0.34750959841974116,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 2.9411902038661806,
+        "rounded_feasible": true,
+        "rounded_objective": 4.679545896423259,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 1.7763568394002505e-15
+      },
+      {
+        "eps_over_std": 0.01,
+        "iters": 20,
+        "max_row_residual": 0.33444893317817415,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 2.943854525314454,
+        "rounded_feasible": true,
+        "rounded_objective": 4.679545896423259,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 1.7763568394002505e-15
+      },
+      {
+        "eps_over_std": 0.05,
+        "iters": 5,
+        "max_row_residual": 0.3977314011988391,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 2.9594684219103424,
+        "rounded_feasible": true,
+        "rounded_objective": 4.679545896423259,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 1.7763568394002505e-15
+      },
+      {
+        "eps_over_std": 0.05,
+        "iters": 10,
+        "max_row_residual": 0.3094327798554306,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 2.9918364948666367,
+        "rounded_feasible": true,
+        "rounded_objective": 4.679545896423259,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 1.7763568394002505e-15
+      },
+      {
+        "eps_over_std": 0.05,
+        "iters": 20,
+        "max_row_residual": 0.24679960012266666,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 3.0525659942513723,
+        "rounded_feasible": true,
+        "rounded_objective": 4.679545896423259,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 1.7763568394002505e-15
+      },
+      {
+        "eps_over_std": 0.1,
+        "iters": 5,
+        "max_row_residual": 0.30329639629186933,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 3.0463846440213627,
+        "rounded_feasible": true,
+        "rounded_objective": 4.679545896423259,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 1.7763568394002505e-15
+      },
+      {
+        "eps_over_std": 0.1,
+        "iters": 10,
+        "max_row_residual": 0.1857898720770388,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 3.1132157518037475,
+        "rounded_feasible": true,
+        "rounded_objective": 4.679545896423259,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 1.7763568394002505e-15
+      },
+      {
+        "eps_over_std": 0.1,
+        "iters": 20,
+        "max_row_residual": 0.06687916922176407,
+        "max_col_excess": 0.0,
+        "fractional_linear_objective": 3.170017770950753,
+        "rounded_feasible": true,
+        "rounded_objective": 4.942012785969886,
+        "fallback_exact": false,
+        "integrality_gap_vs_exact": 0.2624668895466282
+      }
+    ],
+    "causal_sanity": {
+      "suffix_invariance_passed": true,
+      "batch_dependence": {
+        "remove_one_request_changed_fraction": 0.0
+      },
+      "non_causal_diagnostic": {
+        "deployable": false,
+        "label": "non_causal_diagnostic_future_information",
+        "oracle_objective_in_modified_units": -4.390869578813952,
+        "causal_objective": 4.6795458964232575,
+        "assignment_changed_fraction": 0.4375
+      }
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "status": "executed_cpu_analytic_checks_only",
+  "not_executed": [
+    "GPU training",
+    "LM accuracy evaluation",
+    "throughput benchmark"
+  ],
+  "parameters_by_expert_width": {
+    "256": 67170816,
+    "512": 104919552,
+    "1024": 180417024
+  },
+  "path_counts": {
+    "top1_four_round_leaves": 4096,
+    "top1_including_stop_prefixes": 4681,
+    "top2_actions": 28,
+    "top2_two_round_leaves": 784,
+    "top2_four_round_leaves": 614656
+  },
+  "matrix_forward_flops": {
+    "single_expert": 1572864,
+    "vocabulary_head": 33554432,
+    "top2_ffn_and_router": 3153920,
+    "head_over_top2_ffn_and_router": 10.638961038961039,
+    "exhaustive_two_round_tree_per_state": 28861005824,
+    "tree_excludes": "backbone, router, norm, activation, softmax and dispatch"
+  },
+  "label_oracle_counterexample": {
+    "actions_predict_p_y1": [
+      0.1,
+      0.9
+    ],
+    "true_y1_probability": 0.5,
+    "best_label_blind_route_nll": 1.203972804325936,
+    "clairvoyant_route_nll": 0.10536051565782628,
+    "unlearnable_oracle_gap_nats": 1.0986122886681096,
+    "scope": "two-route action space; averaging outputs adds another action"
+  },
+  "seqtopk_budget_counterexample": {
+    "source_scope": "public Eq.7, not an audit of authors' implementation",
+    "probabilities": [
+      [
+        0.4,
+        0.3,
+        0.2,
+        0.1
+      ],
+      [
+        0.49,
+        0.48,
+        0.02,
+        0.01
+      ]
+    ],
+    "K": 1,
+    "trace": [
+      {
+        "prefix": 1,
+        "requested_current": 1,
+        "actual_cumulative_without_ledger": 1,
+        "nominal_prefix_budget": 1,
+        "actual_cumulative_with_ledger": 1
+      },
+      {
+        "prefix": 2,
+        "requested_current": 2,
+        "actual_cumulative_without_ledger": 3,
+        "nominal_prefix_budget": 2,
+        "actual_cumulative_with_ledger": 2
+      }
+    ]
+  },
+  "gpu_hours_algebraic_scenarios_not_measured": {
+    "screen_0.95B": {
+      "2000": 131.94444444444446,
+      "8000": 32.986111111111114,
+      "20000": 13.194444444444445
+    },
+    "minimal_3.65B": {
+      "2000": 506.94444444444446,
+      "8000": 126.73611111111111,
+      "20000": 50.69444444444444
+    },
+    "architecture_5.65B": {
+      "2000": 784.7222222222222,
+      "8000": 196.18055555555554,
+      "20000": 78.47222222222223
+    },
+    "expanded_9.65B": {
+      "2000": 1340.2777777777778,
+      "8000": 335.06944444444446,
+      "20000": 134.02777777777777
+    }
+  },
+  "all_assertions_passed": true
+}

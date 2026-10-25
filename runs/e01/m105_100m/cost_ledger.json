@@ -1,0 +1,9 @@
+{
+  "backbone_prefix_tokens": 14336,
+  "candidate_pair_calls": 1146880,
+  "head_readouts": 573440,
+  "student_train_samples": 163840,
+  "student_optimizer_updates": 640,
+  "elapsed_seconds": 17.186298155982513,
+  "peak_memory_bytes": 604775424
+}

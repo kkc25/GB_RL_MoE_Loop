@@ -1,0 +1,10 @@
+{
+  "scope": "algebraic_equivalence_only_not_value_learning",
+  "hidden_size": 32,
+  "experts": 8,
+  "samples": 128,
+  "max_absolute_difference": 7.105427357601002e-15,
+  "equivalent": true,
+  "conclusion": "linear_per_expert_bids_are_a_central_linear_router_reparameterization",
+  "value_label_experiment": "awaiting_E01_same_hash_labels"
+}

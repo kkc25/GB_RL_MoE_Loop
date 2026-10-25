@@ -1,0 +1,41 @@
+{
+  "environment": {
+    "python": "3.12.15",
+    "torch": "2.12.1+cu130",
+    "cuda": "13.0",
+    "device": "NVIDIA RTX A6000",
+    "parameters": 104870400,
+    "data_revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+    "data_hash": "542f45c25c41e2689835e1044fa0fb56a36d7d82ea40bc21a5ea3a703711ec11",
+    "tokenizer_hash": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628"
+  },
+  "ledger": {
+    "updates": 100,
+    "input_tokens": 102400,
+    "supervised_tokens": 102188,
+    "expert_calls": 1228800,
+    "elapsed_seconds": 15.406719836988486,
+    "allocated_gpu_hours": 0.004279644399163469,
+    "peak_memory_bytes": 2739825152
+  },
+  "validation": {
+    "depth_1": {
+      "nll": 7.604031335095153,
+      "ppl": 2006.26806640625,
+      "supervised_tokens": 16342,
+      "depth": 1
+    },
+    "depth_2": {
+      "nll": 7.604031335095153,
+      "ppl": 2006.26806640625,
+      "supervised_tokens": 16342,
+      "depth": 2
+    },
+    "depth_4": {
+      "nll": 7.604031335095153,
+      "ppl": 2006.26806640625,
+      "supervised_tokens": 16342,
+      "depth": 4
+    }
+  }
+}

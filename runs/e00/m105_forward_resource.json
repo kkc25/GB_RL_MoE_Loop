@@ -1,0 +1,7 @@
+{
+  "parameters": 104919552,
+  "loss": 10.183704376220703,
+  "peak_memory_bytes": 529754112,
+  "calls_per_token": 15.0,
+  "scope": "random_weight_forward_resource_check"
+}

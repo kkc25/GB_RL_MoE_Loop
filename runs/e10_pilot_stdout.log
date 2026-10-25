@@ -1,0 +1,198 @@
+{
+  "experiment": "E10 ordered complementarity: exact two-round Top-2 path costs and interaction predictability",
+  "checkpoint": "runs/e00/debug67_b2/latest.pt",
+  "backbone_hash": "7c417e7bcac3469596275ccba6f05b965e6bdfeefd0046de033d74a16910d9d9",
+  "rounds": 4,
+  "n_actions": 28,
+  "n_states": {
+    "train": 32,
+    "validation": 16,
+    "test": 16
+  },
+  "matched_compute": "every path forces rounds 1-2 and follows pi0 to T=rounds; all Gamma terms use the same number of expert calls",
+  "primary_anchor": {
+    "a0": 0,
+    "b0": 0
+  },
+  "gamma_t_final": {
+    "mean": -0.00033531335066072643,
+    "std": 0.002827876014634967,
+    "frac_positive": 0.33338648080825806,
+    "frac_negative": 0.6249203085899353,
+    "repeat_set_mean": -0.0011702383635565639,
+    "repeat_set_frac_positive": 0.1495535671710968,
+    "distinct_set_mean": -0.0003043901815544814,
+    "distinct_set_frac_positive": 0.3401951193809509
+  },
+  "gamma_two_round": {
+    "mean": -0.001282437122426927,
+    "std": 0.005085927899926901,
+    "frac_positive": 0.3380899131298065,
+    "frac_negative": 0.6229273080825806,
+    "repeat_set_mean": -0.003458441933616996,
+    "repeat_set_frac_positive": 0.1116071417927742,
+    "distinct_set_mean": -0.0012018444249406457,
+    "distinct_set_frac_positive": 0.3464781641960144
+  },
+  "order_effect": {
+    "mean_abs": 0.0008508936152793467,
+    "std": 0.0018956796266138554
+  },
+  "reference_sensitivity": {
+    "anchors": [
+      {
+        "a0": 0,
+        "b0": 0,
+        "mean": -0.00033531335066072643,
+        "std": 0.002827876014634967,
+        "frac_positive": 0.33338648080825806,
+        "frac_negative": 0.6249203085899353,
+        "repeat_set_mean": -0.0011702383635565639,
+        "repeat_set_frac_positive": 0.1495535671710968,
+        "distinct_set_mean": -0.0003043901815544814,
+        "distinct_set_frac_positive": 0.3401951193809509
+      },
+      {
+        "a0": 0,
+        "b0": 1,
+        "mean": -0.0007660522242076695,
+        "std": 0.003051699372008443,
+        "frac_positive": 0.4180484712123871,
+        "frac_negative": 0.5418526530265808,
+        "repeat_set_mean": -0.0016009652754291892,
+        "repeat_set_frac_positive": 0.1919642835855484,
+        "distinct_set_mean": -0.0007351294625550508,
+        "distinct_set_frac_positive": 0.42642197012901306
+      },
+      {
+        "a0": 1,
+        "b0": 0,
+        "mean": -0.0007404063362628222,
+        "std": 0.0029668817296624184,
+        "frac_positive": 0.42841199040412903,
+        "frac_negative": 0.5303730964660645,
+        "repeat_set_mean": -0.0015753402840346098,
+        "repeat_set_frac_positive": 0.2098214328289032,
+        "distinct_set_mean": -0.0007094829343259335,
+        "distinct_set_frac_positive": 0.4365079402923584
+      },
+      {
+        "a0": 1,
+        "b0": 1,
+        "mean": -0.0005763532244600356,
+        "std": 0.002522790338844061,
+        "frac_positive": 0.3353794515132904,
+        "frac_negative": 0.6257174611091614,
+        "repeat_set_mean": -0.0014112595235928893,
+        "repeat_set_frac_positive": 0.1205357164144516,
+        "distinct_set_mean": -0.0005454308120533824,
+        "distinct_set_frac_positive": 0.34333664178848267
+      },
+      {
+        "a0": 2,
+        "b0": 2,
+        "mean": -0.0007760824519209564,
+        "std": 0.0029478580690920353,
+        "frac_positive": 0.3169642984867096,
+        "frac_negative": 0.6466836929321289,
+        "repeat_set_mean": -0.0016109871212393045,
+        "repeat_set_frac_positive": 0.1361607164144516,
+        "distinct_set_mean": -0.0007451599813066423,
+        "distinct_set_frac_positive": 0.3236607015132904
+      }
+    ],
+    "pair_mean_std_across_anchors": 0.00038745623896829784,
+    "pair_mean_abs_across_anchors": 0.0007365746423602104,
+    "sign_flip_pair_fraction": 0.5
+  },
+  "policies": {
+    "baseline": {
+      "mean_cost": 5.406886100769043,
+      "mean_two_round_cost": 5.403379440307617,
+      "deploy_improvement": 0.0,
+      "deploy_improvement_se": 0.0
+    },
+    "random": {
+      "mean_cost": 5.406199932098389,
+      "mean_two_round_cost": 5.4061503410339355,
+      "deploy_improvement": 0.0006864331662654877,
+      "deploy_improvement_se": 0.012218465097248554
+    },
+    "additive": {
+      "mean_cost": 5.41971492767334,
+      "mean_two_round_cost": 5.419879913330078,
+      "deploy_improvement": -0.012828415259718895,
+      "deploy_improvement_se": 0.011398714035749435
+    },
+    "lowrank": {
+      "mean_cost": 5.419137001037598,
+      "mean_two_round_cost": 5.425317287445068,
+      "deploy_improvement": -0.012250382453203201,
+      "deploy_improvement_se": 0.0086410753428936
+    },
+    "mlp": {
+      "mean_cost": 5.4062042236328125,
+      "mean_two_round_cost": 5.4079155921936035,
+      "deploy_improvement": 0.0006818717811256647,
+      "deploy_improvement_se": 0.010475853458046913
+    }
+  },
+  "order_shuffle_controls": {
+    "additive": {
+      "selected_mean_cost": 5.41971492767334,
+      "swapped_mean_cost": 5.42055082321167,
+      "mean_order_gain": 0.0008360526990145445,
+      "mean_order_gain_se": 0.0003809894260484725
+    },
+    "lowrank": {
+      "selected_mean_cost": 5.419137001037598,
+      "swapped_mean_cost": 5.419103622436523,
+      "mean_order_gain": -3.287545405328274e-05,
+      "mean_order_gain_se": 0.0002173512039007619
+    },
+    "mlp": {
+      "selected_mean_cost": 5.4062042236328125,
+      "swapped_mean_cost": 5.405937194824219,
+      "mean_order_gain": -0.00026808097027242184,
+      "mean_order_gain_se": 0.0002887786249630153
+    }
+  },
+  "oracle": {
+    "mean_cost": 5.360438823699951,
+    "oracle_gap": 0.046447522938251495,
+    "oracle_gap_se": 0.01099507324397564,
+    "mean_oracle_pair_is_baseline": 0.0,
+    "deployable": false,
+    "note": "label-informed lower bound on cost; reported separately and never counted as deploy improvement"
+  },
+  "predictors": {
+    "additive": {
+      "test_mse": 35.918251037597656,
+      "best_validation_mse": 35.66745376586914,
+      "parameter_count": 28728,
+      "parameter_budget": 28728
+    },
+    "lowrank": {
+      "test_mse": 27.767242431640625,
+      "best_validation_mse": 14.643842697143555,
+      "parameter_count": 143640,
+      "parameter_budget": 143640
+    },
+    "mlp": {
+      "test_mse": 28.2651309967041,
+      "best_validation_mse": 24.530208587646484,
+      "parameter_count": 143584,
+      "parameter_budget": 143640
+    }
+  },
+  "interpretation_note": "Gamma > 0 is relative to the anchor, input distribution and loss scale; a nonzero Gamma distribution is neither predictability nor deploy gain by itself",
+  "ledger": {
+    "backbone_prefix_tokens": 6144,
+    "candidate_pair_calls": 152320,
+    "head_readouts": 102144,
+    "student_train_samples": 1920,
+    "student_optimizer_updates": 60,
+    "elapsed_seconds": 10.431411835015751,
+    "peak_memory_bytes": 0
+  }
+}

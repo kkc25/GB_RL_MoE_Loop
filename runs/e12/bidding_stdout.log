@@ -1,0 +1,215 @@
+{
+  "experiment": "E12 nonlinear bidding: central MLP vs per-expert conditional-bid adapters",
+  "scope": "capacity/input-matched supervised comparison; NOT a market mechanism and no incentive-compatibility claim",
+  "backbone_hash": "55622a25939d63797bf8ac19375241b83f40172a01697056152d398782c8a513",
+  "label": "q_pi0",
+  "rounds": 4,
+  "n_states": {
+    "train": 8192,
+    "validation": 1024,
+    "test": 1024
+  },
+  "n_candidates": 28,
+  "experts": 8,
+  "training_budget": {
+    "epochs": 5,
+    "lr": 0.001,
+    "batch_size": 256,
+    "seed": 0,
+    "optimizer": "AdamW",
+    "schedule": "batch-over-states, shared by all arms"
+  },
+  "label_scalars_per_state_per_epoch": {
+    "central": 28,
+    "bidding": 56,
+    "bidding_note": "each pair supervised once per orientation (56 = 2 x 28 for 8 experts) so adapters stay calibrated for any legal anchor rule"
+  },
+  "systems": {
+    "central": {
+      "architecture": "single MLP h -> all-candidate costs (E01 value-student architecture)",
+      "input_dim": 512,
+      "hidden_dim": 128,
+      "parameters": 85788,
+      "macs_per_state": 85504,
+      "best_validation_mse": 9.50185489654541,
+      "optimizer_updates": 160,
+      "test_mse_all_candidates": 11.598617553710938
+    },
+    "central_irrelevant": {
+      "architecture": "central MLP with irrelevant fields (position, doc, sequence) appended",
+      "input_dim": 515,
+      "hidden_dim": 128,
+      "parameters": 86172,
+      "macs_per_state": 85888,
+      "best_validation_mse": 36.151710510253906,
+      "optimizer_updates": 160,
+      "test_mse_all_candidates": 13.347765922546387
+    },
+    "bidding": {
+      "architecture": "8 per-expert adapter MLPs; conditional bid for pair {anchor, e}",
+      "input_dim": 520,
+      "hidden_dim": 20,
+      "summary_mode": "none",
+      "parameters": 86888,
+      "macs_per_state_deployed": 79964,
+      "macs_note": "anchor scorer + (experts-1) adapter forwards; batched implementation computes one extra masked diagonal bid",
+      "best_validation_mse": 10.454497337341309,
+      "optimizer_updates": 160
+    },
+    "bidding_summary": {
+      "architecture": "8 per-expert adapter MLPs; conditional bid for pair {anchor, e}",
+      "input_dim": 529,
+      "hidden_dim": 19,
+      "summary_mode": "learned",
+      "parameters": 83832,
+      "macs_per_state_deployed": 77241,
+      "macs_note": "anchor scorer + (experts-1) adapter forwards; batched implementation computes one extra masked diagonal bid",
+      "best_validation_mse": 10.757471084594727,
+      "optimizer_updates": 160
+    }
+  },
+  "parameter_matching": {
+    "central_parameters": 85788,
+    "note": "integer hidden widths cannot match exactly; differences reported, not hidden",
+    "bidding": {
+      "adapter_parameters_total": 86888,
+      "difference_vs_central": 1100,
+      "relative_difference": 0.012822306150044295,
+      "anchor_scorer_parameters_extra": 4104,
+      "matched_hidden_dim": 20
+    },
+    "bidding_summary": {
+      "adapter_parameters_total": 83832,
+      "difference_vs_central": -1956,
+      "relative_difference": -0.022800391663169675,
+      "anchor_scorer_parameters_extra": 4104,
+      "matched_hidden_dim": 19
+    }
+  },
+  "input_matching": {
+    "central_input_dim": 512,
+    "bidding_input_dim": 520,
+    "bidding_summary_input_dim": 529,
+    "difference": "adapters additionally read the anchor one-hot (and expert summary in bidding_summary); central reads h only"
+  },
+  "mse_comparison": {
+    "cells": "every ordered (anchor, second) orientation of all 28 test pairs; central predictions gathered on the same cells (each pair counted twice in both arms)",
+    "central_on_same_cells": 11.598617553710938,
+    "bidding_on_same_cells": 12.42922306060791,
+    "bidding_summary_on_same_cells": 12.287443161010742
+  },
+  "deployed_cell_mse": {
+    "bidding_learned_anchor": {
+      "bidding_mse_on_deployed_cells": 12.464404106140137,
+      "central_mse_on_same_deployed_cells": 11.646574974060059
+    },
+    "bidding_summary_learned_anchor": {
+      "bidding_mse_on_deployed_cells": 12.383317947387695,
+      "central_mse_on_same_deployed_cells": 11.646574974060059
+    },
+    "bidding_baseline_pair_first_anchor": {
+      "bidding_mse_on_deployed_cells": 12.482836723327637,
+      "central_mse_on_same_deployed_cells": 11.666289329528809
+    },
+    "bidding_summary_baseline_pair_first_anchor": {
+      "bidding_mse_on_deployed_cells": 12.413559913635254,
+      "central_mse_on_same_deployed_cells": 11.666289329528809
+    }
+  },
+  "policies": {
+    "baseline": {
+      "mean_cost": 6.064254283905029,
+      "mean_immediate_cost": 6.067316055297852,
+      "deploy_improvement": 0.0,
+      "deploy_improvement_se": 0.0
+    },
+    "random": {
+      "mean_cost": 6.065917491912842,
+      "mean_immediate_cost": 6.072632789611816,
+      "deploy_improvement": -0.0016631495673209429,
+      "deploy_improvement_se": 0.0014212116366252303
+    },
+    "central_argmin": {
+      "mean_cost": 6.067054271697998,
+      "mean_immediate_cost": 6.073692798614502,
+      "deploy_improvement": -0.0027998462319374084,
+      "deploy_improvement_se": 0.0015096321003511548
+    },
+    "central_irrelevant_argmin": {
+      "mean_cost": 6.065016269683838,
+      "mean_immediate_cost": 6.070756435394287,
+      "deploy_improvement": -0.000762089213822037,
+      "deploy_improvement_se": 0.001748262089677155
+    },
+    "bidding_learned_anchor": {
+      "mean_cost": 6.068142414093018,
+      "mean_immediate_cost": 6.0750908851623535,
+      "deploy_improvement": -0.0038883700035512447,
+      "deploy_improvement_se": 0.0016885405639186502
+    },
+    "bidding_summary_learned_anchor": {
+      "mean_cost": 6.066919326782227,
+      "mean_immediate_cost": 6.073636054992676,
+      "deploy_improvement": -0.0026657050475478172,
+      "deploy_improvement_se": 0.0016123998211696744
+    },
+    "bidding_baseline_pair_first_anchor": {
+      "mean_cost": 6.067805767059326,
+      "mean_immediate_cost": 6.074762344360352,
+      "deploy_improvement": -0.003551518777385354,
+      "deploy_improvement_se": 0.0016067971009761095
+    },
+    "bidding_summary_baseline_pair_first_anchor": {
+      "mean_cost": 6.066718578338623,
+      "mean_immediate_cost": 6.073309898376465,
+      "deploy_improvement": -0.0024643451906740665,
+      "deploy_improvement_se": 0.0015096169663593173
+    }
+  },
+  "oracle": {
+    "mean_cost": 6.02364444732666,
+    "oracle_gap": 0.040609583258628845,
+    "oracle_gap_se": 0.0011521363630890846,
+    "mean_oracle_action_is_baseline": 0.021484375,
+    "deployable": false,
+    "note": "label-informed lower bound; reported separately, never a deploy gain"
+  },
+  "anchor_rules": {
+    "learned": "linear scorer on h, trained on train split only; counted as control overhead",
+    "baseline_pair_first": "first-listed member of the frozen baseline router's Top-2 pair (a legal function of h); zero parameters",
+    "diagnostics": {
+      "rule_agreement_fraction": 0.09765625,
+      "learned_anchor_in_label_informed_best_pair_fraction": 0.34375,
+      "note": "label-informed diagnostics, reported separately; never counted as deploy improvement"
+    }
+  },
+  "control_overhead": {
+    "bids_collected_per_state": {
+      "central": 0,
+      "bidding": 7
+    },
+    "scores_computed_per_state": {
+      "central": 28,
+      "bidding": 7
+    },
+    "anchor_scorer": {
+      "parameters": 4104,
+      "macs_per_state": 4224,
+      "optimizer_updates": 160
+    },
+    "optimizer_updates": {
+      "central": 160,
+      "central_irrelevant": 160,
+      "bidding": 160,
+      "bidding_summary": 160
+    },
+    "runtime_seconds": {
+      "central": 1.176,
+      "anchor_scorer": 0.117,
+      "bidding": 1.687,
+      "bidding_summary": 1.635,
+      "central_irrelevant": 0.259
+    }
+  },
+  "elapsed_seconds": 4.965
+}

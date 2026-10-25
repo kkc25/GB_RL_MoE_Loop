@@ -1,0 +1,83 @@
+{
+  "runs/e00/debug67_b2": {
+    "parameters": 67170816,
+    "input_tokens": 5000000,
+    "gpu_hours": 0.3712963357919458,
+    "peak_memory_bytes": 2423953920,
+    "aggregate_tokens_per_second": 3740.647981150954,
+    "validation": {
+      "depth_1": {
+        "nll": 6.204755522340824,
+        "ppl": 495.0978088378906,
+        "supervised_tokens": 16342,
+        "depth": 1
+      },
+      "depth_2": {
+        "nll": 6.203384707540387,
+        "ppl": 494.4197692871094,
+        "supervised_tokens": 16342,
+        "depth": 2
+      },
+      "depth_4": {
+        "nll": 6.203380823281269,
+        "ppl": 494.4178771972656,
+        "supervised_tokens": 16342,
+        "depth": 4
+      }
+    }
+  },
+  "runs/e00/dense_b3": {
+    "parameters": 48247296,
+    "input_tokens": 5000000,
+    "gpu_hours": 0.15353416080499302,
+    "peak_memory_bytes": 1838162944,
+    "aggregate_tokens_per_second": 9046.122905852504,
+    "validation": {
+      "depth_1": {
+        "nll": 6.1911326487635385,
+        "ppl": 488.39892578125,
+        "supervised_tokens": 16342,
+        "depth": 1
+      },
+      "depth_2": {
+        "nll": 6.1911326487635385,
+        "ppl": 488.39892578125,
+        "supervised_tokens": 16342,
+        "depth": 2
+      },
+      "depth_4": {
+        "nll": 6.1911326487635385,
+        "ppl": 488.39892578125,
+        "supervised_tokens": 16342,
+        "depth": 4
+      }
+    }
+  },
+  "runs/e00/dense_b5": {
+    "parameters": 48247808,
+    "input_tokens": 5000000,
+    "gpu_hours": 0.15081713402111846,
+    "peak_memory_bytes": 1912736256,
+    "aggregate_tokens_per_second": 9209.092175789569,
+    "validation": {
+      "depth_1": {
+        "nll": 6.219287133278133,
+        "ppl": 502.3448791503906,
+        "supervised_tokens": 16342,
+        "depth": 1
+      },
+      "depth_2": {
+        "nll": 6.218220784634684,
+        "ppl": 501.8095703125,
+        "supervised_tokens": 16342,
+        "depth": 2
+      },
+      "depth_4": {
+        "nll": 6.21803601341635,
+        "ppl": 501.71697998046875,
+        "supervised_tokens": 16342,
+        "depth": 4
+      }
+    }
+  }
+}

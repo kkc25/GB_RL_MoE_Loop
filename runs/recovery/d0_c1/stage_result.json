@@ -1,0 +1,10 @@
+{
+  "stage": "c1",
+  "data_hash": "e69dbf074c83334241daf616cc30eddef761a32a6d0ae9e78b21da3660f02097",
+  "d0_pass": true,
+  "splits": {
+    "train": 847,
+    "id_validation": 182,
+    "id_test": 181
+  }
+}

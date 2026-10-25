@@ -1,0 +1,44 @@
+{
+  "stage": "c0_identity",
+  "data_hash": "bf34a8c5aadf0da515291d7b5d0b191506cb26cbfc1a45b5dbba765aa04ab7df",
+  "d0_pass": true,
+  "splits": {
+    "train": 97
+  },
+  "environment": {
+    "python": "3.12.15",
+    "torch": "2.12.1+cu130",
+    "cuda": "13.0",
+    "device": "NVIDIA RTX A6000",
+    "parameters": 722560,
+    "moe_layers": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "metrics": {
+    "train": {
+      "ce_full": 1.0610800524501456e-05,
+      "ce_answer_conditional": 7.97590533674685e-06,
+      "answer_mass": 0.9999973257792365,
+      "correct_count": 97,
+      "eval_count": 97,
+      "accuracy": 1.0,
+      "depth": 1
+    }
+  },
+  "ledger": {
+    "optimizer_updates": 500,
+    "supervised_targets": 48500,
+    "input_tokens": 145500,
+    "rollouts": 0,
+    "expert_calls": 582000,
+    "elapsed_seconds": 53.57465865300037,
+    "allocated_gpu_hours": 0.014881849625833436,
+    "lost_compute_seconds": 0.0,
+    "peak_memory_bytes": 45580288
+  },
+  "stage_pass": true
+}

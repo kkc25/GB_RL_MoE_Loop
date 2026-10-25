@@ -1,0 +1,65 @@
+{
+  "stage": "c1",
+  "data_hash": "e69dbf074c83334241daf616cc30eddef761a32a6d0ae9e78b21da3660f02097",
+  "d0_pass": true,
+  "splits": {
+    "train": 847,
+    "id_validation": 182,
+    "id_test": 181
+  },
+  "checkpoint_selection": "best_validation",
+  "environment": {
+    "python": "3.12.15",
+    "torch": "2.12.1+cu130",
+    "cuda": "13.0",
+    "device": "NVIDIA RTX A6000",
+    "parameters": 1903744,
+    "moe_layers": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "metrics": {
+    "train": {
+      "ce_full": 2.396436076518918,
+      "ce_answer_conditional": 2.393508857087515,
+      "answer_mass": 0.9970770231244697,
+      "correct_count": 88,
+      "eval_count": 847,
+      "accuracy": 0.1038961038961039,
+      "depth": 1
+    },
+    "id_validation": {
+      "ce_full": 2.4256524725274726,
+      "ce_answer_conditional": 2.422727312360491,
+      "answer_mass": 0.9970790737277859,
+      "correct_count": 12,
+      "eval_count": 182,
+      "accuracy": 0.06593406593406594,
+      "depth": 1
+    },
+    "id_test": {
+      "ce_full": 2.4160742996805937,
+      "ce_answer_conditional": 2.413146930504899,
+      "answer_mass": 0.9970766984296767,
+      "correct_count": 14,
+      "eval_count": 181,
+      "accuracy": 0.07734806629834254,
+      "depth": 1
+    }
+  },
+  "ledger": {
+    "optimizer_updates": 3000,
+    "supervised_targets": 384000,
+    "input_tokens": 2304000,
+    "rollouts": 0,
+    "expert_calls": 9216000,
+    "elapsed_seconds": 146.46987164200982,
+    "allocated_gpu_hours": 0.040686075456113836,
+    "lost_compute_seconds": 0.0,
+    "peak_memory_bytes": 84551168
+  },
+  "stage_pass": false
+}

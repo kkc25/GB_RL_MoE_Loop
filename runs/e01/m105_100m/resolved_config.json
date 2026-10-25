@@ -1,0 +1,57 @@
+{
+  "model": {
+    "layers": 12,
+    "hidden_size": 512,
+    "attention_heads": 8,
+    "head_dim": 64,
+    "vocab_size": 32768,
+    "intermediate_size": 512,
+    "experts_per_layer": 8,
+    "top_k": 2,
+    "adaptive_layers": [
+      11
+    ],
+    "moe_layers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "min_calls": 1,
+    "max_calls": 4,
+    "max_position_embeddings": 1024,
+    "norm_eps": 1e-05,
+    "rope_base": 10000.0,
+    "adaptive_residual_scale": 0.5,
+    "nonadaptive_residual_scale": 1.0,
+    "dropout": 0.0,
+    "target_only": false
+  },
+  "train": {
+    "data_dir": "runs/data/fineweb_edu_100m",
+    "output_dir": "runs/e00/m105_b2",
+    "device": "cuda",
+    "dtype": "bfloat16",
+    "seed": 17,
+    "batch_size": 1,
+    "updates": 100,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.1,
+    "warmup_fraction": 0.02,
+    "gradient_clip": 1.0,
+    "validation_interval": 50,
+    "validation_batches": 16,
+    "log_interval": 10,
+    "depth_schedule": "random",
+    "fixed_depth": 4,
+    "resume": null
+  }
+}

@@ -1,0 +1,423 @@
+test_apply_matches_definition (test_affine.TestAffineMath.test_apply_matches_definition) ... ok
+test_compose_matches_sequential_application (test_affine.TestAffineMath.test_compose_matches_sequential_application) ... ok
+test_inverse_of_constant_raises (test_affine.TestAffineMath.test_inverse_of_constant_raises) ... ok
+test_inverse_roundtrip (test_affine.TestAffineMath.test_inverse_roundtrip) ... ok
+test_program_run_matches_brute_force (test_affine.TestAffineMath.test_program_run_matches_brute_force) ... ok
+test_complementary_program_is_identity (test_affine.TestDiagnostics.test_complementary_program_is_identity) ... ok
+test_default_noncommuting_pair_known_values (test_affine.TestDiagnostics.test_default_noncommuting_pair_known_values) ... ok
+test_noncommuting_pair_rejects_commuting (test_affine.TestDiagnostics.test_noncommuting_pair_rejects_commuting) ... ok
+test_order_diagnostic_matches_composition (test_affine.TestDiagnostics.test_order_diagnostic_matches_composition) ... ok
+test_all_token_ids_within_vocab (test_affine.TestEncoding.test_all_token_ids_within_vocab) ... ok
+test_known_program_encoding (test_affine.TestEncoding.test_known_program_encoding) ... ok
+test_labels_predict_answer_at_query_delimiter (test_affine.TestEncoding.test_labels_predict_answer_at_query_delimiter) ... ok
+test_batch_api_deterministic (test_affine.TestReproducibility.test_batch_api_deterministic) ... ok
+test_batch_api_padding_and_shapes (test_affine.TestReproducibility.test_batch_api_padding_and_shapes) ... ok
+test_collate_matches_dataset_items (test_affine.TestReproducibility.test_collate_matches_dataset_items) ... ok
+test_different_seed_differs (test_affine.TestReproducibility.test_different_seed_differs) ... ok
+test_offset_shifts_stream (test_affine.TestReproducibility.test_offset_shifts_stream) ... ok
+test_same_seed_same_items (test_affine.TestReproducibility.test_same_seed_same_items) ... ok
+test_assignment_is_deterministic (test_affine.TestSplits.test_assignment_is_deterministic) ... ok
+test_dataset_items_respect_split_families (test_affine.TestSplits.test_dataset_items_respect_split_families) ... ok
+test_difficulty_metadata (test_affine.TestSplits.test_difficulty_metadata) ... ok
+test_family_assignment_disjoint_and_complete (test_affine.TestSplits.test_family_assignment_disjoint_and_complete) ... ok
+test_family_overlap_between_instance_samples (test_affine.TestSplits.test_family_overlap_between_instance_samples) ... ok
+test_length_stratification (test_affine.TestSplits.test_length_stratification) ... ok
+test_special_tokens_do_not_collide_with_symbols (test_affine.TestTokenLayout.test_special_tokens_do_not_collide_with_symbols) ... ok
+test_sym_rejects_out_of_range (test_affine.TestTokenLayout.test_sym_rejects_out_of_range) ... ok
+test_vocab_size_and_symbol_range (test_affine.TestTokenLayout.test_vocab_size_and_symbol_range) ... ok
+test_batch_objective_constant (test_controlled.TestExactMath.test_batch_objective_constant) ... ok
+test_exact_objectives_match_reference_constants (test_controlled.TestExactMath.test_exact_objectives_match_reference_constants) ... ok
+test_forced_decisions_carry_no_score (test_controlled.TestExactMath.test_forced_decisions_carry_no_score) ... ok
+test_mean_score_is_zero (test_controlled.TestExactMath.test_mean_score_is_zero) ... ok
+test_probability_mass_sums_to_one (test_controlled.TestExactMath.test_probability_mass_sums_to_one) ... ok
+test_rloo_g2_expected_gradient_equals_exact_gradient (test_controlled.TestExactMath.test_rloo_g2_expected_gradient_equals_exact_gradient) ... ok
+test_score_function_gradient_vs_finite_difference (test_controlled.TestExactMath.test_score_function_gradient_vs_finite_difference) ... ok
+test_self_mean_baseline_shrinks_gradient_by_half (test_controlled.TestExactMath.test_self_mean_baseline_shrinks_gradient_by_half) ... ok
+test_tree_leaf_paths_cover_all_terminal_paths (test_controlled.TestExactMath.test_tree_leaf_paths_cover_all_terminal_paths) ... ok
+test_observation_contains_only_input_and_prefix_state (test_controlled.TestObservation.test_observation_contains_only_input_and_prefix_state) ... ok
+test_previous_expert_onehot_after_first_call (test_controlled.TestObservation.test_previous_expert_onehot_after_first_call) ... ok
+test_shape_dtype_and_layout (test_controlled.TestObservation.test_shape_dtype_and_layout) ... ok
+test_all_ordered_pairs_noncommuting (test_controlled.TestOperators.test_all_ordered_pairs_noncommuting) ... ok
+test_apply_matches_definition (test_controlled.TestOperators.test_apply_matches_definition) ... ok
+test_circular_distance (test_controlled.TestOperators.test_circular_distance) ... ok
+test_terminal_loss_bounds_and_zero (test_controlled.TestOperators.test_terminal_loss_bounds_and_zero) ... ok
+test_budget_monotonicity (test_controlled.TestOptimalPaths.test_budget_monotonicity) ... ok
+test_complementary_actions_look_worse_after_one_step (test_controlled.TestOptimalPaths.test_complementary_actions_look_worse_after_one_step) ... ok
+test_documented_optima_are_unique_and_exact (test_controlled.TestOptimalPaths.test_documented_optima_are_unique_and_exact) ... ok
+test_myopic_greedy_is_suboptimal (test_controlled.TestOptimalPaths.test_myopic_greedy_is_suboptimal) ... ok
+test_one_step_near_beats_exact_two_step (test_controlled.TestOptimalPaths.test_one_step_near_beats_exact_two_step) ... ok
+test_some_instances_one_step_optimal_some_two_step (test_controlled.TestOptimalPaths.test_some_instances_one_step_optimal_some_two_step) ... ok
+test_at_least_one_call (test_controlled.TestPathEnumeration.test_at_least_one_call) ... ok
+test_path_objective_definition (test_controlled.TestPathEnumeration.test_path_objective_definition) ... ok
+test_path_objective_enforces_budget (test_controlled.TestPathEnumeration.test_path_objective_enforces_budget) ... ok
+test_terminal_path_counts (test_controlled.TestPathEnumeration.test_terminal_path_counts) ... ok
+test_budget_two_forces_exit_at_two_calls (test_controlled.TestRolloutSemantics.test_budget_two_forces_exit_at_two_calls) ... ok
+test_first_call_forced_continue (test_controlled.TestRolloutSemantics.test_first_call_forced_continue) ... ok
+test_forced_exit_at_limit (test_controlled.TestRolloutSemantics.test_forced_exit_at_limit) ... ok
+test_full_rollout_with_reference_policy_terminates (test_controlled.TestRolloutSemantics.test_full_rollout_with_reference_policy_terminates) ... ok
+test_rollout_matches_enumerated_path (test_controlled.TestRolloutSemantics.test_rollout_matches_enumerated_path) ... ok
+test_stochastic_stop_after_one_call_under_budget (test_controlled.TestRolloutSemantics.test_stochastic_stop_after_one_call_under_budget) ... ok
+test_cached_h_matches_normal_baseline_forward (test_counterfactual.CounterfactualTests.test_cached_h_matches_normal_baseline_forward) ... ok
+test_chunking_does_not_change_costs (test_counterfactual.CounterfactualTests.test_chunking_does_not_change_costs) ... ok
+test_forced_baseline_then_baseline_continuation_equals_baseline (test_counterfactual.CounterfactualTests.test_forced_baseline_then_baseline_continuation_equals_baseline) ... ok
+test_no_attention_after_cached_h (test_counterfactual.CounterfactualTests.test_no_attention_after_cached_h) ... ok
+test_path_cost_shapes_and_candidate_set (test_counterfactual.CounterfactualTests.test_path_cost_shapes_and_candidate_set) ... ok
+test_states_only_at_supervised_positions (test_counterfactual.CounterfactualTests.test_states_only_at_supervised_positions) ... ok
+test_gathered_states_stay_inside_their_split_file_and_docs (test_counterfactual.SplitIsolationTests.test_gathered_states_stay_inside_their_split_file_and_docs) ... ok
+test_ledger_counts_real_work (test_counterfactual.StudentTests.test_ledger_counts_real_work) ... ok
+test_oracle_is_not_a_deploy_policy (test_counterfactual.StudentTests.test_oracle_is_not_a_deploy_policy) ... ok
+test_student_input_is_only_the_legal_state (test_counterfactual.StudentTests.test_student_input_is_only_the_legal_state) ... ok
+test_students_fit_and_select_legal_actions (test_counterfactual.StudentTests.test_students_fit_and_select_legal_actions) ... ok
+test_cli_writes_real_json (test_e05_e06.TestCLI.test_cli_writes_real_json) ... ok
+test_async_result_is_enumerated_equilibrium (test_e05_e06.TestE05Enumeration.test_async_result_is_enumerated_equilibrium) ... ok
+test_enumeration_finds_equilibria (test_e05_e06.TestE05Enumeration.test_enumeration_finds_equilibria) ... ok
+test_potential_optimum_is_equilibrium (test_e05_e06.TestE05Enumeration.test_potential_optimum_is_equilibrium) ... ok
+test_social_optimum_dominates_every_equilibrium (test_e05_e06.TestE05Enumeration.test_social_optimum_dominates_every_equilibrium) ... ok
+test_sync_cycles_and_async_converges (test_e05_e06.TestE05OscillationGate.test_sync_cycles_and_async_converges) ... ok
+test_async_improvement_delta_error_and_monotone_potential (test_e05_e06.TestE05PotentialIdentity.test_async_improvement_delta_error_and_monotone_potential) ... ok
+test_single_strict_improvement_delta_equals_potential_delta (test_e05_e06.TestE05PotentialIdentity.test_single_strict_improvement_delta_equals_potential_delta) ... ok
+test_batch_dependence_is_recorded (test_e05_e06.TestE06CausalSanity.test_batch_dependence_is_recorded) ... ok
+test_non_causal_diagnostic_is_labeled_non_deployable (test_e05_e06.TestE06CausalSanity.test_non_causal_diagnostic_is_labeled_non_deployable) ... ok
+test_suffix_invariance_passes (test_e05_e06.TestE06CausalSanity.test_suffix_invariance_passes) ... ok
+test_candidate_restriction_respected (test_e05_e06.TestE06MinCostFlow.test_candidate_restriction_respected) ... ok
+test_hard_capacity_and_distinct_experts (test_e05_e06.TestE06MinCostFlow.test_hard_capacity_and_distinct_experts) ... ok
+test_infeasible_total_slots_detected (test_e05_e06.TestE06MinCostFlow.test_infeasible_total_slots_detected) ... ok
+test_matches_brute_force (test_e05_e06.TestE06MinCostFlow.test_matches_brute_force) ... ok
+test_structural_infeasibility_detected (test_e05_e06.TestE06MinCostFlow.test_structural_infeasibility_detected) ... ok
+test_additive_fit_recovers_truly_additive_costs (test_e05_e06.TestE06SetVersion.test_additive_fit_recovers_truly_additive_costs) ... ok
+test_enumeration_is_optimal_and_feasible (test_e05_e06.TestE06SetVersion.test_enumeration_is_optimal_and_feasible) ... ok
+test_rounding_is_feasible_and_not_better_than_exact (test_e05_e06.TestE06SoftAndRounding.test_rounding_is_feasible_and_not_better_than_exact) ... ok
+test_rounding_is_identity_on_integer_solution (test_e05_e06.TestE06SoftAndRounding.test_rounding_is_identity_on_integer_solution) ... ok
+test_rounding_reports_infeasible_instance (test_e05_e06.TestE06SoftAndRounding.test_rounding_reports_infeasible_instance) ... ok
+test_soft_transport_residuals_shrink_with_iterations (test_e05_e06.TestE06SoftAndRounding.test_soft_transport_residuals_shrink_with_iterations) ... ok
+test_output_json_written (test_e07.TestCLI.test_output_json_written) ... ok
+test_seed_reproducible (test_e07.TestCLI.test_seed_reproducible) ... ok
+test_budget_and_horizon_respected (test_e07.TestExactDP.test_budget_and_horizon_respected) ... ok
+test_dp_upper_bounds_heuristics (test_e07.TestExactDP.test_dp_upper_bounds_heuristics) ... ok
+test_matches_brute_force (test_e07.TestExactDP.test_matches_brute_force) ... ok
+test_no_forced_spending_on_nonpositive_gain (test_e07.TestExactDP.test_no_forced_spending_on_nonpositive_gain) ... ok
+test_base_round_always_affordable (test_e07.TestHardLedger.test_base_round_always_affordable) ... ok
+test_carryover_cap_voids_overflow (test_e07.TestHardLedger.test_carryover_cap_voids_overflow) ... ok
+test_prefix_invariant_every_prefix (test_e07.TestHardLedger.test_prefix_invariant_every_prefix) ... ok
+test_uncapped_carries_surplus_forward (test_e07.TestHardLedger.test_uncapped_carries_surplus_forward) ... ok
+test_formula_overdraws_prefix_budget (test_e07.TestSeqTopKCounterexample.test_formula_overdraws_prefix_budget) ... ok
+test_hard_ledger_blocks_overdraw (test_e07.TestSeqTopKCounterexample.test_hard_ledger_blocks_overdraw) ... ok
+test_virtual_accounting_hides_overdraw (test_e07.TestSeqTopKCounterexample.test_virtual_accounting_hides_overdraw) ... ok
+test_deep_delay_greedy_fails_and_failure_is_kept (test_e07.TestTrajectories.test_deep_delay_greedy_fails_and_failure_is_kept) ... ok
+test_diminishing_greedy_is_optimal (test_e07.TestTrajectories.test_diminishing_greedy_is_optimal) ... ok
+test_shallow_delay_package_recovers (test_e07.TestTrajectories.test_shallow_delay_package_recovers) ... ok
+test_all_conditions_enumerated (test_e08_ab.TestA1SufficientState.test_all_conditions_enumerated) ... ok
+test_checker_detects_omitted_state_variable (test_e08_ab.TestA1SufficientState.test_checker_detects_omitted_state_variable) ... ok
+test_history_cannot_beat_markov_dp (test_e08_ab.TestA1SufficientState.test_history_cannot_beat_markov_dp) ... ok
+test_negative_control_passes (test_e08_ab.TestA1SufficientState.test_negative_control_passes) ... ok
+test_h_only_at_chance (test_e08_ab.TestA2InformationErasure.test_h_only_at_chance) ... ok
+test_history_recovers_up_to_label_noise (test_e08_ab.TestA2InformationErasure.test_history_recovers_up_to_label_noise) ... ok
+test_ordered_history_beats_recent_expert_when_recent_is_erased (test_e08_ab.TestA2InformationErasure.test_ordered_history_beats_recent_expert_when_recent_is_erased) ... ok
+test_passes (test_e08_ab.TestA2InformationErasure.test_passes) ... ok
+test_history_features_make_parity_readable (test_e08_ab.TestA3ParityReadability.test_history_features_make_parity_readable) ... ok
+test_linear_h_only_cannot_represent_parity (test_e08_ab.TestA3ParityReadability.test_linear_h_only_cannot_represent_parity) ... ok
+test_param_matched_big_mlp_at_least_as_many_params (test_e08_ab.TestA3ParityReadability.test_param_matched_big_mlp_at_least_as_many_params) ... ok
+test_passes (test_e08_ab.TestA3ParityReadability.test_passes) ... ok
+test_dp_zero_regret_and_two_step_dominates (test_e08_ab.TestB1DelayedReward.test_dp_zero_regret_and_two_step_dominates) ... ok
+test_exact_c5_env_matches_verified_values (test_e08_ab.TestB1DelayedReward.test_exact_c5_env_matches_verified_values) ... ok
+test_passes (test_e08_ab.TestB1DelayedReward.test_passes) ... ok
+test_supervised_q_reports_calibration_and_samples (test_e08_ab.TestB1DelayedReward.test_supervised_q_reports_calibration_and_samples) ... ok
+test_controller_never_beats_achievable_optimum (test_e08_ab.TestB2UnpredictableLabels.test_controller_never_beats_achievable_optimum) ... ok
+test_no_super_bayes_at_zero_signal (test_e08_ab.TestB2UnpredictableLabels.test_no_super_bayes_at_zero_signal) ... ok
+test_passes (test_e08_ab.TestB2UnpredictableLabels.test_passes) ... ok
+test_component_coverage_preserved (test_e08_ab.TestB3OrderedComposition.test_component_coverage_preserved) ... ok
+test_experts_actually_noncommuting (test_e08_ab.TestB3OrderedComposition.test_experts_actually_noncommuting) ... ok
+test_extrapolation_reported_separately (test_e08_ab.TestB3OrderedComposition.test_extrapolation_reported_separately) ... ok
+test_holdout_composition_with_exact_experts (test_e08_ab.TestB3OrderedComposition.test_holdout_composition_with_exact_experts) ... ok
+test_passes (test_e08_ab.TestB3OrderedComposition.test_passes) ... ok
+test_cli_writes_json_with_required_fields (test_e08_ab.TestCLI.test_cli_writes_json_with_required_fields) ... ok
+test_async_strict_best_response_potential_monotone (test_e08_cde.TestC1.test_async_strict_best_response_potential_monotone) ... ok
+test_enumeration_size_and_dp_match (test_e08_cde.TestC1.test_enumeration_size_and_dp_match) ... ok
+test_hard_capacity_fix_feasible_everywhere (test_e08_cde.TestC1.test_hard_capacity_fix_feasible_everywhere) ... ok
+test_insufficient_capacity_uses_priced_dummy (test_e08_cde.TestC1.test_insufficient_capacity_uses_priced_dummy) ... ok
+test_last_and_average_iterate_reported_separately (test_e08_cde.TestC1.test_last_and_average_iterate_reported_separately) ... ok
+test_oracle_dominates_feasible_methods (test_e08_cde.TestC1.test_oracle_dominates_feasible_methods) ... ok
+test_all_cells_present (test_e08_cde.TestC2.test_all_cells_present) ... ok
+test_delta_zero_top1_has_no_drift_effect (test_e08_cde.TestC2.test_delta_zero_top1_has_no_drift_effect) ... ok
+test_drift_changes_pre_fix_behavior (test_e08_cde.TestC2.test_drift_changes_pre_fix_behavior) ... ok
+test_hard_fix_feasible_and_gate (test_e08_cde.TestC2.test_hard_fix_feasible_and_gate) ... ok
+test_output_json_written (test_e08_cde.TestCLI.test_output_json_written) ... /nvme-1/zhoukegu/GB_RL_MoE_Loop/tests/test_e08_cde.py:250: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp35unehky/e08.json' mode='r' encoding='utf-8'>
+  loaded = json.load(open(out, encoding="utf-8"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_unknown_section_rejected (test_e08_cde.TestCLI.test_unknown_section_rejected) ... usage: python -m unittest [-h] [--output OUTPUT] [--only ONLY] [--seed SEED]
+python -m unittest: error: unknown sub-experiments: ['c9']
+ok
+test_c6_spectral_radii (test_e08_cde.TestD1.test_c6_spectral_radii) ... ok
+test_d2_gated_not_run (test_e08_cde.TestD1.test_d2_gated_not_run) ... ok
+test_damping_not_assumed_sufficient (test_e08_cde.TestD1.test_damping_not_assumed_sufficient) ... ok
+test_single_stable_alternating_explodes (test_e08_cde.TestD1.test_single_stable_alternating_explodes) ... ok
+test_spectral_norm_scaling_contracts (test_e08_cde.TestD1.test_spectral_norm_scaling_contracts) ... ok
+test_switching_graph_reduces_actions (test_e08_cde.TestD1.test_switching_graph_reduces_actions) ... ok
+test_causal_controls_exactly_invariant (test_e08_cde.TestE1.test_causal_controls_exactly_invariant) ... ok
+test_every_noncausal_rule_flagged (test_e08_cde.TestE1.test_every_noncausal_rule_flagged) ... ok
+test_prefix_budget_rule_respects_budget (test_e08_cde.TestE1.test_prefix_budget_rule_respects_budget) ... ok
+test_c8_unfixed_exceeds_budget (test_e08_cde.TestE2.test_c8_unfixed_exceeds_budget) ... ok
+test_counting_bases_separate (test_e08_cde.TestE2.test_counting_bases_separate) ... ok
+test_ledger_fix_restores_budget (test_e08_cde.TestE2.test_ledger_fix_restores_budget) ... ok
+test_naive_topset_inference_is_wrong (test_e08_cde.TestE2.test_naive_topset_inference_is_wrong) ... ok
+test_randomized_stress (test_e08_cde.TestE2.test_randomized_stress) ... ok
+test_c9_path_values (test_e08_cde.TestE3.test_c9_path_values) ... ok
+test_parallel_mix_is_different_function_class (test_e08_cde.TestE3.test_parallel_mix_is_different_function_class) ... ok
+test_top2_pairs_counted_as_pairs (test_e08_cde.TestE3.test_top2_pairs_counted_as_pairs) ... ok
+test_no_hard_violations_and_limits_respected (test_e09_controlled.TestBudget.test_no_hard_violations_and_limits_respected) ... ok
+test_output_json_written (test_e09_controlled.TestCLI.test_output_json_written) ... ok
+test_seed_reproducible (test_e09_controlled.TestCLI.test_seed_reproducible) ... ok
+test_mc_check_against_exact_gradient (test_e09_controlled.TestEstimatorMoments.test_mc_check_against_exact_gradient) ... ok
+test_rloo2_expectation_equals_exact_gradient (test_e09_controlled.TestEstimatorMoments.test_rloo2_expectation_equals_exact_gradient) ... ok
+test_rloo2_variance_below_unbaselined_reinforce (test_e09_controlled.TestEstimatorMoments.test_rloo2_variance_below_unbaselined_reinforce) ... ok
+test_self_mean_baseline_is_biased (test_e09_controlled.TestEstimatorMoments.test_self_mean_baseline_is_biased) ... ok
+test_unbiased_estimators (test_e09_controlled.TestEstimatorMoments.test_unbiased_estimators) ... ok
+test_greedy_rollout_terminates_within_budget (test_e09_controlled.TestSharedPolicyRollouts.test_greedy_rollout_terminates_within_budget) ... ok
+test_sampled_objective_mean_matches_exact (test_e09_controlled.TestSharedPolicyRollouts.test_sampled_objective_mean_matches_exact) ... ok
+test_sampled_rollout_is_legal_and_consistent (test_e09_controlled.TestSharedPolicyRollouts.test_sampled_rollout_is_legal_and_consistent) ... ok
+test_gradient_matches_finite_difference (test_e09_controlled.TestSupervisedSignal.test_gradient_matches_finite_difference) ... ok
+test_training_recovers_all_designed_optima (test_e09_controlled.TestSupervisedSignal.test_training_recovers_all_designed_optima) ... ok
+test_exact_training_reduces_objective (test_e09_controlled.TestTrainingSignals.test_exact_training_reduces_objective) ... ok
+test_held_out_recovery_rates_are_valid (test_e09_controlled.TestTrainingSignals.test_held_out_recovery_rates_are_valid) ... ok
+test_rloo2_training_reduces_objective (test_e09_controlled.TestTrainingSignals.test_rloo2_training_reduces_objective) ... ok
+test_linear_bids_are_central_router (test_e12.E12EquivalenceTests.test_linear_bids_are_central_router) ... ok
+test_fetch_fails_clearly_without_pyarrow (test_fineweb.TestCLI.test_fetch_fails_clearly_without_pyarrow) ... skipped 'pyarrow installed'
+test_main_from_jsonl_runs_offline (test_fineweb.TestCLI.test_main_from_jsonl_runs_offline) ... ok
+test_revision_has_no_default (test_fineweb.TestCLI.test_revision_has_no_default) ... usage: prepare_fineweb [-h] --revision REVISION --out-dir OUT_DIR
+                       [--from-jsonl FROM_JSONL] [--max-docs MAX_DOCS]
+                       [--limit-shards LIMIT_SHARDS] [--seq-len SEQ_LEN]
+                       [--vocab-size VOCAB_SIZE]
+                       [--tokenizer-bytes TOKENIZER_BYTES]
+                       [--val-tokens VAL_TOKENS] [--test-tokens TEST_TOKENS]
+                       [--train-tokens TRAIN_TOKENS]
+                       [--val-pool-bytes VAL_POOL_BYTES]
+                       [--test-pool-bytes TEST_POOL_BYTES]
+prepare_fineweb: error: the following arguments are required: --revision, --out-dir
+ok
+test_revision_is_required_by_parser (test_fineweb.TestCLI.test_revision_is_required_by_parser) ... usage: prepare_fineweb [-h] --revision REVISION --out-dir OUT_DIR
+                       [--from-jsonl FROM_JSONL] [--max-docs MAX_DOCS]
+                       [--limit-shards LIMIT_SHARDS] [--seq-len SEQ_LEN]
+                       [--vocab-size VOCAB_SIZE]
+                       [--tokenizer-bytes TOKENIZER_BYTES]
+                       [--val-tokens VAL_TOKENS] [--test-tokens TEST_TOKENS]
+                       [--train-tokens TRAIN_TOKENS]
+                       [--val-pool-bytes VAL_POOL_BYTES]
+                       [--test-pool-bytes TEST_POOL_BYTES]
+prepare_fineweb: error: the following arguments are required: --revision
+ok
+test_duplicate_texts_share_text_fingerprint_but_not_doc_fingerprint (test_fineweb.TestFingerprints.test_duplicate_texts_share_text_fingerprint_but_not_doc_fingerprint) ... ok
+test_fingerprints_are_deterministic (test_fineweb.TestFingerprints.test_fingerprints_are_deterministic) ... ok
+test_normalization_collapses_whitespace (test_fineweb.TestFingerprints.test_normalization_collapses_whitespace) ... ok
+test_normalization_is_unicode_nfc (test_fineweb.TestFingerprints.test_normalization_is_unicode_nfc) ... ok
+test_split_key_is_stable_across_calls (test_fineweb.TestFingerprints.test_split_key_is_stable_across_calls) ... ok
+test_boundaries_offsets_and_reconstruction (test_fineweb.TestPacking.test_boundaries_offsets_and_reconstruction) ... ok
+test_document_spanning_sequences (test_fineweb.TestPacking.test_document_spanning_sequences) ... ok
+test_document_spanning_sequences_drop_partial_loses_tail (test_fineweb.TestPacking.test_document_spanning_sequences_drop_partial_loses_tail) ... ok
+test_drop_partial (test_fineweb.TestPacking.test_drop_partial) ... ok
+test_partial_sequence_padding (test_fineweb.TestPacking.test_partial_sequence_padding) ... ok
+test_segment_ids_mark_attention_blocks (test_fineweb.TestPacking.test_segment_ids_mark_attention_blocks) ... ok
+test_exact_split_token_counts_and_files (test_fineweb.TestPrepareEndToEnd.test_exact_split_token_counts_and_files) ... ok
+test_insufficient_validation_pool_raises (test_fineweb.TestPrepareEndToEnd.test_insufficient_validation_pool_raises) ... ok
+test_pipeline_is_deterministic (test_fineweb.TestPrepareEndToEnd.test_pipeline_is_deterministic) ... ok
+test_provenance_manifest (test_fineweb.TestPrepareEndToEnd.test_provenance_manifest) ... ok
+test_revision_is_required (test_fineweb.TestPrepareEndToEnd.test_revision_is_required) ... ok
+test_split_before_tokenizer_fit (test_fineweb.TestPrepareEndToEnd.test_split_before_tokenizer_fit) ... ok
+test_train_without_cap_uses_everything (test_fineweb.TestPrepareEndToEnd.test_train_without_cap_uses_everything) ... ok
+test_assignment_is_invariant_to_input_order (test_fineweb.TestSplitAssignment.test_assignment_is_invariant_to_input_order) ... ok
+test_duplicates_land_in_the_same_split (test_fineweb.TestSplitAssignment.test_duplicates_land_in_the_same_split) ... ok
+test_pool_byte_targets_are_met (test_fineweb.TestSplitAssignment.test_pool_byte_targets_are_met) ... ok
+test_splits_are_disjoint_and_exhaustive (test_fineweb.TestSplitAssignment.test_splits_are_disjoint_and_exhaustive) ... ok
+test_split_writer_matches_batch_pipeline (test_fineweb.TestTokenBudgets.test_split_writer_matches_batch_pipeline) ... ok
+test_split_writer_stops_at_budget (test_fineweb.TestTokenBudgets.test_split_writer_stops_at_budget) ... ok
+test_take_first_tokens_exact_and_prefix (test_fineweb.TestTokenBudgets.test_take_first_tokens_exact_and_prefix) ... ok
+test_byte_level_roundtrip_including_unicode (test_fineweb.TestTokenizer.test_byte_level_roundtrip_including_unicode) ... ok
+test_corpus_takes_deterministic_byte_budget_and_train_docs_only (test_fineweb.TestTokenizer.test_corpus_takes_deterministic_byte_budget_and_train_docs_only) ... ok
+test_encode_document_wraps_bos_eos (test_fineweb.TestTokenizer.test_encode_document_wraps_bos_eos) ... ok
+test_special_tokens_get_first_ids (test_fineweb.TestTokenizer.test_special_tokens_get_first_ids) ... ok
+test_training_is_deterministic (test_fineweb.TestTokenizer.test_training_is_deterministic) ... ok
+test_vocab_size_includes_special_tokens (test_fineweb.TestTokenizer.test_vocab_size_includes_special_tokens) ... ok
+test_vocab_size_is_capped_when_merges_run_out (test_fineweb.TestTokenizer.test_vocab_size_is_capped_when_merges_run_out) ... ok
+test_controller_params (test_math_resources.TestResourceAccounting.test_controller_params) ... ok
+test_flops_constants (test_math_resources.TestResourceAccounting.test_flops_constants) ... ok
+test_flops_table (test_math_resources.TestResourceAccounting.test_flops_table) ... ok
+test_full_head (test_math_resources.TestResourceAccounting.test_full_head) ... ok
+test_loop_saving_4_to_2_calls (test_math_resources.TestResourceAccounting.test_loop_saving_4_to_2_calls) ... ok
+test_memory_gib (test_math_resources.TestResourceAccounting.test_memory_gib) ... ok
+test_parameter_counts (test_math_resources.TestResourceAccounting.test_parameter_counts) ... ok
+test_shared_prefix (test_math_resources.TestResourceAccounting.test_shared_prefix) ... ok
+test_token_quota (test_math_resources.TestResourceAccounting.test_token_quota) ... ok
+test_expected_loss (test_math_resources.TestRouterMath.test_expected_loss) ... ok
+test_expected_vs_marginal_nll (test_math_resources.TestRouterMath.test_expected_vs_marginal_nll) ... ok
+test_halt_gradient_vs_fd (test_math_resources.TestRouterMath.test_halt_gradient_vs_fd) ... ok
+test_mean_score_zero (test_math_resources.TestRouterMath.test_mean_score_zero) ... ok
+test_myopic_counterexample (test_math_resources.TestRouterMath.test_myopic_counterexample) ... ok
+test_pg_vs_finite_difference (test_math_resources.TestRouterMath.test_pg_vs_finite_difference) ... ok
+test_potential_shaping_telescoping (test_math_resources.TestRouterMath.test_potential_shaping_telescoping) ... ok
+test_rloo2_exact_expectation (test_math_resources.TestRouterMath.test_rloo2_exact_expectation) ... ok
+test_self_mean_half_gradient (test_math_resources.TestRouterMath.test_self_mean_half_gradient) ... ok
+test_terminal_paths_39 (test_math_resources.TestRouterMath.test_terminal_paths_39) ... ok
+test_total_probability (test_math_resources.TestRouterMath.test_total_probability) ... ok
+test_fixed_depth_batch_invariance (test_model_policy.TestBatchInvariance.test_fixed_depth_batch_invariance) ... ok
+test_routed_greedy_batch_invariance (test_model_policy.TestBatchInvariance.test_routed_greedy_batch_invariance) ... ok
+test_sampled_batch_invariance (test_model_policy.TestBatchInvariance.test_sampled_batch_invariance) ... ok
+test_sampled_reproducibility (test_model_policy.TestBatchInvariance.test_sampled_reproducibility) ... ok
+test_supervised_positions_contract (test_model_policy.TestBudget.test_supervised_positions_contract) ... ok
+test_validate_budget_bounds (test_model_policy.TestBudget.test_validate_budget_bounds) ... ok
+test_zero_violations_greedy_and_sampled (test_model_policy.TestBudget.test_zero_violations_greedy_and_sampled) ... ok
+test_full_sequence_call_counts (test_model_policy.TestFixedDepthCalls.test_full_sequence_call_counts) ... ok
+test_target_only_call_counts (test_model_policy.TestFixedDepthCalls.test_target_only_call_counts) ... ok
+test_target_only_nontarget_executes_exactly_one_ffn_per_layer (test_model_policy.TestFixedDepthCalls.test_target_only_nontarget_executes_exactly_one_ffn_per_layer) ... ok
+test_budget_above_max_calls_fully_usable (test_model_policy.TestMultiAdaptive.test_budget_above_max_calls_fully_usable) ... ok
+test_budget_reserve_zero_violations (test_model_policy.TestMultiAdaptive.test_budget_reserve_zero_violations) ... ok
+test_full_sequence_replay_shapes (test_model_policy.TestMultiAdaptive.test_full_sequence_replay_shapes) ... ok
+test_initial_memory_follows_module_dtype (test_model_policy.TestMultiAdaptive.test_initial_memory_follows_module_dtype) ... ok
+test_target_only_multi_adaptive_is_rejected (test_model_policy.TestMultiAdaptive.test_target_only_multi_adaptive_is_rejected) ... ok
+test_fixed_depth_prefix_invariance (test_model_policy.TestPrefixInvariance.test_fixed_depth_prefix_invariance) ... ok
+test_routed_greedy_prefix_invariance (test_model_policy.TestPrefixInvariance.test_routed_greedy_prefix_invariance) ... ok
+test_groups_require_identical_input_and_budget (test_model_policy.TestRLOOAuxiliary.test_groups_require_identical_input_and_budget) ... ok
+test_leave_one_out_hand_values (test_model_policy.TestRLOOAuxiliary.test_leave_one_out_hand_values) ... ok
+test_shift_invariance_within_group (test_model_policy.TestRLOOAuxiliary.test_shift_invariance_within_group) ... ok
+test_zero_sum_within_group (test_model_policy.TestRLOOAuxiliary.test_zero_sum_within_group) ... ok
+test_first_decision_is_forced_continue (test_model_policy.TestReplayAndAccounting.test_first_decision_is_forced_continue) ... ok
+test_forced_stop_not_double_counted (test_model_policy.TestReplayAndAccounting.test_forced_stop_not_double_counted) ... ok
+test_reference_formula_matches (test_model_policy.TestReplayAndAccounting.test_reference_formula_matches) ... ok
+test_replay_matches_manual_recomputation (test_model_policy.TestReplayAndAccounting.test_replay_matches_manual_recomputation) ... ok
+test_replay_matches_per_decision_log_prob (test_model_policy.TestReplayAndAccounting.test_replay_matches_per_decision_log_prob) ... ok
+test_forced_continue_matches_fixed_max_depth (test_model_policy.TestZeroDeltaGreedy.test_forced_continue_matches_fixed_max_depth) ... ok
+test_greedy_experts_match_gate_argmax (test_model_policy.TestZeroDeltaGreedy.test_greedy_experts_match_gate_argmax) ... ok
+test_stop_after_forced_round_matches_fixed_depth_1 (test_model_policy.TestZeroDeltaGreedy.test_stop_after_forced_round_matches_fixed_depth_1) ... ok
+test_block_diagonal_mask (test_packed_lm.TestAttentionMaskMetadata.test_block_diagonal_mask) ... ok
+test_mask_matches_item_segments (test_packed_lm.TestAttentionMaskMetadata.test_mask_matches_item_segments) ... ok
+test_accepts_dataset (test_packed_lm.TestBatchSampler.test_accepts_dataset) ... ok
+test_deterministic_for_same_seed_and_epoch (test_packed_lm.TestBatchSampler.test_deterministic_for_same_seed_and_epoch) ... ok
+test_drop_last (test_packed_lm.TestBatchSampler.test_drop_last) ... ok
+test_epoch_changes_permutation (test_packed_lm.TestBatchSampler.test_epoch_changes_permutation) ... ok
+test_len_counts_remaining_batches (test_packed_lm.TestBatchSampler.test_len_counts_remaining_batches) ... ok
+test_permutation_is_valid (test_packed_lm.TestBatchSampler.test_permutation_is_valid) ... ok
+test_rejects_bad_batch_size (test_packed_lm.TestBatchSampler.test_rejects_bad_batch_size) ... ok
+test_sequential_no_shuffle (test_packed_lm.TestBatchSampler.test_sequential_no_shuffle) ... ok
+test_start_batch_resumes (test_packed_lm.TestBatchSampler.test_start_batch_resumes) ... ok
+test_doc_identity_per_token (test_packed_lm.TestLabelSemantics.test_doc_identity_per_token) ... ok
+test_document_ends_are_not_supervised (test_packed_lm.TestLabelSemantics.test_document_ends_are_not_supervised) ... ok
+test_labels_are_inputs_shifted_by_one_within_segment (test_packed_lm.TestLabelSemantics.test_labels_are_inputs_shifted_by_one_within_segment) ... ok
+test_no_cross_document_supervision (test_packed_lm.TestLabelSemantics.test_no_cross_document_supervision) ... ok
+test_padding_is_not_supervised (test_packed_lm.TestLabelSemantics.test_padding_is_not_supervised) ... ok
+test_limit_clipped_at_end (test_packed_lm.TestOffsetAndLimit.test_limit_clipped_at_end) ... ok
+test_offset_and_limit (test_packed_lm.TestOffsetAndLimit.test_offset_and_limit) ... ok
+test_offset_counts_only_cover_view (test_packed_lm.TestOffsetAndLimit.test_offset_counts_only_cover_view) ... ok
+test_offset_out_of_range (test_packed_lm.TestOffsetAndLimit.test_offset_out_of_range) ... ok
+test_offset_view (test_packed_lm.TestOffsetAndLimit.test_offset_view) ... ok
+test_items_match_reference (test_packed_lm.TestReading.test_items_match_reference) ... ok
+test_layout_matches_writer_stats (test_packed_lm.TestReading.test_layout_matches_writer_stats) ... ok
+test_memmap_backing (test_packed_lm.TestReading.test_memmap_backing) ... ok
+test_missing_files_raise (test_packed_lm.TestReading.test_missing_files_raise) ... ok
+test_negative_indexing (test_packed_lm.TestReading.test_negative_indexing) ... ok
+test_seq_len_inferred_from_manifest (test_packed_lm.TestReading.test_seq_len_inferred_from_manifest) ... ok
+test_seq_len_required_without_manifest (test_packed_lm.TestReading.test_seq_len_required_without_manifest) ... ok
+test_aggregate_counts (test_packed_lm.TestTokenCounts.test_aggregate_counts) ... ok
+test_doc_map_lengths_match_real_tokens (test_packed_lm.TestTokenCounts.test_doc_map_lengths_match_real_tokens) ... ok
+test_c0_small_full_table_passes (test_recovery_data.TestAudit.test_c0_small_full_table_passes) ... ok
+test_c1_full_domain_passes (test_recovery_data.TestAudit.test_c1_full_domain_passes) ... ok
+test_c2_all_splits_pass (test_recovery_data.TestAudit.test_c2_all_splits_pass) ... ok
+test_detects_corrupted_label (test_recovery_data.TestAudit.test_detects_corrupted_label) ... ok
+test_detects_prefix_conflict (test_recovery_data.TestAudit.test_detects_prefix_conflict) ... ok
+test_detects_query_position_error (test_recovery_data.TestAudit.test_detects_query_position_error) ... ok
+test_fixed_affine_full_table (test_recovery_data.TestC0.test_fixed_affine_full_table) ... ok
+test_identity_full_table (test_recovery_data.TestC0.test_identity_full_table) ... ok
+test_counts (test_recovery_data.TestC1.test_counts) ... ok
+test_deterministic_seed (test_recovery_data.TestC1.test_deterministic_seed) ... ok
+test_disjoint_and_complete (test_recovery_data.TestC1.test_disjoint_and_complete) ... ok
+test_labels_match_interpreter (test_recovery_data.TestC1.test_labels_match_interpreter) ... ok
+test_nonzero_multiplier (test_recovery_data.TestC1.test_nonzero_multiplier) ... ok
+test_train_covers_digits_and_roles (test_recovery_data.TestC1.test_train_covers_digits_and_roles) ... ok
+test_audit_batch_clean (test_recovery_data.TestCollate.test_audit_batch_clean) ... ok
+test_batch_invariance (test_recovery_data.TestCollate.test_batch_invariance) ... ok
+test_right_padding_and_positions (test_recovery_data.TestCollate.test_right_padding_and_positions) ... ok
+test_c2 (test_recovery_data.TestCompositionStages.test_c2) ... ok
+test_c3 (test_recovery_data.TestCompositionStages.test_c3) ... ok
+test_canonical_matches_instances (test_recovery_data.TestCompositionStages.test_canonical_matches_instances) ... ok
+test_program_split_aligned_across_moduli (test_recovery_data.TestCompositionStages.test_program_split_aligned_across_moduli) ... ok
+test_collate_feeds_metrics (test_recovery_data.TestEndToEnd.test_collate_feeds_metrics) ... ok
+test_identities (test_recovery_data.TestInterpreter.test_identities) ... ok
+test_ops_do_not_commute (test_recovery_data.TestInterpreter.test_ops_do_not_commute) ... ok
+test_run_matches_canonical (test_recovery_data.TestInterpreter.test_run_matches_canonical) ... ok
+test_counts_match_plan (test_recovery_data.TestManifest.test_counts_match_plan) ... ok
+test_hash_stable_and_sensitive (test_recovery_data.TestManifest.test_hash_stable_and_sensitive) ... ok
+test_aggregation_is_sum_then_divide (test_recovery_data.TestMetrics.test_aggregation_is_sum_then_divide) ... ok
+test_aggregator_empty_raises (test_recovery_data.TestMetrics.test_aggregator_empty_raises) ... ok
+test_contract_assertions (test_recovery_data.TestMetrics.test_contract_assertions) ... ok
+test_correct_count (test_recovery_data.TestMetrics.test_correct_count) ... ok
+test_hand_computed_identity (test_recovery_data.TestMetrics.test_hand_computed_identity) ... ok
+test_uniform_baseline (test_recovery_data.TestMetrics.test_uniform_baseline) ... ok
+test_decode_rejects_malformed (test_recovery_data.TestTokenContract.test_decode_rejects_malformed) ... ok
+test_encode_decode_roundtrip (test_recovery_data.TestTokenContract.test_encode_decode_roundtrip) ... ok
+test_input_has_no_answer (test_recovery_data.TestTokenContract.test_input_has_no_answer) ... ok
+test_vocab_layout_reused (test_recovery_data.TestTokenContract.test_vocab_layout_reused) ... ok
+test_dense_and_single_expert_dispatch_match_forward_and_gradients (test_recovery_model.RecoveryModelTests.test_dense_and_single_expert_dispatch_match_forward_and_gradients) ... ok
+test_document_blocks_are_isolated (test_recovery_model.RecoveryModelTests.test_document_blocks_are_isolated) ... ok
+test_final_moe_uses_dense_prefix (test_recovery_model.RecoveryModelTests.test_final_moe_uses_dense_prefix) ... ok
+test_main_parameter_counts_unchanged_by_default_moe_layers (test_recovery_model.RecoveryModelTests.test_main_parameter_counts_unchanged_by_default_moe_layers) ... ok
+test_action_pair_roundtrip (test_top2.TestActionTable.test_action_pair_roundtrip) ... ok
+test_enumerates_all_28_unordered_pairs (test_top2.TestActionTable.test_enumerates_all_28_unordered_pairs) ... ok
+test_invalid_pair_rejected (test_top2.TestActionTable.test_invalid_pair_rejected) ... ok
+test_pair_order_does_not_matter (test_top2.TestActionTable.test_pair_order_does_not_matter) ... ok
+test_bf16_buffer_safety (test_top2.TestBF16Safety.test_bf16_buffer_safety) ... ok
+test_bf16_module_matches_fp32_baseline (test_top2.TestBF16Safety.test_bf16_module_matches_fp32_baseline) ... ok
+test_e2_matches_dense_forward_and_gradients (test_top2.TestDensePositiveControl.test_e2_matches_dense_forward_and_gradients) ... ok
+test_dropless_dispatch_matches_manual_reference (test_top2.TestDispatch.test_dropless_dispatch_matches_manual_reference) ... ok
+test_every_token_gets_both_experts (test_top2.TestDispatch.test_every_token_gets_both_experts) ... ok
+test_forced_baseline_action_matches_baseline (test_top2.TestDispatch.test_forced_baseline_action_matches_baseline) ... ok
+test_module_defaults_to_baseline (test_top2.TestDispatch.test_module_defaults_to_baseline) ... ok
+test_module_freezes_router_and_experts (test_top2.TestDispatch.test_module_freezes_router_and_experts) ... ok
+test_shape_mismatch_rejected (test_top2.TestDispatch.test_shape_mismatch_rejected) ... ok
+test_uniform_ablation (test_top2.TestDispatch.test_uniform_ablation) ... ok
+test_unselected_experts_receive_zero_gradient (test_top2.TestDispatch.test_unselected_experts_receive_zero_gradient) ... ok
+test_router_weights_are_renormalized_softmax (test_top2.TestWeights.test_router_weights_are_renormalized_softmax) ... ok
+test_router_weights_do_not_backprop_into_frozen_router (test_top2.TestWeights.test_router_weights_do_not_backprop_into_frozen_router) ... ok
+test_uniform_weights (test_top2.TestWeights.test_uniform_weights) ... ok
+test_unknown_rule_rejected (test_top2.TestWeights.test_unknown_rule_rejected) ... ok
+test_exact_halt_probabilities_sum_to_one (test_training.TrainingObjectiveTests.test_exact_halt_probabilities_sum_to_one) ... ok
+test_exact_path_probability_mass (test_training.TrainingObjectiveTests.test_exact_path_probability_mass) ... ok
+test_expected_path_count (test_training.TrainingObjectiveTests.test_expected_path_count) ... ok
+test_rloo_leave_one_out_formula (test_training.TrainingObjectiveTests.test_rloo_leave_one_out_formula) ... ok
+
+----------------------------------------------------------------------
+Ran 358 tests in 66.726s
+
+OK (skipped=1)
+wrote /tmp/tmp2ggrcne8/e07.json
+service_load: not_executed
+seqtopk counterexample violation: True
+ledger prefix invariant holds: True
+worst max_rel_gap over curve: 1.2802
+{"output": "/tmp/tmp35unehky/e08.json", "sections": ["d1", "e3"], "total_wall_time_s": 0.015249171992763877}
+wrote /tmp/tmpzccz3s89/e09.json
+real_lm_rl: not_executed
+init batch objective: 0.5486
+supervised final: 0.1832 designed recovery 6/6
+exact final: 0.3178 designed recovery 3/6
+rloo2 final: 0.3598 +- 0.0000
+rloo2==exact identity err: 5.13e-16; MC check passed: True
+hard budget violations: 0
+{
+  "document_list_sha256": "5b147021eeda814ae3d37bdad57139471895f3f0c690fd47b6a0d1be115ae1fb",
+  "n_documents": 60,
+  "revision": "explicit-test-rev",
+  "sequences": {
+    "test": 4,
+    "train": 16,
+    "validation": 4
+  },
+  "split_documents": {
+    "test": 6,
+    "train": 48,
+    "validation": 6
+  },
+  "tokenizer_sha256": "2f8d75a4e7864229575912517d323e00ebba846af0d9316134f5683192b23290",
+  "tokens": {
+    "test": 200,
+    "train": 1000,
+    "validation": 200
+  }
+}

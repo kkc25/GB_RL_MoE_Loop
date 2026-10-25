@@ -1,0 +1,4 @@
+{"time": 1792863866.5288107, "phase": "student", "student": "immediate", "best_validation_mse": 9.634016036987305}
+{"time": 1792863867.1213937, "phase": "student", "student": "q_pi0", "best_validation_mse": 9.40537166595459}
+{"time": 1792863867.1288881, "phase": "heldout", "policy_baseline": 6.064254283905029, "policy_random": 6.065917491912842, "policy_student_immediate": 6.064224720001221, "policy_student_q_pi0": 6.064445495605469}
+{"time": 1792863867.1289847, "phase": "heldout_oracle", "mean_cost": 6.02364444732666, "oracle_gap": 0.040609583258628845, "oracle_gap_se": 0.0011521363630890846, "mean_oracle_action_is_baseline": 0.021484375, "deployable": false}

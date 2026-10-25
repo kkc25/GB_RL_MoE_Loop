@@ -1,0 +1,10 @@
+{
+  "python": "3.12.15",
+  "torch": "2.12.1+cu130",
+  "cuda": "13.0",
+  "device": "NVIDIA RTX A6000",
+  "parameters": 104870400,
+  "data_revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+  "data_hash": "542f45c25c41e2689835e1044fa0fb56a36d7d82ea40bc21a5ea3a703711ec11",
+  "tokenizer_hash": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628"
+}

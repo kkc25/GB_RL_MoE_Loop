@@ -1,0 +1,39 @@
+{
+  "model": {
+    "layers": 8,
+    "hidden_size": 512,
+    "attention_heads": 8,
+    "head_dim": 64,
+    "vocab_size": 32768,
+    "intermediate_size": 1024,
+    "experts_per_layer": 8,
+    "adaptive_layers": [4, 5, 6, 7],
+    "min_calls": 1,
+    "max_calls": 4,
+    "max_position_embeddings": 2048,
+    "adaptive_residual_scale": 0.5,
+    "nonadaptive_residual_scale": 1.0,
+    "target_only": false
+  },
+  "controller": {
+    "projected_hidden": 128,
+    "gru_hidden_size": 128,
+    "reference_temperature": 0.25,
+    "reference_tempered_weight": 0.9,
+    "initial_stop_hazard": 0.5
+  },
+  "train": {
+    "output_dir": "runs/pilot_126m",
+    "device": "cuda",
+    "dtype": "bfloat16",
+    "seed": 11,
+    "batch_size": 4,
+    "updates": 3815,
+    "learning_rate": 0.0003,
+    "controller_learning_rate": 0.0001,
+    "rollout_groups": 2,
+    "budget": 8,
+    "input_token_limit": 1000000000,
+    "pretrain_updates": 0
+  }
+}

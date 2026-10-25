@@ -1,0 +1,14 @@
+{
+  "label_contract": "answer_at_qry_not_in_input",
+  "modulus": 97,
+  "sha256": "bf34a8c5aadf0da515291d7b5d0b191506cb26cbfc1a45b5dbba765aa04ab7df",
+  "split_seed": 0,
+  "splits": {
+    "train": {
+      "count": 97,
+      "sha256": "17e02554bedf9d52eb0c5c40f0579cc7832e6ac9fdcac4823c5c0247d6632aa5"
+    }
+  },
+  "stage": "c0_identity",
+  "total_instances": 97
+}

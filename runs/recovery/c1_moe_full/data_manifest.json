@@ -1,0 +1,22 @@
+{
+  "label_contract": "answer_at_qry_not_in_input",
+  "modulus": 11,
+  "sha256": "e69dbf074c83334241daf616cc30eddef761a32a6d0ae9e78b21da3660f02097",
+  "split_seed": 0,
+  "splits": {
+    "id_test": {
+      "count": 181,
+      "sha256": "4b87034f8055814f4f21b839e32ca3c34c9e3a0ee1246da048f724fee5b6d119"
+    },
+    "id_validation": {
+      "count": 182,
+      "sha256": "39ff8ff60f0c6adef9499bb61ca6a5e12d10e3709410fb91c16080c3419cbd8f"
+    },
+    "train": {
+      "count": 847,
+      "sha256": "082b86c14790d4d14bd6fab231d07bf2eb70155a8b409682ecf5d71ed8adf90e"
+    }
+  },
+  "stage": "c1",
+  "total_instances": 1210
+}

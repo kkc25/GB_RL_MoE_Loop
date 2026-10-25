@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "errors": [],
+  "scope": "structure, local links, math delimiters, syntax, JSON, optional manifest",
+  "experiment_files": 13,
+  "markdown_files": 28,
+  "python_syntax_files": 5,
+  "cpu_executed": [
+    "code/verify_design.py",
+    "theory/verify_counterexamples.py",
+    "resources/code/estimate_budget.py"
+  ],
+  "gpu_training_executed": false,
+  "full_model_implementation_included": false,
+  "source_cutoff": "2026-10-25",
+  "archive_verification": "All files hashed and ZIP CRC checked during packaging; hash manifest excludes itself."
+}

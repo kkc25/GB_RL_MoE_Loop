@@ -1,0 +1,3749 @@
+{
+  "experiment": "E09_controlled",
+  "date": "2026-10-25",
+  "seed": 20261025,
+  "quick": false,
+  "plan": "plans/loop_moe_research_plan_2026-10-25/experiments/E09_router_only_policy_gradient.md",
+  "scope": "All numbers come from the enumerable synthetic control environment of data/controlled.py (Z_97, 4 non-commuting affine experts, 84 terminal paths at budget 3). They compare training signals for one small linear router policy and verify estimator properties (unbiasedness, variance, budget semantics). They are not evidence about natural-language models, and no language-model RL was performed.",
+  "real_lm_rl": {
+    "status": "not_executed",
+    "reason": "The E09 real-LM router-RL part (frozen backbone, Top-2 set actions, teacher-forced terminal reward) requires the training stack and is outside this script; only the enumerable synthetic analogue runs here."
+  },
+  "environment": {
+    "instances": [
+      "one_step_exact",
+      "one_step_near",
+      "two_step_complementary",
+      "two_step_complementary_2",
+      "budget_one",
+      "budget_two"
+    ],
+    "price": 0.05,
+    "num_experts": 4,
+    "max_calls": 3,
+    "terminal_paths_per_instance": [
+      84,
+      84,
+      84,
+      84,
+      4,
+      20
+    ],
+    "policy": "shared linear factorized STOP/expert policy, weights (5, 12), deployment-legal observations only",
+    "init": "reference_weights()",
+    "init_exact_batch_objective": 0.5485602969695441
+  },
+  "gradient_verification": {
+    "rloo2_expectation_equals_exact_gradient_max_abs_err": 5.134781488891349e-16,
+    "monte_carlo_rloo2_mean_vs_exact": {
+      "samples": 3000,
+      "sigma": 6,
+      "max_abs_err": 0.0010518169251936358,
+      "max_abs_tol": 0.006488411475852433,
+      "coordinates_over_tolerance": 0,
+      "passed": true
+    },
+    "estimator_variance_at_init": {
+      "reinforce_b0": {
+        "total_variance": 0.29584258749804765,
+        "max_coordinate_variance": 0.021271866424687966
+      },
+      "reinforce_mean_baseline": {
+        "total_variance": 0.05819431304331865,
+        "max_coordinate_variance": 0.0034048533339114304
+      },
+      "rloo2_loo": {
+        "total_variance": 0.058974580911274686,
+        "max_coordinate_variance": 0.0035082902899977956
+      },
+      "self_mean_g2": {
+        "total_variance": 0.014743645227818673,
+        "max_coordinate_variance": 0.0008770725724994489
+      }
+    },
+    "estimator_variance_at_exact_trained": {
+      "reinforce_b0": {
+        "total_variance": 0.004591109281828907,
+        "max_coordinate_variance": 0.0005386217992524783
+      },
+      "reinforce_mean_baseline": {
+        "total_variance": 0.0032144092005465066,
+        "max_coordinate_variance": 0.0003713800442529669
+      },
+      "rloo2_loo": {
+        "total_variance": 0.00166089067869495,
+        "max_coordinate_variance": 0.00019096074887549206
+      },
+      "self_mean_g2": {
+        "total_variance": 0.00041522266967373755,
+        "max_coordinate_variance": 4.774018721887302e-05
+      }
+    },
+    "note": "reinforce_b0, reinforce_mean_baseline and rloo2_loo are unbiased (bias ~1e-16); self_mean_g2 includes the sample in its own baseline, is biased toward grad/2, and its low variance must not be read as an advantage."
+  },
+  "training": {
+    "hyperparameters": {
+      "supervised": {
+        "lr": 2.0,
+        "steps": 200
+      },
+      "exact_joint": {
+        "lr": 3.0,
+        "steps": 600
+      },
+      "rloo2_onpolicy": {
+        "lr": 1.0,
+        "steps": 2000,
+        "seeds": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "grad_clip": 1.0
+      },
+      "eval_every": 25
+    },
+    "supervised_oracle_imitation": {
+      "curve": [
+        {
+          "step": 0,
+          "exact_batch_objective": 0.5485602969695441
+        },
+        {
+          "step": 25,
+          "exact_batch_objective": 0.2613800241551664
+        },
+        {
+          "step": 50,
+          "exact_batch_objective": 0.22113532829486018
+        },
+        {
+          "step": 75,
+          "exact_batch_objective": 0.20571790530073678
+        },
+        {
+          "step": 100,
+          "exact_batch_objective": 0.19752078799743447
+        },
+        {
+          "step": 125,
+          "exact_batch_objective": 0.19229470586431383
+        },
+        {
+          "step": 150,
+          "exact_batch_objective": 0.18853796025200886
+        },
+        {
+          "step": 175,
+          "exact_batch_objective": 0.18560997997325382
+        },
+        {
+          "step": 200,
+          "exact_batch_objective": 0.18320157605317253
+        }
+      ],
+      "final_ce_loss": 0.29743192821356346,
+      "final_exact_batch_objective": 0.18320157605317253,
+      "cost": {
+        "updates": 200,
+        "oracle_enumeration_trajectories": 360,
+        "sampled_rollouts": 0,
+        "note": "Optimal-path labels are computed once by full enumeration; each update then costs zero rollouts."
+      }
+    },
+    "exact_joint_gradient": {
+      "curve": [
+        {
+          "step": 0,
+          "exact_batch_objective": 0.5485602969695441
+        },
+        {
+          "step": 25,
+          "exact_batch_objective": 0.4447131586239785
+        },
+        {
+          "step": 50,
+          "exact_batch_objective": 0.3906452004195489
+        },
+        {
+          "step": 75,
+          "exact_batch_objective": 0.3712370748707892
+        },
+        {
+          "step": 100,
+          "exact_batch_objective": 0.358618656001038
+        },
+        {
+          "step": 125,
+          "exact_batch_objective": 0.293490676511961
+        },
+        {
+          "step": 150,
+          "exact_batch_objective": 0.20548095633381414
+        },
+        {
+          "step": 175,
+          "exact_batch_objective": 0.18285140306642586
+        },
+        {
+          "step": 200,
+          "exact_batch_objective": 0.17289940363447334
+        },
+        {
+          "step": 225,
+          "exact_batch_objective": 0.1672233975186358
+        },
+        {
+          "step": 250,
+          "exact_batch_objective": 0.1635357477217049
+        },
+        {
+          "step": 275,
+          "exact_batch_objective": 0.16093969900354527
+        },
+        {
+          "step": 300,
+          "exact_batch_objective": 0.15900910709797245
+        },
+        {
+          "step": 325,
+          "exact_batch_objective": 0.15751489479986897
+        },
+        {
+          "step": 350,
+          "exact_batch_objective": 0.15632272136369338
+        },
+        {
+          "step": 375,
+          "exact_batch_objective": 0.1553484982781218
+        },
+        {
+          "step": 400,
+          "exact_batch_objective": 0.15453684935186648
+        },
+        {
+          "step": 425,
+          "exact_batch_objective": 0.15384978950913517
+        },
+        {
+          "step": 450,
+          "exact_batch_objective": 0.15326037619578772
+        },
+        {
+          "step": 475,
+          "exact_batch_objective": 0.15274895685717424
+        },
+        {
+          "step": 500,
+          "exact_batch_objective": 0.15230085183273687
+        },
+        {
+          "step": 525,
+          "exact_batch_objective": 0.15190486981566756
+        },
+        {
+          "step": 550,
+          "exact_batch_objective": 0.15155232619832446
+        },
+        {
+          "step": 575,
+          "exact_batch_objective": 0.15123637594002934
+        },
+        {
+          "step": 600,
+          "exact_batch_objective": 0.15095154919524875
+        }
+      ],
+      "final_exact_batch_objective": 0.15095154919524875,
+      "cost": {
+        "updates": 600,
+        "enumerated_trajectories": 216000,
+        "enumerated_trajectories_per_update": 360,
+        "sampled_rollouts": 0
+      }
+    },
+    "rloo2_onpolicy": {
+      "runs": [
+        {
+          "seed": 20261025000,
+          "curve": [
+            {
+              "step": 0,
+              "exact_batch_objective": 0.5485602969695441
+            },
+            {
+              "step": 25,
+              "exact_batch_objective": 0.5069083483868012
+            },
+            {
+              "step": 50,
+              "exact_batch_objective": 0.47354736668546743
+            },
+            {
+              "step": 75,
+              "exact_batch_objective": 0.43090066170208646
+            },
+            {
+              "step": 100,
+              "exact_batch_objective": 0.4043999136003327
+            },
+            {
+              "step": 125,
+              "exact_batch_objective": 0.3977802354726576
+            },
+            {
+              "step": 150,
+              "exact_batch_objective": 0.3811357903619839
+            },
+            {
+              "step": 175,
+              "exact_batch_objective": 0.373207315782007
+            },
+            {
+              "step": 200,
+              "exact_batch_objective": 0.3681503308986021
+            },
+            {
+              "step": 225,
+              "exact_batch_objective": 0.36693984143089403
+            },
+            {
+              "step": 250,
+              "exact_batch_objective": 0.3650086741925496
+            },
+            {
+              "step": 275,
+              "exact_batch_objective": 0.36137850271195243
+            },
+            {
+              "step": 300,
+              "exact_batch_objective": 0.35865451583806524
+            },
+            {
+              "step": 325,
+              "exact_batch_objective": 0.3575548043057804
+            },
+            {
+              "step": 350,
+              "exact_batch_objective": 0.3571135658205058
+            },
+            {
+              "step": 375,
+              "exact_batch_objective": 0.3566032145582198
+            },
+            {
+              "step": 400,
+              "exact_batch_objective": 0.3559295558720072
+            },
+            {
+              "step": 425,
+              "exact_batch_objective": 0.3549347089807499
+            },
+            {
+              "step": 450,
+              "exact_batch_objective": 0.3535234278006782
+            },
+            {
+              "step": 475,
+              "exact_batch_objective": 0.3532207507784156
+            },
+            {
+              "step": 500,
+              "exact_batch_objective": 0.35185540599140497
+            },
+            {
+              "step": 525,
+              "exact_batch_objective": 0.35398976897243206
+            },
+            {
+              "step": 550,
+              "exact_batch_objective": 0.35094583991821987
+            },
+            {
+              "step": 575,
+              "exact_batch_objective": 0.35014415851847697
+            },
+            {
+              "step": 600,
+              "exact_batch_objective": 0.35062211888735856
+            },
+            {
+              "step": 625,
+              "exact_batch_objective": 0.34996631751430146
+            },
+            {
+              "step": 650,
+              "exact_batch_objective": 0.3504538567015505
+            },
+            {
+              "step": 675,
+              "exact_batch_objective": 0.34862641774695424
+            },
+            {
+              "step": 700,
+              "exact_batch_objective": 0.34816885800277547
+            },
+            {
+              "step": 725,
+              "exact_batch_objective": 0.3478857380326021
+            },
+            {
+              "step": 750,
+              "exact_batch_objective": 0.34741570345942846
+            },
+            {
+              "step": 775,
+              "exact_batch_objective": 0.3474277381720489
+            },
+            {
+              "step": 800,
+              "exact_batch_objective": 0.3463660856563913
+            },
+            {
+              "step": 825,
+              "exact_batch_objective": 0.3477743710910503
+            },
+            {
+              "step": 850,
+              "exact_batch_objective": 0.34565669488134954
+            },
+            {
+              "step": 875,
+              "exact_batch_objective": 0.3462321798726608
+            },
+            {
+              "step": 900,
+              "exact_batch_objective": 0.3450591252243587
+            },
+            {
+              "step": 925,
+              "exact_batch_objective": 0.34442337373973336
+            },
+            {
+              "step": 950,
+              "exact_batch_objective": 0.34527354037645414
+            },
+            {
+              "step": 975,
+              "exact_batch_objective": 0.3441515014365781
+            },
+            {
+              "step": 1000,
+              "exact_batch_objective": 0.3436934122651471
+            },
+            {
+              "step": 1025,
+              "exact_batch_objective": 0.3434760682864468
+            },
+            {
+              "step": 1050,
+              "exact_batch_objective": 0.34325028304408156
+            },
+            {
+              "step": 1075,
+              "exact_batch_objective": 0.34521700129475014
+            },
+            {
+              "step": 1100,
+              "exact_batch_objective": 0.34283910592063965
+            },
+            {
+              "step": 1125,
+              "exact_batch_objective": 0.34230105599596605
+            },
+            {
+              "step": 1150,
+              "exact_batch_objective": 0.34195903919223597
+            },
+            {
+              "step": 1175,
+              "exact_batch_objective": 0.3417464826876744
+            },
+            {
+              "step": 1200,
+              "exact_batch_objective": 0.34156381696687266
+            },
+            {
+              "step": 1225,
+              "exact_batch_objective": 0.3418677095444002
+            },
+            {
+              "step": 1250,
+              "exact_batch_objective": 0.34095239030851965
+            },
+            {
+              "step": 1275,
+              "exact_batch_objective": 0.3407061629086148
+            },
+            {
+              "step": 1300,
+              "exact_batch_objective": 0.34076049528546326
+            },
+            {
+              "step": 1325,
+              "exact_batch_objective": 0.34027470040619606
+            },
+            {
+              "step": 1350,
+              "exact_batch_objective": 0.34157600306225294
+            },
+            {
+              "step": 1375,
+              "exact_batch_objective": 0.3397495594141294
+            },
+            {
+              "step": 1400,
+              "exact_batch_objective": 0.3400767809037272
+            },
+            {
+              "step": 1425,
+              "exact_batch_objective": 0.33947512245838496
+            },
+            {
+              "step": 1450,
+              "exact_batch_objective": 0.3401217906682208
+            },
+            {
+              "step": 1475,
+              "exact_batch_objective": 0.3389729422039494
+            },
+            {
+              "step": 1500,
+              "exact_batch_objective": 0.3409166268405764
+            },
+            {
+              "step": 1525,
+              "exact_batch_objective": 0.3385186954859083
+            },
+            {
+              "step": 1550,
+              "exact_batch_objective": 0.3386400949052057
+            },
+            {
+              "step": 1575,
+              "exact_batch_objective": 0.3384366321186775
+            },
+            {
+              "step": 1600,
+              "exact_batch_objective": 0.33853564273078574
+            },
+            {
+              "step": 1625,
+              "exact_batch_objective": 0.3380671424439934
+            },
+            {
+              "step": 1650,
+              "exact_batch_objective": 0.3379528330894232
+            },
+            {
+              "step": 1675,
+              "exact_batch_objective": 0.33759769056766803
+            },
+            {
+              "step": 1700,
+              "exact_batch_objective": 0.3379038978054867
+            },
+            {
+              "step": 1725,
+              "exact_batch_objective": 0.3375204441996602
+            },
+            {
+              "step": 1750,
+              "exact_batch_objective": 0.3371657365101881
+            },
+            {
+              "step": 1775,
+              "exact_batch_objective": 0.338024028203222
+            },
+            {
+              "step": 1800,
+              "exact_batch_objective": 0.3367070602466078
+            },
+            {
+              "step": 1825,
+              "exact_batch_objective": 0.33683537005223374
+            },
+            {
+              "step": 1850,
+              "exact_batch_objective": 0.3366701454665955
+            },
+            {
+              "step": 1875,
+              "exact_batch_objective": 0.3375281903313894
+            },
+            {
+              "step": 1900,
+              "exact_batch_objective": 0.3367373601180954
+            },
+            {
+              "step": 1925,
+              "exact_batch_objective": 0.3379911808198415
+            },
+            {
+              "step": 1950,
+              "exact_batch_objective": 0.3361049145562292
+            },
+            {
+              "step": 1975,
+              "exact_batch_objective": 0.3388150592257792
+            },
+            {
+              "step": 2000,
+              "exact_batch_objective": 0.3355931179058529
+            }
+          ],
+          "final_exact_batch_objective": 0.3355931179058529,
+          "cost": {
+            "updates": 2000,
+            "sampled_rollouts": 24000,
+            "sampled_rollouts_per_update": 12,
+            "grad_clip_norm": 1.0
+          }
+        },
+        {
+          "seed": 20261025001,
+          "curve": [
+            {
+              "step": 0,
+              "exact_batch_objective": 0.5485602969695441
+            },
+            {
+              "step": 25,
+              "exact_batch_objective": 0.4987330303014807
+            },
+            {
+              "step": 50,
+              "exact_batch_objective": 0.4578012704495034
+            },
+            {
+              "step": 75,
+              "exact_batch_objective": 0.42611682261303413
+            },
+            {
+              "step": 100,
+              "exact_batch_objective": 0.3847462004826047
+            },
+            {
+              "step": 125,
+              "exact_batch_objective": 0.350012035112747
+            },
+            {
+              "step": 150,
+              "exact_batch_objective": 0.3361350499554196
+            },
+            {
+              "step": 175,
+              "exact_batch_objective": 0.32527267345910776
+            },
+            {
+              "step": 200,
+              "exact_batch_objective": 0.31437549463150993
+            },
+            {
+              "step": 225,
+              "exact_batch_objective": 0.29610449377701603
+            },
+            {
+              "step": 250,
+              "exact_batch_objective": 0.274672777790602
+            },
+            {
+              "step": 275,
+              "exact_batch_objective": 0.2643297008514533
+            },
+            {
+              "step": 300,
+              "exact_batch_objective": 0.2526352750614999
+            },
+            {
+              "step": 325,
+              "exact_batch_objective": 0.23721855115534132
+            },
+            {
+              "step": 350,
+              "exact_batch_objective": 0.22380950177887593
+            },
+            {
+              "step": 375,
+              "exact_batch_objective": 0.21482609329481916
+            },
+            {
+              "step": 400,
+              "exact_batch_objective": 0.20975557174278947
+            },
+            {
+              "step": 425,
+              "exact_batch_objective": 0.20644957710868792
+            },
+            {
+              "step": 450,
+              "exact_batch_objective": 0.2013178189808641
+            },
+            {
+              "step": 475,
+              "exact_batch_objective": 0.2007125371260197
+            },
+            {
+              "step": 500,
+              "exact_batch_objective": 0.19531436593632998
+            },
+            {
+              "step": 525,
+              "exact_batch_objective": 0.1919553946894054
+            },
+            {
+              "step": 550,
+              "exact_batch_objective": 0.1896903080265994
+            },
+            {
+              "step": 575,
+              "exact_batch_objective": 0.1866988411827978
+            },
+            {
+              "step": 600,
+              "exact_batch_objective": 0.1845436316632817
+            },
+            {
+              "step": 625,
+              "exact_batch_objective": 0.1828915283091387
+            },
+            {
+              "step": 650,
+              "exact_batch_objective": 0.18133626404996014
+            },
+            {
+              "step": 675,
+              "exact_batch_objective": 0.1793867401714008
+            },
+            {
+              "step": 700,
+              "exact_batch_objective": 0.18922354804173022
+            },
+            {
+              "step": 725,
+              "exact_batch_objective": 0.1778524467294038
+            },
+            {
+              "step": 750,
+              "exact_batch_objective": 0.17573897082294365
+            },
+            {
+              "step": 775,
+              "exact_batch_objective": 0.17491604558202134
+            },
+            {
+              "step": 800,
+              "exact_batch_objective": 0.17639569651226328
+            },
+            {
+              "step": 825,
+              "exact_batch_objective": 0.18315054095935
+            },
+            {
+              "step": 850,
+              "exact_batch_objective": 0.17256488101081258
+            },
+            {
+              "step": 875,
+              "exact_batch_objective": 0.17139432335258323
+            },
+            {
+              "step": 900,
+              "exact_batch_objective": 0.17090675369618238
+            },
+            {
+              "step": 925,
+              "exact_batch_objective": 0.1700809547184765
+            },
+            {
+              "step": 950,
+              "exact_batch_objective": 0.16951275274376665
+            },
+            {
+              "step": 975,
+              "exact_batch_objective": 0.16957532880579973
+            },
+            {
+              "step": 1000,
+              "exact_batch_objective": 0.16942015735232677
+            },
+            {
+              "step": 1025,
+              "exact_batch_objective": 0.16850339105244136
+            },
+            {
+              "step": 1050,
+              "exact_batch_objective": 0.1678456475255956
+            },
+            {
+              "step": 1075,
+              "exact_batch_objective": 0.16753924218634628
+            },
+            {
+              "step": 1100,
+              "exact_batch_objective": 0.1676308951792442
+            },
+            {
+              "step": 1125,
+              "exact_batch_objective": 0.16771054957187193
+            },
+            {
+              "step": 1150,
+              "exact_batch_objective": 0.16812665626622747
+            },
+            {
+              "step": 1175,
+              "exact_batch_objective": 0.16661117456841112
+            },
+            {
+              "step": 1200,
+              "exact_batch_objective": 0.16565966235932147
+            },
+            {
+              "step": 1225,
+              "exact_batch_objective": 0.1656800841768768
+            },
+            {
+              "step": 1250,
+              "exact_batch_objective": 0.16513495426861022
+            },
+            {
+              "step": 1275,
+              "exact_batch_objective": 0.1652074388283854
+            },
+            {
+              "step": 1300,
+              "exact_batch_objective": 0.16477812175387951
+            },
+            {
+              "step": 1325,
+              "exact_batch_objective": 0.16439795075133604
+            },
+            {
+              "step": 1350,
+              "exact_batch_objective": 0.1659174809687279
+            },
+            {
+              "step": 1375,
+              "exact_batch_objective": 0.16395683315148565
+            },
+            {
+              "step": 1400,
+              "exact_batch_objective": 0.16559824831104394
+            },
+            {
+              "step": 1425,
+              "exact_batch_objective": 0.1635916567739403
+            },
+            {
+              "step": 1450,
+              "exact_batch_objective": 0.16310960242123218
+            },
+            {
+              "step": 1475,
+              "exact_batch_objective": 0.1629942904211181
+            },
+            {
+              "step": 1500,
+              "exact_batch_objective": 0.1630989760860602
+            },
+            {
+              "step": 1525,
+              "exact_batch_objective": 0.16282465707092586
+            },
+            {
+              "step": 1550,
+              "exact_batch_objective": 0.16239912982794716
+            },
+            {
+              "step": 1575,
+              "exact_batch_objective": 0.16243930929753467
+            },
+            {
+              "step": 1600,
+              "exact_batch_objective": 0.16219675092803168
+            },
+            {
+              "step": 1625,
+              "exact_batch_objective": 0.16405736559316964
+            },
+            {
+              "step": 1650,
+              "exact_batch_objective": 0.16203638190462286
+            },
+            {
+              "step": 1675,
+              "exact_batch_objective": 0.1619208410464896
+            },
+            {
+              "step": 1700,
+              "exact_batch_objective": 0.16192946977515013
+            },
+            {
+              "step": 1725,
+              "exact_batch_objective": 0.16221232029459423
+            },
+            {
+              "step": 1750,
+              "exact_batch_objective": 0.1613897103167336
+            },
+            {
+              "step": 1775,
+              "exact_batch_objective": 0.16143767182133406
+            },
+            {
+              "step": 1800,
+              "exact_batch_objective": 0.16205452277575158
+            },
+            {
+              "step": 1825,
+              "exact_batch_objective": 0.16233077131090995
+            },
+            {
+              "step": 1850,
+              "exact_batch_objective": 0.1619045121635007
+            },
+            {
+              "step": 1875,
+              "exact_batch_objective": 0.1626295187807217
+            },
+            {
+              "step": 1900,
+              "exact_batch_objective": 0.16387101240602364
+            },
+            {
+              "step": 1925,
+              "exact_batch_objective": 0.16128966206075615
+            },
+            {
+              "step": 1950,
+              "exact_batch_objective": 0.16124997238424346
+            },
+            {
+              "step": 1975,
+              "exact_batch_objective": 0.16123780741341057
+            },
+            {
+              "step": 2000,
+              "exact_batch_objective": 0.1609795939524998
+            }
+          ],
+          "final_exact_batch_objective": 0.1609795939524998,
+          "cost": {
+            "updates": 2000,
+            "sampled_rollouts": 24000,
+            "sampled_rollouts_per_update": 12,
+            "grad_clip_norm": 1.0
+          }
+        },
+        {
+          "seed": 20261025002,
+          "curve": [
+            {
+              "step": 0,
+              "exact_batch_objective": 0.5485602969695441
+            },
+            {
+              "step": 25,
+              "exact_batch_objective": 0.5012549833069673
+            },
+            {
+              "step": 50,
+              "exact_batch_objective": 0.5050283093623283
+            },
+            {
+              "step": 75,
+              "exact_batch_objective": 0.48991322103243556
+            },
+            {
+              "step": 100,
+              "exact_batch_objective": 0.47064157729172135
+            },
+            {
+              "step": 125,
+              "exact_batch_objective": 0.4619971519153654
+            },
+            {
+              "step": 150,
+              "exact_batch_objective": 0.4543673558605032
+            },
+            {
+              "step": 175,
+              "exact_batch_objective": 0.44239283597158785
+            },
+            {
+              "step": 200,
+              "exact_batch_objective": 0.43169552959800744
+            },
+            {
+              "step": 225,
+              "exact_batch_objective": 0.4193636135118015
+            },
+            {
+              "step": 250,
+              "exact_batch_objective": 0.41499760092096544
+            },
+            {
+              "step": 275,
+              "exact_batch_objective": 0.4107004477832536
+            },
+            {
+              "step": 300,
+              "exact_batch_objective": 0.4142640799103104
+            },
+            {
+              "step": 325,
+              "exact_batch_objective": 0.3906309083677805
+            },
+            {
+              "step": 350,
+              "exact_batch_objective": 0.38030200543605863
+            },
+            {
+              "step": 375,
+              "exact_batch_objective": 0.4086501149705948
+            },
+            {
+              "step": 400,
+              "exact_batch_objective": 0.3729711971794483
+            },
+            {
+              "step": 425,
+              "exact_batch_objective": 0.37486189884370585
+            },
+            {
+              "step": 450,
+              "exact_batch_objective": 0.3712718401186537
+            },
+            {
+              "step": 475,
+              "exact_batch_objective": 0.3514836807656594
+            },
+            {
+              "step": 500,
+              "exact_batch_objective": 0.35651649006939073
+            },
+            {
+              "step": 525,
+              "exact_batch_objective": 0.34638125731752983
+            },
+            {
+              "step": 550,
+              "exact_batch_objective": 0.33855600575918743
+            },
+            {
+              "step": 575,
+              "exact_batch_objective": 0.3341785764751331
+            },
+            {
+              "step": 600,
+              "exact_batch_objective": 0.3453316821666063
+            },
+            {
+              "step": 625,
+              "exact_batch_objective": 0.33537829603327074
+            },
+            {
+              "step": 650,
+              "exact_batch_objective": 0.32598265167969215
+            },
+            {
+              "step": 675,
+              "exact_batch_objective": 0.32230445507109506
+            },
+            {
+              "step": 700,
+              "exact_batch_objective": 0.32304264878275935
+            },
+            {
+              "step": 725,
+              "exact_batch_objective": 0.3201434129138119
+            },
+            {
+              "step": 750,
+              "exact_batch_objective": 0.3148757964312017
+            },
+            {
+              "step": 775,
+              "exact_batch_objective": 0.31279922903590235
+            },
+            {
+              "step": 800,
+              "exact_batch_objective": 0.31091095064833696
+            },
+            {
+              "step": 825,
+              "exact_batch_objective": 0.308892243131051
+            },
+            {
+              "step": 850,
+              "exact_batch_objective": 0.31373978463056423
+            },
+            {
+              "step": 875,
+              "exact_batch_objective": 0.30649789174215525
+            },
+            {
+              "step": 900,
+              "exact_batch_objective": 0.3118828509700357
+            },
+            {
+              "step": 925,
+              "exact_batch_objective": 0.30484509858600156
+            },
+            {
+              "step": 950,
+              "exact_batch_objective": 0.3012102702670874
+            },
+            {
+              "step": 975,
+              "exact_batch_objective": 0.2997824418163083
+            },
+            {
+              "step": 1000,
+              "exact_batch_objective": 0.2988288479020636
+            },
+            {
+              "step": 1025,
+              "exact_batch_objective": 0.2971931241857555
+            },
+            {
+              "step": 1050,
+              "exact_batch_objective": 0.29527975734354495
+            },
+            {
+              "step": 1075,
+              "exact_batch_objective": 0.29507366636073146
+            },
+            {
+              "step": 1100,
+              "exact_batch_objective": 0.2949127670172507
+            },
+            {
+              "step": 1125,
+              "exact_batch_objective": 0.2967124011324013
+            },
+            {
+              "step": 1150,
+              "exact_batch_objective": 0.2905394837673842
+            },
+            {
+              "step": 1175,
+              "exact_batch_objective": 0.29245718815825156
+            },
+            {
+              "step": 1200,
+              "exact_batch_objective": 0.29355556215159967
+            },
+            {
+              "step": 1225,
+              "exact_batch_objective": 0.2903761834160228
+            },
+            {
+              "step": 1250,
+              "exact_batch_objective": 0.2873650333961173
+            },
+            {
+              "step": 1275,
+              "exact_batch_objective": 0.2920036630884755
+            },
+            {
+              "step": 1300,
+              "exact_batch_objective": 0.30048589471982035
+            },
+            {
+              "step": 1325,
+              "exact_batch_objective": 0.2850478254491576
+            },
+            {
+              "step": 1350,
+              "exact_batch_objective": 0.2877847049794136
+            },
+            {
+              "step": 1375,
+              "exact_batch_objective": 0.2856511077471639
+            },
+            {
+              "step": 1400,
+              "exact_batch_objective": 0.283955657340422
+            },
+            {
+              "step": 1425,
+              "exact_batch_objective": 0.2823955380093526
+            },
+            {
+              "step": 1450,
+              "exact_batch_objective": 0.2854385214925867
+            },
+            {
+              "step": 1475,
+              "exact_batch_objective": 0.2818304905675742
+            },
+            {
+              "step": 1500,
+              "exact_batch_objective": 0.280654378656414
+            },
+            {
+              "step": 1525,
+              "exact_batch_objective": 0.2801712215753468
+            },
+            {
+              "step": 1550,
+              "exact_batch_objective": 0.28059181743431433
+            },
+            {
+              "step": 1575,
+              "exact_batch_objective": 0.27959993091562785
+            },
+            {
+              "step": 1600,
+              "exact_batch_objective": 0.27833976164737884
+            },
+            {
+              "step": 1625,
+              "exact_batch_objective": 0.27760085139072727
+            },
+            {
+              "step": 1650,
+              "exact_batch_objective": 0.27718395783575295
+            },
+            {
+              "step": 1675,
+              "exact_batch_objective": 0.2766604108471405
+            },
+            {
+              "step": 1700,
+              "exact_batch_objective": 0.2763081081395429
+            },
+            {
+              "step": 1725,
+              "exact_batch_objective": 0.27605773726912985
+            },
+            {
+              "step": 1750,
+              "exact_batch_objective": 0.28673777289537233
+            },
+            {
+              "step": 1775,
+              "exact_batch_objective": 0.27499647607968036
+            },
+            {
+              "step": 1800,
+              "exact_batch_objective": 0.2747088523502491
+            },
+            {
+              "step": 1825,
+              "exact_batch_objective": 0.2742022688489111
+            },
+            {
+              "step": 1850,
+              "exact_batch_objective": 0.293501110061124
+            },
+            {
+              "step": 1875,
+              "exact_batch_objective": 0.2750093873047688
+            },
+            {
+              "step": 1900,
+              "exact_batch_objective": 0.27410916564315446
+            },
+            {
+              "step": 1925,
+              "exact_batch_objective": 0.27393312778215645
+            },
+            {
+              "step": 1950,
+              "exact_batch_objective": 0.27273135695358935
+            },
+            {
+              "step": 1975,
+              "exact_batch_objective": 0.2728186304148979
+            },
+            {
+              "step": 2000,
+              "exact_batch_objective": 0.2763150116003949
+            }
+          ],
+          "final_exact_batch_objective": 0.2763150116003949,
+          "cost": {
+            "updates": 2000,
+            "sampled_rollouts": 24000,
+            "sampled_rollouts_per_update": 12,
+            "grad_clip_norm": 1.0
+          }
+        },
+        {
+          "seed": 20261025003,
+          "curve": [
+            {
+              "step": 0,
+              "exact_batch_objective": 0.5485602969695441
+            },
+            {
+              "step": 25,
+              "exact_batch_objective": 0.5075572469617902
+            },
+            {
+              "step": 50,
+              "exact_batch_objective": 0.4939017090651834
+            },
+            {
+              "step": 75,
+              "exact_batch_objective": 0.469152204591559
+            },
+            {
+              "step": 100,
+              "exact_batch_objective": 0.4267158701295135
+            },
+            {
+              "step": 125,
+              "exact_batch_objective": 0.40293935362625266
+            },
+            {
+              "step": 150,
+              "exact_batch_objective": 0.39196547863575626
+            },
+            {
+              "step": 175,
+              "exact_batch_objective": 0.37915770841312013
+            },
+            {
+              "step": 200,
+              "exact_batch_objective": 0.37165771772027023
+            },
+            {
+              "step": 225,
+              "exact_batch_objective": 0.36674925715644296
+            },
+            {
+              "step": 250,
+              "exact_batch_objective": 0.3644773113049035
+            },
+            {
+              "step": 275,
+              "exact_batch_objective": 0.3614870252528843
+            },
+            {
+              "step": 300,
+              "exact_batch_objective": 0.3596973221367838
+            },
+            {
+              "step": 325,
+              "exact_batch_objective": 0.35863445006399264
+            },
+            {
+              "step": 350,
+              "exact_batch_objective": 0.3583491144350557
+            },
+            {
+              "step": 375,
+              "exact_batch_objective": 0.3568007753522351
+            },
+            {
+              "step": 400,
+              "exact_batch_objective": 0.3553656558661555
+            },
+            {
+              "step": 425,
+              "exact_batch_objective": 0.35750001342245513
+            },
+            {
+              "step": 450,
+              "exact_batch_objective": 0.3553351013866905
+            },
+            {
+              "step": 475,
+              "exact_batch_objective": 0.35278445817093657
+            },
+            {
+              "step": 500,
+              "exact_batch_objective": 0.35249189895897254
+            },
+            {
+              "step": 525,
+              "exact_batch_objective": 0.3522207295307411
+            },
+            {
+              "step": 550,
+              "exact_batch_objective": 0.3510181335991503
+            },
+            {
+              "step": 575,
+              "exact_batch_objective": 0.3501395115489126
+            },
+            {
+              "step": 600,
+              "exact_batch_objective": 0.35043127937494495
+            },
+            {
+              "step": 625,
+              "exact_batch_objective": 0.34916759773764644
+            },
+            {
+              "step": 650,
+              "exact_batch_objective": 0.3485732237852314
+            },
+            {
+              "step": 675,
+              "exact_batch_objective": 0.3485095396935059
+            },
+            {
+              "step": 700,
+              "exact_batch_objective": 0.34804369861536283
+            },
+            {
+              "step": 725,
+              "exact_batch_objective": 0.3475770895579657
+            },
+            {
+              "step": 750,
+              "exact_batch_objective": 0.3473364999235233
+            },
+            {
+              "step": 775,
+              "exact_batch_objective": 0.3472147436740529
+            },
+            {
+              "step": 800,
+              "exact_batch_objective": 0.3466856883202096
+            },
+            {
+              "step": 825,
+              "exact_batch_objective": 0.3487514814421595
+            },
+            {
+              "step": 850,
+              "exact_batch_objective": 0.34594112522476356
+            },
+            {
+              "step": 875,
+              "exact_batch_objective": 0.34820885467987717
+            },
+            {
+              "step": 900,
+              "exact_batch_objective": 0.34622595427187713
+            },
+            {
+              "step": 925,
+              "exact_batch_objective": 0.3450636254305169
+            },
+            {
+              "step": 950,
+              "exact_batch_objective": 0.3448946106681548
+            },
+            {
+              "step": 975,
+              "exact_batch_objective": 0.34494974218806246
+            },
+            {
+              "step": 1000,
+              "exact_batch_objective": 0.34409945278217585
+            },
+            {
+              "step": 1025,
+              "exact_batch_objective": 0.34455318984142586
+            },
+            {
+              "step": 1050,
+              "exact_batch_objective": 0.3437631417293268
+            },
+            {
+              "step": 1075,
+              "exact_batch_objective": 0.3433918801048375
+            },
+            {
+              "step": 1100,
+              "exact_batch_objective": 0.3431255934264008
+            },
+            {
+              "step": 1125,
+              "exact_batch_objective": 0.3429939542942144
+            },
+            {
+              "step": 1150,
+              "exact_batch_objective": 0.3432050588868256
+            },
+            {
+              "step": 1175,
+              "exact_batch_objective": 0.3423168546389291
+            },
+            {
+              "step": 1200,
+              "exact_batch_objective": 0.3441711382653365
+            },
+            {
+              "step": 1225,
+              "exact_batch_objective": 0.34287047600813353
+            },
+            {
+              "step": 1250,
+              "exact_batch_objective": 0.34144769382592527
+            },
+            {
+              "step": 1275,
+              "exact_batch_objective": 0.34105467230763553
+            },
+            {
+              "step": 1300,
+              "exact_batch_objective": 0.3411215342066099
+            },
+            {
+              "step": 1325,
+              "exact_batch_objective": 0.34087735191861174
+            },
+            {
+              "step": 1350,
+              "exact_batch_objective": 0.3414012146858074
+            },
+            {
+              "step": 1375,
+              "exact_batch_objective": 0.3408171478078492
+            },
+            {
+              "step": 1400,
+              "exact_batch_objective": 0.34046999478291723
+            },
+            {
+              "step": 1425,
+              "exact_batch_objective": 0.3395949601010118
+            },
+            {
+              "step": 1450,
+              "exact_batch_objective": 0.339707395332334
+            },
+            {
+              "step": 1475,
+              "exact_batch_objective": 0.33952478601155683
+            },
+            {
+              "step": 1500,
+              "exact_batch_objective": 0.3397226174355348
+            },
+            {
+              "step": 1525,
+              "exact_batch_objective": 0.3392881524093336
+            },
+            {
+              "step": 1550,
+              "exact_batch_objective": 0.33882310334376203
+            },
+            {
+              "step": 1575,
+              "exact_batch_objective": 0.34125341843057105
+            },
+            {
+              "step": 1600,
+              "exact_batch_objective": 0.33963727721659737
+            },
+            {
+              "step": 1625,
+              "exact_batch_objective": 0.3401060550851871
+            },
+            {
+              "step": 1650,
+              "exact_batch_objective": 0.33835587132564227
+            },
+            {
+              "step": 1675,
+              "exact_batch_objective": 0.3376418216953367
+            },
+            {
+              "step": 1700,
+              "exact_batch_objective": 0.33748773768070706
+            },
+            {
+              "step": 1725,
+              "exact_batch_objective": 0.33727428883016414
+            },
+            {
+              "step": 1750,
+              "exact_batch_objective": 0.33706772147180614
+            },
+            {
+              "step": 1775,
+              "exact_batch_objective": 0.3369771985617846
+            },
+            {
+              "step": 1800,
+              "exact_batch_objective": 0.3366762245448671
+            },
+            {
+              "step": 1825,
+              "exact_batch_objective": 0.3365010983984174
+            },
+            {
+              "step": 1850,
+              "exact_batch_objective": 0.33751130123999773
+            },
+            {
+              "step": 1875,
+              "exact_batch_objective": 0.33622591576994276
+            },
+            {
+              "step": 1900,
+              "exact_batch_objective": 0.3361541424131409
+            },
+            {
+              "step": 1925,
+              "exact_batch_objective": 0.3360605553377976
+            },
+            {
+              "step": 1950,
+              "exact_batch_objective": 0.3364582343544397
+            },
+            {
+              "step": 1975,
+              "exact_batch_objective": 0.33562809027503193
+            },
+            {
+              "step": 2000,
+              "exact_batch_objective": 0.3354909213492115
+            }
+          ],
+          "final_exact_batch_objective": 0.3354909213492115,
+          "cost": {
+            "updates": 2000,
+            "sampled_rollouts": 24000,
+            "sampled_rollouts_per_update": 12,
+            "grad_clip_norm": 1.0
+          }
+        }
+      ],
+      "final_objective_mean": 0.2770946612019898,
+      "final_objective_std": 0.07126624259032215,
+      "final_objective_min": 0.1609795939524998,
+      "final_objective_max": 0.3355931179058529
+    },
+    "eval_enumerated_trajectories_per_curve_point": 360
+  },
+  "validation": {
+    "initial": {
+      "designed": {
+        "set": "designed",
+        "n_instances": 6,
+        "n_recovered": 0,
+        "recovery_rate": 0.0,
+        "instances": {
+          "one_step_exact": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.09340277777777778,
+            "optimal_objective": 0.05,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "one_step_near": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.08515625,
+            "optimal_objective": 0.05043402777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "two_step_complementary": {
+            "greedy_path": [
+              0,
+              3
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.41640625,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "two_step_complementary_2": {
+            "greedy_path": [
+              0,
+              3
+            ],
+            "optimal_path": [
+              3,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.6625,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "budget_one": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.8525173611111112,
+            "optimal_objective": 0.440625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "budget_two": {
+            "greedy_path": [
+              0,
+              3
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.41640625,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          }
+        }
+      },
+      "held_out": {
+        "set": "held_out",
+        "n_instances": 24,
+        "n_recovered": 2,
+        "recovery_rate": 0.08333333333333333,
+        "instances": {
+          "val_0": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.968402777777778,
+            "optimal_objective": 0.27960069444444446,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_1": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.6125,
+            "optimal_objective": 0.46710069444444446,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_2": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              3,
+              3,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.7796006944444445,
+            "optimal_objective": 0.1504340277777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 3
+          },
+          "val_3": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.5816840277777777,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_4": {
+            "greedy_path": [
+              2,
+              1,
+              1
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.24765625000000002,
+            "optimal_objective": 0.05390625,
+            "recovered": false,
+            "greedy_calls": 3,
+            "optimal_calls": 1
+          },
+          "val_5": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.32126736111111115,
+            "optimal_objective": 0.07777777777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_6": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.24140625,
+            "optimal_objective": 0.05694444444444445,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_7": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.10251736111111111,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_8": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.09340277777777778,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_9": {
+            "greedy_path": [
+              2,
+              1,
+              1
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.540625,
+            "optimal_objective": 0.10390625,
+            "recovered": false,
+            "greedy_calls": 3,
+            "optimal_calls": 2
+          },
+          "val_10": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.815625,
+            "optimal_objective": 0.065625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_11": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.8525173611111112,
+            "optimal_objective": 0.14765625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_12": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.36640625,
+            "optimal_objective": 0.05,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_13": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.7444444444444446,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_14": {
+            "greedy_path": [
+              2,
+              2
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.57265625,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_15": {
+            "greedy_path": [
+              0,
+              3
+            ],
+            "optimal_path": [
+              2,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.240625,
+            "optimal_objective": 0.1434027777777778,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "val_16": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.1611111111111111,
+            "optimal_objective": 0.1611111111111111,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_17": {
+            "greedy_path": [
+              0,
+              3,
+              3
+            ],
+            "optimal_path": [
+              3,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.16562500000000002,
+            "optimal_objective": 0.10390625,
+            "recovered": false,
+            "greedy_calls": 3,
+            "optimal_calls": 2
+          },
+          "val_18": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.05043402777777778,
+            "optimal_objective": 0.05043402777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_19": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.3434027777777777,
+            "optimal_objective": 0.06085069444444445,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_20": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.05,
+            "optimal_objective": 0.07777777777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_21": {
+            "greedy_path": [
+              2
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.52265625,
+            "optimal_objective": 0.07126736111111112,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_22": {
+            "greedy_path": [
+              0,
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.17335069444444445,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_23": {
+            "greedy_path": [
+              2,
+              1,
+              1
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.4212673611111112,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 3,
+            "optimal_calls": 2
+          }
+        }
+      }
+    },
+    "supervised_oracle_imitation": {
+      "designed": {
+        "set": "designed",
+        "n_instances": 6,
+        "n_recovered": 6,
+        "recovery_rate": 1.0,
+        "instances": {
+          "one_step_exact": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.05,
+            "optimal_objective": 0.05,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "one_step_near": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.05043402777777778,
+            "optimal_objective": 0.05043402777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "two_step_complementary": {
+            "greedy_path": [
+              1,
+              3
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.1,
+            "optimal_objective": 0.1,
+            "recovered": true,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "two_step_complementary_2": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              3,
+              2
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.1,
+            "optimal_objective": 0.1,
+            "recovered": true,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "budget_one": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.440625,
+            "optimal_objective": 0.440625,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "budget_two": {
+            "greedy_path": [
+              1,
+              3
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.1,
+            "optimal_objective": 0.1,
+            "recovered": true,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          }
+        }
+      },
+      "held_out": {
+        "set": "held_out",
+        "n_instances": 24,
+        "n_recovered": 6,
+        "recovery_rate": 0.25,
+        "instances": {
+          "val_0": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.27960069444444446,
+            "optimal_objective": 0.27960069444444446,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_1": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.46710069444444446,
+            "optimal_objective": 0.46710069444444446,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_2": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3,
+              3,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.7796006944444445,
+            "optimal_objective": 0.1504340277777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 3
+          },
+          "val_3": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.051736111111111115,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_4": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.7444444444444446,
+            "optimal_objective": 0.05390625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_5": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.008767361111111,
+            "optimal_objective": 0.07777777777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_6": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.008767361111111,
+            "optimal_objective": 0.05694444444444445,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_7": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.09340277777777778,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_8": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.051736111111111115,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_9": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.190625,
+            "optimal_objective": 0.10390625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 2
+          },
+          "val_10": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.018402777777778,
+            "optimal_objective": 0.065625,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_11": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.4944444444444444,
+            "optimal_objective": 0.14765625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_12": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.39027777777777783,
+            "optimal_objective": 0.05,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_13": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.71015625,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_14": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.09340277777777778,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_15": {
+            "greedy_path": [
+              1,
+              3
+            ],
+            "optimal_path": [
+              2,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.240625,
+            "optimal_objective": 0.1434027777777778,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "val_16": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.3,
+            "optimal_objective": 0.1611111111111111,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_17": {
+            "greedy_path": [
+              1,
+              3,
+              2
+            ],
+            "optimal_path": [
+              3,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.15000000000000002,
+            "optimal_objective": 0.10390625,
+            "recovered": false,
+            "greedy_calls": 3,
+            "optimal_calls": 2
+          },
+          "val_18": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.440625,
+            "optimal_objective": 0.05043402777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_19": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.6125,
+            "optimal_objective": 0.06085069444444445,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_20": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.10251736111111111,
+            "optimal_objective": 0.07777777777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_21": {
+            "greedy_path": [
+              1,
+              3
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.6625,
+            "optimal_objective": 0.07126736111111112,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_22": {
+            "greedy_path": [
+              1,
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.2254340277777778,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_23": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.7796006944444445,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 2
+          }
+        }
+      }
+    },
+    "exact_joint_gradient": {
+      "designed": {
+        "set": "designed",
+        "n_instances": 6,
+        "n_recovered": 4,
+        "recovery_rate": 0.6666666666666666,
+        "instances": {
+          "one_step_exact": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.05,
+            "optimal_objective": 0.05,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "one_step_near": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.05043402777777778,
+            "optimal_objective": 0.05043402777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "two_step_complementary": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.115625,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "two_step_complementary_2": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              3,
+              2
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.1,
+            "optimal_objective": 0.1,
+            "recovered": true,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "budget_one": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.440625,
+            "optimal_objective": 0.440625,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "budget_two": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.115625,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          }
+        }
+      },
+      "held_out": {
+        "set": "held_out",
+        "n_instances": 24,
+        "n_recovered": 7,
+        "recovery_rate": 0.2916666666666667,
+        "instances": {
+          "val_0": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.27960069444444446,
+            "optimal_objective": 0.27960069444444446,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_1": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.4944444444444444,
+            "optimal_objective": 0.46710069444444446,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_2": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3,
+              3,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.7796006944444445,
+            "optimal_objective": 0.1504340277777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 3
+          },
+          "val_3": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.051736111111111115,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_4": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.7444444444444446,
+            "optimal_objective": 0.05390625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_5": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.008767361111111,
+            "optimal_objective": 0.07777777777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_6": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.008767361111111,
+            "optimal_objective": 0.05694444444444445,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_7": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.09340277777777778,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_8": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.051736111111111115,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_9": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.190625,
+            "optimal_objective": 0.10390625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 2
+          },
+          "val_10": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.018402777777778,
+            "optimal_objective": 0.065625,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_11": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.14765625,
+            "optimal_objective": 0.14765625,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_12": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.008767361111111,
+            "optimal_objective": 0.05,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_13": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.051736111111111115,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_14": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.09340277777777778,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_15": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              2,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.35,
+            "optimal_objective": 0.1434027777777778,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "val_16": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.3,
+            "optimal_objective": 0.1611111111111111,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_17": {
+            "greedy_path": [
+              3,
+              2,
+              3
+            ],
+            "optimal_path": [
+              3,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.068402777777778,
+            "optimal_objective": 0.10390625,
+            "recovered": false,
+            "greedy_calls": 3,
+            "optimal_calls": 2
+          },
+          "val_18": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.440625,
+            "optimal_objective": 0.05043402777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_19": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.6125,
+            "optimal_objective": 0.06085069444444445,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_20": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.10251736111111111,
+            "optimal_objective": 0.07777777777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_21": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.490625,
+            "optimal_objective": 0.07126736111111112,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_22": {
+            "greedy_path": [
+              3,
+              2
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.1525173611111111,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_23": {
+            "greedy_path": [
+              0
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.7796006944444445,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 2
+          }
+        }
+      }
+    },
+    "rloo2_onpolicy_best_seed": {
+      "designed": {
+        "set": "designed",
+        "n_instances": 6,
+        "n_recovered": 1,
+        "recovery_rate": 0.16666666666666666,
+        "instances": {
+          "one_step_exact": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.08515625,
+            "optimal_objective": 0.05,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "one_step_near": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.07777777777777778,
+            "optimal_objective": 0.05043402777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "two_step_complementary": {
+            "greedy_path": [
+              3,
+              1
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.11085069444444445,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "two_step_complementary_2": {
+            "greedy_path": [
+              3,
+              1
+            ],
+            "optimal_path": [
+              3,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.10043402777777778,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "budget_one": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.440625,
+            "optimal_objective": 0.440625,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "budget_two": {
+            "greedy_path": [
+              3,
+              1
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.11085069444444445,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          }
+        }
+      },
+      "held_out": {
+        "set": "held_out",
+        "n_instances": 24,
+        "n_recovered": 7,
+        "recovery_rate": 0.2916666666666667,
+        "instances": {
+          "val_0": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.27960069444444446,
+            "optimal_objective": 0.27960069444444446,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_1": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.4944444444444444,
+            "optimal_objective": 0.46710069444444446,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_2": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              3,
+              3,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.815625,
+            "optimal_objective": 0.1504340277777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 3
+          },
+          "val_3": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.5517361111111112,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_4": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.05390625,
+            "optimal_objective": 0.05390625,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_5": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              1
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.008767361111111,
+            "optimal_objective": 0.07777777777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_6": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.22361111111111115,
+            "optimal_objective": 0.05694444444444445,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_7": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.09340277777777778,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_8": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.08515625,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_9": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.5816840277777777,
+            "optimal_objective": 0.10390625,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 2
+          },
+          "val_10": {
+            "greedy_path": [
+              3,
+              1
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.058767361111111,
+            "optimal_objective": 0.065625,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_11": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.14765625,
+            "optimal_objective": 0.14765625,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_12": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.008767361111111,
+            "optimal_objective": 0.05,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_13": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.051736111111111115,
+            "optimal_objective": 0.051736111111111115,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_14": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.12335069444444444,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_15": {
+            "greedy_path": [
+              3,
+              1
+            ],
+            "optimal_path": [
+              2,
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.3296006944444445,
+            "optimal_objective": 0.1434027777777778,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 2
+          },
+          "val_16": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.17543402777777778,
+            "optimal_objective": 0.1611111111111111,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_17": {
+            "greedy_path": [
+              3,
+              1,
+              1
+            ],
+            "optimal_path": [
+              3,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.18515625000000002,
+            "optimal_objective": 0.10390625,
+            "recovered": false,
+            "greedy_calls": 3,
+            "optimal_calls": 2
+          },
+          "val_18": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              2
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.051736111111111115,
+            "optimal_objective": 0.05043402777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_19": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.06085069444444445,
+            "optimal_objective": 0.06085069444444445,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_20": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 1.008767361111111,
+            "optimal_objective": 0.07777777777777778,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_21": {
+            "greedy_path": [
+              3,
+              1
+            ],
+            "optimal_path": [
+              0
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.5171006944444445,
+            "optimal_objective": 0.07126736111111112,
+            "recovered": false,
+            "greedy_calls": 2,
+            "optimal_calls": 1
+          },
+          "val_22": {
+            "greedy_path": [
+              3
+            ],
+            "optimal_path": [
+              3
+            ],
+            "path_matches": true,
+            "greedy_objective": 0.09340277777777778,
+            "optimal_objective": 0.09340277777777778,
+            "recovered": true,
+            "greedy_calls": 1,
+            "optimal_calls": 1
+          },
+          "val_23": {
+            "greedy_path": [
+              1
+            ],
+            "optimal_path": [
+              1,
+              3
+            ],
+            "path_matches": false,
+            "greedy_objective": 0.8525173611111112,
+            "optimal_objective": 0.1,
+            "recovered": false,
+            "greedy_calls": 1,
+            "optimal_calls": 2
+          }
+        }
+      }
+    }
+  },
+  "complementary_two_step": {
+    "two_step_complementary": {
+      "optimal_path": [
+        1,
+        3
+      ],
+      "optimal_distance_trajectory": [
+        42,
+        45,
+        0
+      ],
+      "first_optimal_call_increases_distance": true,
+      "methods": {
+        "initial": {
+          "greedy_path": [
+            0,
+            3
+          ],
+          "recovered": false,
+          "greedy_objective": 0.41640625,
+          "distance_trajectory": [
+            42,
+            43,
+            27
+          ]
+        },
+        "supervised_oracle_imitation": {
+          "greedy_path": [
+            1,
+            3
+          ],
+          "recovered": true,
+          "greedy_objective": 0.1,
+          "distance_trajectory": [
+            42,
+            45,
+            0
+          ]
+        },
+        "exact_joint_gradient": {
+          "greedy_path": [
+            3,
+            2
+          ],
+          "recovered": false,
+          "greedy_objective": 0.115625,
+          "distance_trajectory": [
+            42,
+            30,
+            6
+          ]
+        },
+        "rloo2_onpolicy_best_seed": {
+          "greedy_path": [
+            3,
+            1
+          ],
+          "recovered": false,
+          "greedy_objective": 0.11085069444444445,
+          "distance_trajectory": [
+            42,
+            30,
+            5
+          ]
+        }
+      }
+    },
+    "two_step_complementary_2": {
+      "optimal_path": [
+        3,
+        2
+      ],
+      "optimal_distance_trajectory": [
+        31,
+        39,
+        0
+      ],
+      "first_optimal_call_increases_distance": true,
+      "methods": {
+        "initial": {
+          "greedy_path": [
+            0,
+            3
+          ],
+          "recovered": false,
+          "greedy_objective": 0.6625,
+          "distance_trajectory": [
+            31,
+            32,
+            36
+          ]
+        },
+        "supervised_oracle_imitation": {
+          "greedy_path": [
+            3,
+            2
+          ],
+          "recovered": true,
+          "greedy_objective": 0.1,
+          "distance_trajectory": [
+            31,
+            39,
+            0
+          ]
+        },
+        "exact_joint_gradient": {
+          "greedy_path": [
+            3,
+            2
+          ],
+          "recovered": true,
+          "greedy_objective": 0.1,
+          "distance_trajectory": [
+            31,
+            39,
+            0
+          ]
+        },
+        "rloo2_onpolicy_best_seed": {
+          "greedy_path": [
+            3,
+            1
+          ],
+          "recovered": false,
+          "greedy_objective": 0.10043402777777778,
+          "distance_trajectory": [
+            31,
+            39,
+            1
+          ]
+        }
+      }
+    }
+  },
+  "budget": {
+    "hard_budget_violations": 0,
+    "trajectories_checked": 132120,
+    "note": "env.step raises on any illegal decision and the forced exit at min(budget, MAX_CALLS) carries probability 1, so a hard violation cannot be sampled; every rollout above asserted 1 <= calls <= limit. Overspend = expected calls under the trained policy minus the optimal path length.",
+    "overspend": {
+      "initial": {
+        "one_step_exact": {
+          "expected_calls": 1.7178851612302575,
+          "optimal_calls": 1,
+          "overspend": 0.7178851612302575,
+          "hard_limit": 3
+        },
+        "one_step_near": {
+          "expected_calls": 1.7160124998016488,
+          "optimal_calls": 1,
+          "overspend": 0.7160124998016488,
+          "hard_limit": 3
+        },
+        "two_step_complementary": {
+          "expected_calls": 1.799954943908418,
+          "optimal_calls": 2,
+          "overspend": -0.20004505609158207,
+          "hard_limit": 3
+        },
+        "two_step_complementary_2": {
+          "expected_calls": 1.7689669226637053,
+          "optimal_calls": 2,
+          "overspend": -0.23103307733629475,
+          "hard_limit": 3
+        },
+        "budget_one": {
+          "expected_calls": 1.0,
+          "optimal_calls": 1,
+          "overspend": 0.0,
+          "hard_limit": 1
+        },
+        "budget_two": {
+          "expected_calls": 1.501057880500189,
+          "optimal_calls": 2,
+          "overspend": -0.49894211949981093,
+          "hard_limit": 2
+        }
+      },
+      "supervised_oracle_imitation": {
+        "one_step_exact": {
+          "expected_calls": 1.041432694868241,
+          "optimal_calls": 1,
+          "overspend": 0.04143269486824108,
+          "hard_limit": 3
+        },
+        "one_step_near": {
+          "expected_calls": 1.0354763389351087,
+          "optimal_calls": 1,
+          "overspend": 0.03547633893510871,
+          "hard_limit": 3
+        },
+        "two_step_complementary": {
+          "expected_calls": 2.0080233661772375,
+          "optimal_calls": 2,
+          "overspend": 0.008023366177237534,
+          "hard_limit": 3
+        },
+        "two_step_complementary_2": {
+          "expected_calls": 1.9417558757377458,
+          "optimal_calls": 2,
+          "overspend": -0.05824412426225423,
+          "hard_limit": 3
+        },
+        "budget_one": {
+          "expected_calls": 1.0,
+          "optimal_calls": 1,
+          "overspend": 0.0,
+          "hard_limit": 1
+        },
+        "budget_two": {
+          "expected_calls": 1.9921071842601015,
+          "optimal_calls": 2,
+          "overspend": -0.007892815739898529,
+          "hard_limit": 2
+        }
+      },
+      "exact_joint_gradient": {
+        "one_step_exact": {
+          "expected_calls": 1.0426275676506302,
+          "optimal_calls": 1,
+          "overspend": 0.04262756765063025,
+          "hard_limit": 3
+        },
+        "one_step_near": {
+          "expected_calls": 1.0382937866608521,
+          "optimal_calls": 1,
+          "overspend": 0.03829378666085215,
+          "hard_limit": 3
+        },
+        "two_step_complementary": {
+          "expected_calls": 2.0024260320892604,
+          "optimal_calls": 2,
+          "overspend": 0.0024260320892603993,
+          "hard_limit": 3
+        },
+        "two_step_complementary_2": {
+          "expected_calls": 1.9866466460882868,
+          "optimal_calls": 2,
+          "overspend": -0.013353353911713217,
+          "hard_limit": 3
+        },
+        "budget_one": {
+          "expected_calls": 0.9999999999999999,
+          "optimal_calls": 1,
+          "overspend": -1.1102230246251565e-16,
+          "hard_limit": 1
+        },
+        "budget_two": {
+          "expected_calls": 1.998105534502312,
+          "optimal_calls": 2,
+          "overspend": -0.0018944654976880138,
+          "hard_limit": 2
+        }
+      },
+      "rloo2_onpolicy_best_seed": {
+        "one_step_exact": {
+          "expected_calls": 1.0056722656871702,
+          "optimal_calls": 1,
+          "overspend": 0.005672265687170164,
+          "hard_limit": 3
+        },
+        "one_step_near": {
+          "expected_calls": 1.004385634265592,
+          "optimal_calls": 1,
+          "overspend": 0.004385634265591909,
+          "hard_limit": 3
+        },
+        "two_step_complementary": {
+          "expected_calls": 2.0024783693592534,
+          "optimal_calls": 2,
+          "overspend": 0.002478369359253385,
+          "hard_limit": 3
+        },
+        "two_step_complementary_2": {
+          "expected_calls": 1.976577447411556,
+          "optimal_calls": 2,
+          "overspend": -0.023422552588443946,
+          "hard_limit": 3
+        },
+        "budget_one": {
+          "expected_calls": 1.0,
+          "optimal_calls": 1,
+          "overspend": 0.0,
+          "hard_limit": 1
+        },
+        "budget_two": {
+          "expected_calls": 1.9987684034742033,
+          "optimal_calls": 2,
+          "overspend": -0.001231596525796741,
+          "hard_limit": 2
+        }
+      }
+    }
+  },
+  "findings": [
+    "Supervised imitation of the enumerable optimal paths recovers 6/6 designed optima at ~zero per-update rollout cost (final batch objective 0.1832); exact joint score-function descent reaches a lower batch objective (0.1510) yet recovers only 4/6 designed optima \u2014 the joint objective is non-convex in the router weights, and batch E[F] and greedy path recovery are different criteria.",
+    "On-policy G=2 RLOO has exactly the same expected update as exact descent (enumeration identity err 5.13e-16) plus batch total gradient variance 0.0590 at init (vs 0.2958 for unbaselined REINFORCE); across seeds its final batch objective is 0.2771 \u00b1 0.0713 (range [0.1610, 0.3356]), and its best seed recovers 1/6 designed optima \u2014 the sampled estimator inherits the exact update's local optima and adds cross-seed variance on top.",
+    "Held-out recovery on fresh random instances is modest for every method (supervised 0.250): one linear policy trained on 6 tasks generalizes weakly, so none of the designed-set gains should be read as general competence.",
+    "All conclusions are restricted to this enumerable synthetic environment; nothing here licenses or refutes router RL on a real language model (that part of E09 is marked not_executed)."
+  ]
+}

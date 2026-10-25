@@ -1,0 +1,13 @@
+{
+  "python": "3.12.15",
+  "torch": "2.12.1+cu130",
+  "cuda": "13.0",
+  "device": "NVIDIA RTX A6000",
+  "parameters": 1903744,
+  "moe_layers": [
+    0,
+    1,
+    2,
+    3
+  ]
+}

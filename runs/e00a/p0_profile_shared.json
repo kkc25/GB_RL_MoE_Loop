@@ -1,0 +1,12 @@
+{
+  "steps": 100,
+  "tokens_per_step": 272,
+  "tokens_per_second": 5534.862572808841,
+  "step_ms_mean": 49.14304491248913,
+  "step_ms_p50": 52.846837032120675,
+  "step_ms_p95": 72.709032043349,
+  "peak_allocated_bytes": 18900992,
+  "mean_calls": 4.0,
+  "scope": "teacher_forced_full_forward_not_decode",
+  "device": "NVIDIA RTX A6000"
+}

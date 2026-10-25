@@ -1,0 +1,28 @@
+{
+  "model": {
+    "layers": 4,
+    "hidden_size": 128,
+    "attention_heads": 4,
+    "head_dim": 32,
+    "vocab_size": 512,
+    "intermediate_size": 256,
+    "experts_per_layer": 4,
+    "adaptive_layers": [3],
+    "max_calls": 3,
+    "target_only": true
+  },
+  "data": {"min_depth": 1, "max_depth": 1, "seed": 20261024},
+  "train": {
+    "output_dir": "runs/p0_depth1_diagnostic",
+    "device": "cuda",
+    "dtype": "bfloat16",
+    "batch_size": 128,
+    "updates": 100,
+    "pretrain_updates": 5000,
+    "learning_rate": 0.0006,
+    "validation_interval": 500,
+    "validation_batches": 16,
+    "log_interval": 100,
+    "input_token_limit": 1000000
+  }
+}

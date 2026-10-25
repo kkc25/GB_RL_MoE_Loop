@@ -1,0 +1,11 @@
+{
+  "optimizer_updates": 3000,
+  "supervised_targets": 384000,
+  "input_tokens": 2304000,
+  "rollouts": 0,
+  "expert_calls": 9216000,
+  "elapsed_seconds": 146.46987164200982,
+  "allocated_gpu_hours": 0.040686075456113836,
+  "lost_compute_seconds": 0.0,
+  "peak_memory_bytes": 84551168
+}

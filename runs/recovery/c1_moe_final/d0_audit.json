@@ -1,0 +1,29 @@
+{
+  "splits": {
+    "train": {
+      "checked": 847,
+      "meets_min_count": false,
+      "label_mismatches": [],
+      "prefix_conflicts": [],
+      "query_errors": [],
+      "target_errors": []
+    },
+    "id_validation": {
+      "checked": 182,
+      "meets_min_count": false,
+      "label_mismatches": [],
+      "prefix_conflicts": [],
+      "query_errors": [],
+      "target_errors": []
+    },
+    "id_test": {
+      "checked": 181,
+      "meets_min_count": false,
+      "label_mismatches": [],
+      "prefix_conflicts": [],
+      "query_errors": [],
+      "target_errors": []
+    }
+  },
+  "failures": []
+}

@@ -1,0 +1,313 @@
+{
+  "version": 1,
+  "updated_at": "2026-10-24T17:19:37.199505+00:00",
+  "experiments": {
+    "E00": {
+      "run_id": "E00_feasibility_and_baselines",
+      "title": "feasibility_and_baselines",
+      "status": "running",
+      "precondition": "none",
+      "components": {
+        "recovery_c0": {
+          "status": "finished",
+          "evidence": [
+            "runs/recovery/c0_identity_dense/stage_result.json",
+            "runs/recovery/c0_fixed_dense/stage_result.json"
+          ],
+          "metrics": {
+            "identity_accuracy": 1.0,
+            "fixed_affine_accuracy": 1.0
+          },
+          "gpu_hours": 0.0203,
+          "updated_at": "2026-10-24T16:58:52.073940+00:00"
+        },
+        "correctness_and_hardware": {
+          "status": "finished",
+          "evidence": [
+            "runs/bundle_validation/hardware_inventory.json",
+            "runs/e00a/p0_profile_shared.json",
+            "runs/recovery/smoke_resume_verified/stage_result.json"
+          ],
+          "metrics": {
+            "selected_unit_tests": 188,
+            "profile_scope": "shared_teacher_forced_smoke_not_isolated",
+            "resume_verified": true
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:02:00.945678+00:00"
+        },
+        "lm_backbone": {
+          "status": "running",
+          "evidence": [],
+          "metrics": {},
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:03:55.406257+00:00"
+        },
+        "recovery_c1": {
+          "status": "running",
+          "evidence": [
+            "runs/recovery/c1_all_comparison.json"
+          ],
+          "metrics": {
+            "c0_pass": true,
+            "c1_gate_pass": false,
+            "dense_best_late_iid_accuracy": 0.5714,
+            "moe_final_iid_accuracy": 0.5714,
+            "moe_full_iid_accuracy": 0.4176
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:14:38.148572+00:00"
+        }
+      },
+      "evidence": [
+        "runs/bundle_validation/hardware_inventory.json",
+        "runs/e00a/p0_profile_shared.json",
+        "runs/recovery/c0_fixed_dense/stage_result.json",
+        "runs/recovery/c0_identity_dense/stage_result.json",
+        "runs/recovery/c1_all_comparison.json",
+        "runs/recovery/smoke_resume_verified/stage_result.json"
+      ],
+      "metrics": {
+        "identity_accuracy": 1.0,
+        "fixed_affine_accuracy": 1.0,
+        "selected_unit_tests": 188,
+        "profile_scope": "shared_teacher_forced_smoke_not_isolated",
+        "resume_verified": true,
+        "c0_pass": true,
+        "c1_gate_pass": false,
+        "dense_best_late_iid_accuracy": 0.5714,
+        "moe_final_iid_accuracy": 0.5714,
+        "moe_full_iid_accuracy": 0.4176
+      },
+      "gpu_hours": 0.0203,
+      "stop_reason": "C1_IID_below_90_after_regularization_and_bounded_extension",
+      "next_trigger": "redesign_task_or_supervision_before_C2"
+    },
+    "E01": {
+      "run_id": "E01_oracle_and_learnability",
+      "title": "oracle_and_learnability",
+      "status": "planned",
+      "precondition": "qualified_frozen_backbone",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "qualified_frozen_backbone"
+    },
+    "E02": {
+      "run_id": "E02_counterfactual_rollout_distillation",
+      "title": "counterfactual_rollout_distillation",
+      "status": "planned",
+      "precondition": "E01_deployable_learnability_pass",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_deployable_learnability_pass"
+    },
+    "E03": {
+      "run_id": "E03_value_calibrated_halting",
+      "title": "value_calibrated_halting",
+      "status": "planned",
+      "precondition": "usable_multi_depth_backbone",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "usable_multi_depth_backbone"
+    },
+    "E04": {
+      "run_id": "E04_memory_and_transition_graph",
+      "title": "memory_and_transition_graph",
+      "status": "planned",
+      "precondition": "E02_same_hash_labels",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E02_same_hash_labels"
+    },
+    "E05": {
+      "run_id": "E05_prices_and_congestion_games",
+      "title": "prices_and_congestion_games",
+      "status": "running",
+      "precondition": "measured_load_bottleneck_and_E02_values",
+      "components": {
+        "synthetic_potential_game": {
+          "status": "running",
+          "evidence": [
+            "runs/e05_e06/seed0.json"
+          ],
+          "metrics": {
+            "tests": 22,
+            "max_potential_identity_error": 4.4e-16,
+            "real_service_executed": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:10:20.508084+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e05_e06/seed0.json"
+      ],
+      "metrics": {
+        "tests": 22,
+        "max_potential_identity_error": 4.4e-16,
+        "real_service_executed": false
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "measured_load_bottleneck_and_E02_values"
+    },
+    "E06": {
+      "run_id": "E06_causal_transport_assignment",
+      "title": "causal_transport_assignment",
+      "status": "running",
+      "precondition": "causal_service_window_and_scores",
+      "components": {
+        "synthetic_matching": {
+          "status": "running",
+          "evidence": [
+            "runs/e05_e06/seed0.json"
+          ],
+          "metrics": {
+            "tests": 22,
+            "capacity_violations": 0,
+            "real_service_executed": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:10:20.553313+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e05_e06/seed0.json"
+      ],
+      "metrics": {
+        "tests": 22,
+        "capacity_violations": 0,
+        "real_service_executed": false
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "causal_service_window_and_scores"
+    },
+    "E07": {
+      "run_id": "E07_budget_scheduling",
+      "title": "budget_scheduling",
+      "status": "running",
+      "precondition": "E03_calibrated_values_and_service_load",
+      "components": {
+        "synthetic_dp_and_ledger": {
+          "status": "running",
+          "evidence": [
+            "plans/loop_moe_research_plan_2026-10-25/results/e07_synthetic.json"
+          ],
+          "metrics": {
+            "synthetic_tests": 16,
+            "service_load_executed": false
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:02:00.984321+00:00"
+        }
+      },
+      "evidence": [
+        "plans/loop_moe_research_plan_2026-10-25/results/e07_synthetic.json"
+      ],
+      "metrics": {
+        "synthetic_tests": 16,
+        "service_load_executed": false
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E03_calibrated_values_and_service_load"
+    },
+    "E08": {
+      "run_id": "E08_stability_and_synthetic_mechanisms",
+      "title": "stability_and_synthetic_mechanisms",
+      "status": "running",
+      "precondition": "none_for_synthetic",
+      "components": {
+        "cde": {
+          "status": "running",
+          "evidence": [
+            "runs/e08_cde_cde.json"
+          ],
+          "metrics": {
+            "tests": 29,
+            "capacity_instances": 18,
+            "budget_repaired_violations": 0,
+            "d2": "not_run_gated",
+            "scope": "synthetic_only"
+          },
+          "gpu_hours": 0.0,
+          "updated_at": "2026-10-24T17:19:37.199455+00:00"
+        }
+      },
+      "evidence": [
+        "runs/e08_cde_cde.json"
+      ],
+      "metrics": {
+        "tests": 29,
+        "capacity_instances": 18,
+        "budget_repaired_violations": 0,
+        "d2": "not_run_gated",
+        "scope": "synthetic_only"
+      },
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": null
+    },
+    "E09": {
+      "run_id": "E09_router_only_policy_gradient",
+      "title": "router_only_policy_gradient",
+      "status": "planned",
+      "precondition": "E01_positive_E02_student_and_credit_limit_evidence",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_positive_E02_student_and_credit_limit_evidence"
+    },
+    "E10": {
+      "run_id": "E10_ordered_complementarity",
+      "title": "ordered_complementarity",
+      "status": "planned",
+      "precondition": "E01_two_round_counterfactual_labels",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_two_round_counterfactual_labels"
+    },
+    "E11": {
+      "run_id": "E11_systems_and_scale_validation",
+      "title": "systems_and_scale_validation",
+      "status": "planned",
+      "precondition": "last_layer_mechanism_pass",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "last_layer_mechanism_pass"
+    },
+    "E12": {
+      "run_id": "E12_expert_self_bidding",
+      "title": "expert_self_bidding",
+      "status": "planned",
+      "precondition": "E01_labels_and_equivalence_screen",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_labels_and_equivalence_screen"
+    }
+  }
+}

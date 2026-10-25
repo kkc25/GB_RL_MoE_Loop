@@ -1,0 +1,52 @@
+{
+  "model": {
+    "layers": 4,
+    "hidden_size": 128,
+    "attention_heads": 4,
+    "head_dim": 32,
+    "vocab_size": 512,
+    "intermediate_size": 256,
+    "experts_per_layer": 1,
+    "adaptive_layers": [
+      3
+    ],
+    "moe_layers": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "min_calls": 1,
+    "max_calls": 3,
+    "max_position_embeddings": 256,
+    "norm_eps": 1e-05,
+    "rope_base": 10000.0,
+    "adaptive_residual_scale": 1.0,
+    "nonadaptive_residual_scale": 1.0,
+    "dropout": 0.0,
+    "target_only": true
+  },
+  "task": {
+    "stage": "c1",
+    "seed": 0
+  },
+  "run": {
+    "output_dir": "runs/recovery/c1_dense",
+    "device": "cuda",
+    "dtype": "float32",
+    "seed": 11,
+    "batch_size": 128,
+    "updates": 3000,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "warmup_updates": 20,
+    "gradient_clip": 1.0,
+    "validation_interval": 100,
+    "log_interval": 20,
+    "fixed_depth": 1,
+    "depth_schedule": "fixed",
+    "shuffle_each_epoch": true,
+    "resume": null,
+    "gpu_hour_cap": 12.0
+  }
+}

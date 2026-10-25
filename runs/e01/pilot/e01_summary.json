@@ -1,0 +1,67 @@
+{
+  "experiment": "E01 counterfactual path space and deployable learnability",
+  "checkpoint": "runs/e00/debug67_b2/latest.pt",
+  "backbone_hash": "285a8cdb4a9656206d662a0371dec750ff9b276e6d4505920f0c6bffcd6a9edd",
+  "rounds": 4,
+  "n_actions": 28,
+  "n_states": {
+    "train": 1024,
+    "validation": 256,
+    "test": 256
+  },
+  "state_isolation": "train/validation/test states come from separate packed-LM split files; (split, doc, seq, position) recorded per state",
+  "policies": {
+    "baseline": {
+      "mean_cost": 5.714469909667969,
+      "mean_immediate_cost": 5.716815948486328,
+      "deploy_improvement": 0.0,
+      "deploy_improvement_se": 0.0
+    },
+    "random": {
+      "mean_cost": 5.715625762939453,
+      "mean_immediate_cost": 5.720888614654541,
+      "deploy_improvement": -0.001155742327682674,
+      "deploy_improvement_se": 0.0028478438034653664
+    },
+    "student_immediate": {
+      "mean_cost": 5.713088035583496,
+      "mean_immediate_cost": 5.715826511383057,
+      "deploy_improvement": 0.001382567803375423,
+      "deploy_improvement_se": 0.0035207904875278473
+    },
+    "student_q_pi0": {
+      "mean_cost": 5.713075160980225,
+      "mean_immediate_cost": 5.715814113616943,
+      "deploy_improvement": 0.0013955541653558612,
+      "deploy_improvement_se": 0.0035202731378376484
+    }
+  },
+  "oracle": {
+    "mean_cost": 5.67334508895874,
+    "oracle_gap": 0.04112548008561134,
+    "oracle_gap_se": 0.002317661652341485,
+    "mean_oracle_action_is_baseline": 0.01953125,
+    "deployable": false,
+    "note": "label-informed lower bound on cost; reported separately and never counted as deploy improvement"
+  },
+  "students": {
+    "immediate": {
+      "test_mse": 16.84566879272461,
+      "best_validation_mse": 12.620396614074707
+    },
+    "q_pi0": {
+      "test_mse": 16.872224807739258,
+      "best_validation_mse": 12.402387619018555
+    }
+  },
+  "ledger": {
+    "backbone_prefix_tokens": 6144,
+    "candidate_pair_calls": 172032,
+    "head_readouts": 86016,
+    "student_train_samples": 10240,
+    "student_optimizer_updates": 40,
+    "elapsed_seconds": 8.99854065902764,
+    "peak_memory_bytes": 0
+  },
+  "descriptive_recovery_ratio": 0.033934051649992206
+}
