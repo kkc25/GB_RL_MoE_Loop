@@ -26,3 +26,10 @@ runs/invalid_label_leak_pilot_console.log
 runs/p0_causal_pilot_console.log
 runs/full_tests_final_candidate.log
 runs/full_tests_goal_round3.log
+runs/repair_*/controller_corpus/exclusions/
+runs/repair_*/controller_corpus_console.log
+runs/repair_*/r1_debug/
+runs/repair_*/r1_fp32/
+runs/repair_*/r1_test/
+runs/repair_*/r2_smoke*
+runs/repair_*/r4_smoke*

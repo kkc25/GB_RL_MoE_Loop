@@ -1,0 +1,20 @@
+{
+  "scope": "Legacy analysis/report.py helper only; no evidence this affects current NumPy E09, whose gradient checks were independently reproduced.",
+  "source": "analysis/report.py:17,38-45",
+  "repository_commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "input_directory_files": [],
+  "math_checks_json_present": false,
+  "original_build_report_output": {
+    "run_dir": "/workspace/scratch/0f24fc616bd0/code_audit_2026-10-25/audit_empty_report_ramv9czl",
+    "math_gate_pass": true,
+    "training_records": 0,
+    "latest_validation": {},
+    "rloo_trend": null,
+    "ledger": {},
+    "p0_learning_gate_pass": false,
+    "large_scale_gate": "not_assessed"
+  },
+  "observed_bug": "A completely empty run directory yields math_gate_pass=true because not math_checks is true.",
+  "required_semantics": "Missing checks must be unknown/not_assessed (or fail closed); only present valid passing checks can establish a passed mathematical gate.",
+  "temporary_input_cleanup": "The empty temporary run directory is removed after this probe."
+}

@@ -35,7 +35,7 @@ def build_report(run_dir: str | Path) -> dict:
             "late_cost": sum(row["cost"] for row in late) / len(late),
         }
         rloo_trend["nll_change"] = rloo_trend["late_nll"] - rloo_trend["early_nll"]
-    math_pass = not math_checks or (
+    math_pass = bool(math_checks) and (
         math_checks["max_abs_pg_vs_fd"] < 1e-7
         and math_checks["max_abs_exact_halt_vs_fd"] < 1e-7
         and math_checks["max_abs_rloo2_vs_exact_pg"] < 1e-7
@@ -43,6 +43,7 @@ def build_report(run_dir: str | Path) -> dict:
     return {
         "run_dir": str(root),
         "math_gate_pass": math_pass,
+        "math_gate_status": "pass" if math_pass else ("fail" if math_checks else "not_assessed"),
         "training_records": len(training),
         "latest_validation": latest,
         "rloo_trend": rloo_trend,

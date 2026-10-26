@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop/experiments/r4_quality.py", line 146, in <module>
+    main()
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop/experiments/r4_quality.py", line 88, in main
+    raise ValueError(f"{role} states do not match the current corpus doc_map; regenerate R2 states")
+ValueError: controller_train states do not match the current corpus doc_map; regenerate R2 states

@@ -1,5 +1,7 @@
 # Budget-aware Adaptive Expert-Loop MoE 实验报告
 
+> **审计修复提示：** 本报告保留原始实验记录，不再单独作为当前科学结论的依据。合作者审计后的代码修复、撤回项及新文档复验见 [代码审计修复与有界复验报告](Loop_MoE_Code_Audit_Repair_Report_2026-10-25.md)；两份报告中的数值不可混用。
+
 **日期：2026-10-25**
 **工作目录：`/nvme-1/zhoukegu/GB_RL_MoE_Loop`**
 **实验范围：E00–E12 按前置门槛逐项实施与评估**

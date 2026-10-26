@@ -1,0 +1,21 @@
+{
+  "scope": "Original NumPy controlled.py plus original e09_controlled pure functions, only data-package import isolated to avoid unrelated Torch requirement",
+  "rloo_vs_exact_max_abs": 5.134781488891349e-16,
+  "exact_vs_finite_difference_6_coordinates_max_abs": 5.385994601703192e-12,
+  "terminal_paths_per_instance": [
+    84,
+    84,
+    84,
+    84,
+    4,
+    20
+  ],
+  "total_probability_per_instance": [
+    1.0000000000000002,
+    1.0,
+    1.0,
+    0.9999999999999999,
+    1.0,
+    1.0000000000000002
+  ]
+}

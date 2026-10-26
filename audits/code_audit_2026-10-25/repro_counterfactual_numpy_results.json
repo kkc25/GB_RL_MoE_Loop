@@ -1,0 +1,87 @@
+{
+  "e12_expert_axis": {
+    "source": "experiments/e12_bidding.py:149",
+    "actual_first_projection": [
+      [
+        [
+          27.0
+        ],
+        [
+          45.0
+        ]
+      ]
+    ],
+    "independent_adapter_projection": [
+      [
+        [
+          6.0
+        ],
+        [
+          35.0
+        ]
+      ]
+    ],
+    "change_expert1_input_actual_delta": [
+      [
+        [
+          3.0
+        ],
+        [
+          5.0
+        ]
+      ]
+    ],
+    "change_expert1_input_expected_delta": [
+      [
+        [
+          0.0
+        ],
+        [
+          5.0
+        ]
+      ]
+    ]
+  },
+  "e11_feature_contract": {
+    "source": "train/value_student.py:35-37 vs eval/dynamic_halting.py:26-31",
+    "illustrative_gain_predictor": "delta_hat(z) = z[0]",
+    "raw_h_gain": 2.0,
+    "normalized_h_gain": 1.414213208819837,
+    "tau": 1.7,
+    "raw_h_continue": true,
+    "normalized_h_continue": false
+  },
+  "e10_sign_flip": {
+    "source": "experiments/e10_ordered.py:237-238",
+    "pair_mean_gamma_across_anchors": [
+      1.0,
+      0.0
+    ],
+    "coded_sign_flip": true,
+    "positive_and_negative_exists": false
+  },
+  "e01_custom_action_table": {
+    "source": "eval/counterfactual.py:199-203,217,222",
+    "requested_pairs": [
+      [
+        0,
+        1
+      ],
+      [
+        6,
+        7
+      ]
+    ],
+    "actually_forced_pairs": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "note": "Default all-28 action order works; a non-prefix subset is mislabeled."
+  }
+}

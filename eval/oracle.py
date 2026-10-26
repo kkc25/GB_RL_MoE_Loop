@@ -11,9 +11,16 @@ def all_paths(experts: int, max_calls: int) -> list[tuple[int, ...]]:
     return [path for depth in range(1, max_calls + 1) for path in itertools.product(range(experts), repeat=depth)]
 
 
+def legal_paths(experts: int, budget: int, max_calls: int) -> list[tuple[int, ...]]:
+    """Unique executable paths under a budget: forced paths deeper than
+    min(budget, max_calls) are truncated by the legality rule, so deeper
+    enumerations only duplicate shallower trajectories."""
+    return all_paths(experts, min(budget, max_calls))
+
+
 @torch.no_grad()
 def oracle_path_metrics(model, controller, input_ids, labels, budget: int, price: float, device: torch.device, dtype: str) -> dict[str, float]:
-    paths = all_paths(model.config.experts_per_layer, model.config.max_calls)
+    paths = legal_paths(model.config.experts_per_layer, budget, model.config.max_calls)
     losses, costs = [], []
     with autocast_context(device, dtype):
         for path in paths:
@@ -33,7 +40,7 @@ def oracle_path_metrics(model, controller, input_ids, labels, budget: int, price
 
 
 def exact_path_batch(model, controller, input_ids, labels, budget: int, price: float, device: torch.device, dtype: str):
-    paths = all_paths(model.config.experts_per_layer, model.config.max_calls)
+    paths = legal_paths(model.config.experts_per_layer, budget, model.config.max_calls)
     for path in paths:
         with torch.no_grad(), autocast_context(device, dtype):
             output = model(input_ids, labels, controller=controller, budget=budget, price=price, forced_path=path, collect_rollout=True, keep_logits=False)

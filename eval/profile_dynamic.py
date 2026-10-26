@@ -20,9 +20,15 @@ def synchronize(device):
         torch.cuda.synchronize(device)
 
 
+def reset_peak_memory(device):
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
+
+
 @torch.no_grad()
 def evaluate_dynamic(model, policy, dataset, config, device, batches):
-    loss_sum, count, rounds_sum = 0.0, 0, 0
+    loss_sum, count = 0.0, 0
+    supervised_rounds_sum, executed_rounds_sum, executed_positions = 0, 0, 0
     sampler = PackedLMBatchSampler(dataset, config.train.batch_size, shuffle=False, drop_last=False)
     for index, indices in enumerate(sampler):
         if index >= batches:
@@ -33,12 +39,23 @@ def evaluate_dynamic(model, policy, dataset, config, device, batches):
         _, batch_sum, batch_count = lm_loss(logits, batch["labels"])
         loss_sum += batch_sum.item()
         count += batch_count.item()
-        rounds_sum += rounds.sum().item()
-    return {"nll": loss_sum / count, "mean_rounds": rounds_sum / count, "supervised_tokens": count}
+        supervised_rounds_sum += rounds[batch["labels"] != -100].sum().item()
+        executed_rounds_sum += rounds.sum().item()
+        executed_positions += rounds.numel()
+    return {
+        "nll": loss_sum / count,
+        "mean_rounds_supervised": supervised_rounds_sum / count,
+        "supervised_tokens": count,
+        "executed_positions": executed_positions,
+        "ffn_rounds_total": executed_rounds_sum,
+        "expert_token_pairs": executed_rounds_sum * model.config.top_k,
+    }
 
 
 @torch.no_grad()
 def profile(model, policy, batch, config, device, mode, warmup, steps):
+    """Time input->logits only, for every mode; quality/CE stays outside."""
+    reset_peak_memory(device)
     times = []
     for step in range(warmup + steps):
         synchronize(device)
@@ -47,7 +64,7 @@ def profile(model, policy, batch, config, device, mode, warmup, steps):
             if mode == "dynamic":
                 policy.forward(model, batch["input_ids"], batch["segment_ids"])
             else:
-                model(batch["input_ids"], batch["labels"], depth=mode, segment_ids=batch["segment_ids"])
+                model(batch["input_ids"], depth=mode, segment_ids=batch["segment_ids"])
         synchronize(device)
         if step >= warmup:
             times.append(time.perf_counter() - started)

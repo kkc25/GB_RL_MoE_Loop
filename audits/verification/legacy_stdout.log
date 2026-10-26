@@ -1,0 +1,35 @@
+{
+  "scope": "Actual legacy train_exact on injected analytic leaves, plus unmodified tiny neural exact_path_batch; no checkpoint or LM claim",
+  "torch": "2.12.1+cu130",
+  "implemented_gradient": -0.20000000298023224,
+  "true_gradient": 0.16,
+  "expected_cost_before": 1.7999999523162842,
+  "expected_cost_after_actual_adamw_update": 1.8015952110290527,
+  "trainer_records": [
+    {
+      "phase": "exact",
+      "step": 0,
+      "expected_objective": 1.800000011920929,
+      "probability_mass": 1.0,
+      "oracle_gap": 0.0,
+      "grad_norm": 0.20000000298023224,
+      "lr": 0.01
+    },
+    {
+      "phase": "validation",
+      "step": 1,
+      "algorithm": "exact_greedy",
+      "fixture": true
+    }
+  ],
+  "budget_probability_mass": {
+    "1": {
+      "enumerated_paths": 6,
+      "total_probability": 3.0
+    },
+    "2": {
+      "enumerated_paths": 6,
+      "total_probability": 0.999999962747097
+    }
+  }
+}

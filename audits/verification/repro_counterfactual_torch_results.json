@@ -1,0 +1,122 @@
+{
+  "torch_version": "2.12.1+cu130",
+  "source_commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "trained_checkpoint_used": false,
+  "dynamic_feature_mismatch": {
+    "tau": 1.4339094161987305,
+    "raw_gains": [
+      0.002570974174886942,
+      0.009157401509582996,
+      -0.0038552337791770697,
+      0.002941141137853265,
+      0.015402266755700111,
+      0.0019691658671945333,
+      -0.01288331113755703
+    ],
+    "normalized_gains": [
+      0.1450134962797165,
+      1.3492417335510254,
+      -0.0734906867146492,
+      0.23555320501327515,
+      2.852416515350342,
+      0.2091943770647049,
+      -0.013657279312610626
+    ],
+    "expected_rounds_from_training_contract": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "actual_deployed_rounds": [
+      1,
+      1,
+      1,
+      1,
+      4,
+      1,
+      1
+    ],
+    "max_logit_difference": 0.004195459187030792
+  },
+  "expert_adapter_einsum": {
+    "actual_final_bids": [
+      [
+        27.0,
+        45.0
+      ]
+    ],
+    "independent_adapter_final_bids": [
+      [
+        6.0,
+        35.0
+      ]
+    ]
+  },
+  "module_apply_override": {
+    "reproduced": true,
+    "exception": "TypeError",
+    "message": "expected Tensor as element 0 in argument 1, but got function"
+  },
+  "checkpoint_summary_cancels": {
+    "expert_summaries": [
+      [
+        1.0
+      ],
+      [
+        -1.0
+      ]
+    ],
+    "actual_bids": [
+      [
+        0.0,
+        0.0
+      ]
+    ]
+  },
+  "custom_action_subset": {
+    "requested_actions": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "actual_global_action_ids": [
+      0,
+      1
+    ],
+    "max_cost_error_vs_requested_second_action": 0.0011525154113769531
+  },
+  "reference_zero_counted_as_sign_flip": {
+    "costs": [
+      [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0
+        ]
+      ]
+    ],
+    "reported_fraction": 0.25,
+    "strict_positive_negative_flip_fraction": 0.0
+  },
+  "central_vs_anchor_candidate_set": {
+    "central_global_argmin": 5,
+    "anchor_legal_actions": [
+      0,
+      1,
+      2
+    ],
+    "central_restricted_argmin": 0
+  }
+}

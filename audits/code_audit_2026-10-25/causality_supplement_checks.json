@@ -1,0 +1,45 @@
+{
+  "aggregate_entrypoint": {
+    "completed": false,
+    "exception_type": "ValueError",
+    "message": "target_only supports exactly one terminal adaptive layer",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/scratch/0f24fc616bd0/code_audit_2026-10-25/reproduce_causality_supplement.py\", line 24, in <module>\n    cz.run(seed=0)\n  File \"/workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/eval/causality.py\", line 544, in run\n    \"multi_adaptive_target_only_probe\": check_multi_adaptive_target_only(ids, labels, seed=seed),\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/eval/causality.py\", line 497, in check_multi_adaptive_target_only\n    model, controller = build_pair(adaptive_layers=(1, 3), target_only=True, seed=seed)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/eval/causality.py\", line 86, in build_pair\n    model_config = small_model_config(adaptive_layers, target_only, **model_overrides)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/eval/causality.py\", line 64, in small_model_config\n    return ModelConfig(**kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"<string>\", line 22, in __init__\n  File \"/workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/config.py\", line 44, in __post_init__\n    raise ValueError(\"target_only supports exactly one terminal adaptive layer\")\nValueError: target_only supports exactly one terminal adaptive layer\n"
+  },
+  "unpatched_production_float64": {
+    "completed": true,
+    "memory_dtype": "torch.float64",
+    "finite_logits": true,
+    "instance_initial_memory_patch_present": false
+  },
+  "sampled_batch_reorder_production": [
+    {
+      "item": 0,
+      "solo_batch_max_logit_difference": 0.0,
+      "solo_batch_max_call_difference": 0,
+      "reorder_max_logit_difference": 0.0,
+      "reorder_max_call_difference": 0
+    },
+    {
+      "item": 1,
+      "solo_batch_max_logit_difference": 3.3306690738754696e-16,
+      "solo_batch_max_call_difference": 0,
+      "reorder_max_logit_difference": 0.0,
+      "reorder_max_call_difference": 0
+    },
+    {
+      "item": 2,
+      "solo_batch_max_logit_difference": 1.6653345369377348e-16,
+      "solo_batch_max_call_difference": 0,
+      "reorder_max_logit_difference": 0.0,
+      "reorder_max_call_difference": 0
+    },
+    {
+      "item": 3,
+      "solo_batch_max_logit_difference": 1.1102230246251565e-16,
+      "solo_batch_max_call_difference": 0,
+      "reorder_max_logit_difference": 0.0,
+      "reorder_max_call_difference": 0
+    }
+  ],
+  "scope": "CPU, no-cache path, Top-1, small random model; not LM Top-2 training or KV-cache validation."
+}

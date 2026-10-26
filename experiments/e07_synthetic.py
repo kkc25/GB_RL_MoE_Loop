@@ -3,12 +3,16 @@
 Scenario A (service window): N <= 8 requests, each with a per-round
 improvement trajectory of length H <= 4, share a budget of B extra Top-2
 group calls. An exact DP over (rounds_used_per_request, remaining_budget)
-gives the computable-range upper bound; the gain-index heuristic
-I_i = d1_i / c1 is compared against it, together with round-robin, random
-and fixed two-step-package (d2/c2) baselines. Two trajectory families are
-built: diminishing marginal returns, and invest-first-benefit-later. The
-latter makes the greedy ratio fail; the failure samples are kept and
-reported, not deleted.
+gives the computable-range upper bound; ``prefix_knapsack`` solves the same
+separable problem exactly in O(N B H) (D_0(0)=0, D_0(b>0)=-inf, answer
+max_{b<=B} D_N(b), budget may be left unspent) and is cross-validated
+against it, scaling to the full 64-request replay window. The gain-index
+heuristic I_i = d1_i / c1 is compared against the optimum, together with
+round-robin, random and fixed two-step-package (d2/c2) baselines. Two
+trajectory families are built: diminishing marginal returns, and
+invest-first-benefit-later. The latter makes the greedy ratio fail; the
+failure samples are kept and reported, not deleted. Absolute regret is
+always reported; the relative gap is null when the optimal gain is zero.
 
 Scenario B (streaming ledger): each token supplies K expert credits,
 R_m = R_{m-1} + K - q_m >= 0, with an optional carryover cap whose overflow
@@ -88,6 +92,49 @@ def exact_dp(deltas, budget):
                     b -= 1
                     break
     return value, rounds
+
+
+def prefix_knapsack(deltas, budget):
+    """Exact separable prefix oracle in O(N * B * H), including optional stop.
+
+    D_0(0) = 0, D_0(b>0) = -inf;
+    D_i(b) = max_{0<=k<=min(H_i,b)} { D_{i-1}(b-k) + G_i(k) }
+    where G_i(k) is the prefix gain of request i.  The answer is
+    max_{b<=B} D_N(b): spending is never forced and budget may be left
+    unused.  Returns (optimal_value, rounds_per_request).
+
+    This solves the offline, separable, known-window problem exactly (the
+    joint exponential-state DP is NOT needed here); it does not apply to
+    online serving with unknown future requests.
+    """
+    budget = min(budget, sum(len(d) for d in deltas))
+    neg_inf = float("-inf")
+    dp = [0.0] + [neg_inf] * budget
+    parents = []
+    for row in deltas:
+        pref = [0.0]
+        for gain in row:
+            pref.append(pref[-1] + gain)
+        new = [neg_inf] * (budget + 1)
+        choice = [0] * (budget + 1)
+        for k in range(min(len(row), budget) + 1):
+            gain = pref[k]
+            for b in range(k, budget + 1):
+                cand = dp[b - k] + gain
+                if cand > new[b]:
+                    new[b] = cand
+                    choice[b] = k
+        parents.append(choice)
+        dp = new
+    b = max(range(budget + 1), key=lambda x: dp[x])
+    value = dp[b]
+    allocation = []
+    for choice in reversed(parents):
+        k = choice[b]
+        allocation.append(k)
+        b -= k
+    allocation.reverse()
+    return value, allocation
 
 
 def index_allocation(deltas, budget, cost=1.0):
@@ -240,21 +287,26 @@ def evaluate_instance(deltas, budget, rng):
     rr_total, _, rr_used = round_robin_allocation(deltas, budget)
     rnd_total, _, rnd_used = random_allocation(deltas, budget, rng)
 
-    def gap(v):
-        return (opt - v) / opt if opt > 1e-12 else 0.0
+    def metrics(v):
+        # Absolute regret is always reported.  The relative gap is null when
+        # the optimal gain is zero: dividing by ~0 would hide negative
+        # heuristic value behind a reported gap of 0.
+        abs_regret = opt - v
+        return abs_regret, (abs_regret / opt if opt > 1e-12 else None)
 
+    rows = {}
+    for name, total, used in (
+            ("index_d1_c1", idx_total, idx_used),
+            ("two_step_package_d2_c2", pkg_total, pkg_used),
+            ("round_robin", rr_total, rr_used),
+            ("random", rnd_total, rnd_used)):
+        abs_regret, rel_gap = metrics(total)
+        rows[name] = {"value": total, "used": used,
+                      "abs_regret": abs_regret, "rel_gap": rel_gap}
     return {
         "optimal": opt, "optimal_rounds": opt_rounds,
-        "heuristics": {
-            "index_d1_c1": {"value": idx_total, "used": idx_used,
-                            "rel_gap": gap(idx_total)},
-            "two_step_package_d2_c2": {"value": pkg_total, "used": pkg_used,
-                                       "rel_gap": gap(pkg_total)},
-            "round_robin": {"value": rr_total, "used": rr_used,
-                            "rel_gap": gap(rr_total)},
-            "random": {"value": rnd_total, "used": rnd_used,
-                       "rel_gap": gap(rnd_total)},
-        },
+        "zero_optimal": opt <= 1e-12,
+        "heuristics": rows,
     }
 
 
@@ -264,20 +316,28 @@ def dp_gap_curve(seed=20261025, n_instances=20, N=6, H=4,
     curve = []
     for B in budgets:
         agg = {}
+        n_zero_optimal = 0
         for _ in range(n_instances):
             deltas = sample_instance(rng, N, H)
             row = evaluate_instance(deltas, B, rng)
+            n_zero_optimal += int(row["zero_optimal"])
             for name, h in row["heuristics"].items():
-                a = agg.setdefault(name, {"gaps": [], "used": 0})
-                a["gaps"].append(h["rel_gap"])
+                a = agg.setdefault(name, {"gaps": [], "regrets": [], "used": 0})
+                if h["rel_gap"] is not None:
+                    a["gaps"].append(h["rel_gap"])
+                a["regrets"].append(h["abs_regret"])
                 a["used"] += h["used"]
         curve.append({
             "budget": B,
             "n_instances": n_instances,
+            "n_zero_optimal_instances": n_zero_optimal,
             "heuristics": {
                 name: {
-                    "mean_rel_gap": sum(a["gaps"]) / len(a["gaps"]),
-                    "max_rel_gap": max(a["gaps"]),
+                    "mean_rel_gap": (sum(a["gaps"]) / len(a["gaps"])
+                                     if a["gaps"] else None),
+                    "max_rel_gap": max(a["gaps"]) if a["gaps"] else None,
+                    "mean_abs_regret": sum(a["regrets"]) / len(a["regrets"]),
+                    "max_abs_regret": max(a["regrets"]),
                     "mean_used_budget": a["used"] / n_instances,
                 } for name, a in agg.items()
             },
@@ -437,14 +497,18 @@ def main(argv=None):
     with open(args.output, "w") as f:
         json.dump(result, f, indent=2)
     gap = result["scenario_a_exact_dp"]["dp_gap"]["curve"]
-    worst = max(h["max_rel_gap"] for row in gap for h in row["heuristics"].values())
+    worst_rel = [h["max_rel_gap"] for row in gap for h in row["heuristics"].values()
+                 if h["max_rel_gap"] is not None]
+    worst_abs = max(h["max_abs_regret"] for row in gap for h in row["heuristics"].values())
     print(f"wrote {args.output}")
     print(f"service_load: {result['service_load']['status']}")
     print(f"seqtopk counterexample violation: "
           f"{result['seqtopk_counterexample']['violation']}")
     print(f"ledger prefix invariant holds: "
           f"{result['scenario_b_hard_ledger']['prefix_invariant_holds']}")
-    print(f"worst max_rel_gap over curve: {worst:.4f}")
+    print(f"worst max_rel_gap over curve (positive-optimum instances only): "
+          f"{max(worst_rel):.4f}" if worst_rel else "no positive-optimum instances")
+    print(f"worst max_abs_regret over curve: {worst_abs:.4f}")
 
 
 if __name__ == "__main__":

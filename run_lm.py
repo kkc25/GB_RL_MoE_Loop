@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import platform
@@ -50,9 +51,10 @@ def main() -> None:
         "data_hash": manifest["document_list_sha256"],
         "tokenizer_hash": manifest["tokenizer"]["sha256"],
     }
+    data_hash = hashlib.sha256(f'{manifest["document_list_sha256"]}:{manifest["tokenizer"]["sha256"]}'.encode()).hexdigest()
     (output_dir / "environment.json").write_text(json.dumps(environment, indent=2) + "\n")
     writer = MetricWriter(output_dir / "metrics.jsonl")
-    ledger = train_lm(model, train_dataset, validation_dataset, config, device, writer)
+    ledger = train_lm(model, train_dataset, validation_dataset, config, device, writer, data_hash=data_hash)
     final = {}
     for depth in (1, 2, 4):
         final[f"depth_{depth}"] = evaluate_lm(model, validation_dataset, config, device, depth, run.validation_batches)

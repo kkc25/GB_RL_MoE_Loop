@@ -1,0 +1,262 @@
+{
+  "version": 1,
+  "updated_at": "2026-10-25T15:29:56.954998+00:00",
+  "experiments": {
+    "E00": {
+      "run_id": "E00_feasibility_and_baselines",
+      "title": "feasibility_and_baselines",
+      "status": "planned",
+      "precondition": "none",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "none"
+    },
+    "E01": {
+      "run_id": "E01_oracle_and_learnability",
+      "title": "oracle_and_learnability",
+      "status": "stopped_by_evidence",
+      "precondition": "qualified_frozen_backbone",
+      "components": {
+        "multidocument_r2_r3": {
+          "status": "stopped_by_evidence",
+          "evidence": [
+            "runs/repair_2026_10_25/r2_full/summary.json"
+          ],
+          "metrics": {
+            "test_documents": 385,
+            "test_states": 4000,
+            "oracle_gap_4_candidates": 0.03440049663186073,
+            "raw_mlp_deploy_improvement": -0.00393255427479744
+          },
+          "gpu_hours": null,
+          "updated_at": "2026-10-25T15:27:10.044705+00:00"
+        }
+      },
+      "evidence": [
+        "runs/repair_2026_10_25/r2_full/summary.json"
+      ],
+      "metrics": {
+        "test_documents": 385,
+        "test_states": 4000,
+        "oracle_gap_4_candidates": 0.03440049663186073,
+        "raw_mlp_deploy_improvement": -0.00393255427479744
+      },
+      "gpu_hours": null,
+      "stop_reason": "\u5f53\u524d\u56db\u5019\u9009\u548c raw-h \u63a5\u53e3\u4e0a\uff0c\u5b66\u751f\u672a\u8d85\u8fc7\u7b80\u5355\u89c4\u5219\uff1b\u4e0d\u7b49\u4e8e\u72b6\u6001\u5728\u6570\u5b66\u4e0a\u65e0\u4fe1\u606f",
+      "next_trigger": "\u4ec5\u5728\u65b0\u9aa8\u5e72\u6216\u65b0\u53ef\u89c2\u6d4b\u63a5\u53e3\u51fa\u73b0\u91cd\u590d\u90e8\u7f72\u6536\u76ca\u540e\u91cd\u5f00"
+    },
+    "E02": {
+      "run_id": "E02_counterfactual_rollout_distillation",
+      "title": "counterfactual_rollout_distillation",
+      "status": "blocked_by_precondition",
+      "precondition": "E01_deployable_learnability_pass",
+      "components": {
+        "lm_distillation": {
+          "status": "blocked_by_precondition",
+          "evidence": [
+            "runs/repair_2026_10_25/r2_full/summary.json"
+          ],
+          "metrics": {},
+          "gpu_hours": null,
+          "updated_at": "2026-10-25T15:27:10.045029+00:00"
+        }
+      },
+      "evidence": [
+        "runs/repair_2026_10_25/r2_full/summary.json"
+      ],
+      "metrics": {},
+      "gpu_hours": null,
+      "stop_reason": "R3 \u672a\u901a\u8fc7\u90e8\u7f72\u6536\u76ca\u4e0e\u7b80\u5355\u89c4\u5219\u95e8\u69db",
+      "next_trigger": "E01/R3 \u5728\u65b0\u6587\u6863\u4e0a\u663e\u793a\u8d85\u8fc7\u7b80\u5355\u89c4\u5219\u7684\u91cd\u590d\u6536\u76ca"
+    },
+    "E03": {
+      "run_id": "E03_value_calibrated_halting",
+      "title": "value_calibrated_halting",
+      "status": "finished",
+      "precondition": "usable_multi_depth_backbone",
+      "components": {
+        "multidocument_r4": {
+          "status": "finished",
+          "evidence": [
+            "runs/repair_2026_10_25/r4_full/summary.json"
+          ],
+          "metrics": {
+            "test_documents": 385,
+            "fixed_r1_nll": 4.968461036682129,
+            "fixed_r2_nll": 4.967247486114502,
+            "direct_delta_nll": 4.968369007110596,
+            "direct_delta_mean_rounds": 1.6195000410079956,
+            "delta_vs_fixed_r2": 0.0011214292608201504
+          },
+          "gpu_hours": null,
+          "updated_at": "2026-10-25T15:29:56.954951+00:00"
+        }
+      },
+      "evidence": [
+        "runs/repair_2026_10_25/r4_full/summary.json"
+      ],
+      "metrics": {
+        "test_documents": 385,
+        "fixed_r1_nll": 4.968461036682129,
+        "fixed_r2_nll": 4.967247486114502,
+        "direct_delta_nll": 4.968369007110596,
+        "direct_delta_mean_rounds": 1.6195000410079956,
+        "delta_vs_fixed_r2": 0.0011214292608201504
+      },
+      "gpu_hours": null,
+      "stop_reason": "\u5b9e\u9a8c\u5df2\u5b8c\u6210\uff1b\u5f53\u524d direct-delta \u672a\u80dc\u56fa\u5b9a R2\uff0c\u56fa\u5b9a R1 \u5df2\u5728 0.005 nat \u5bb9\u5fcd\u5185",
+      "next_trigger": "\u53ea\u6709\u65b0\u72ec\u7acb\u786e\u8ba4\u663e\u793a\u72b6\u6001\u6761\u4ef6\u505c\u6b62\u6536\u76ca\u540e\u624d\u505a\u7cfb\u7edf\u786e\u8ba4"
+    },
+    "E04": {
+      "run_id": "E04_memory_and_transition_graph",
+      "title": "memory_and_transition_graph",
+      "status": "planned",
+      "precondition": "E02_same_hash_labels",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E02_same_hash_labels"
+    },
+    "E05": {
+      "run_id": "E05_prices_and_congestion_games",
+      "title": "prices_and_congestion_games",
+      "status": "planned",
+      "precondition": "measured_load_bottleneck_and_E02_values",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "measured_load_bottleneck_and_E02_values"
+    },
+    "E06": {
+      "run_id": "E06_causal_transport_assignment",
+      "title": "causal_transport_assignment",
+      "status": "planned",
+      "precondition": "causal_service_window_and_scores",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "causal_service_window_and_scores"
+    },
+    "E07": {
+      "run_id": "E07_budget_scheduling",
+      "title": "budget_scheduling",
+      "status": "planned",
+      "precondition": "E03_calibrated_values_and_service_load",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E03_calibrated_values_and_service_load"
+    },
+    "E08": {
+      "run_id": "E08_stability_and_synthetic_mechanisms",
+      "title": "stability_and_synthetic_mechanisms",
+      "status": "planned",
+      "precondition": "none_for_synthetic",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "none_for_synthetic"
+    },
+    "E09": {
+      "run_id": "E09_router_only_policy_gradient",
+      "title": "router_only_policy_gradient",
+      "status": "planned",
+      "precondition": "E01_positive_E02_student_and_credit_limit_evidence",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_positive_E02_student_and_credit_limit_evidence"
+    },
+    "E10": {
+      "run_id": "E10_ordered_complementarity",
+      "title": "ordered_complementarity",
+      "status": "planned",
+      "precondition": "E01_two_round_counterfactual_labels",
+      "components": {},
+      "evidence": [],
+      "metrics": {},
+      "gpu_hours": 0.0,
+      "stop_reason": null,
+      "next_trigger": "E01_two_round_counterfactual_labels"
+    },
+    "E11": {
+      "run_id": "E11_systems_and_scale_validation",
+      "title": "systems_and_scale_validation",
+      "status": "finished",
+      "precondition": "last_layer_mechanism_pass",
+      "components": {
+        "raw_h_closed_loop": {
+          "status": "finished",
+          "evidence": [
+            "runs/repair_2026_10_25/r1_bf16/summary.json",
+            "runs/repair_2026_10_25/r1_validation/summary.json"
+          ],
+          "metrics": {
+            "test_decision_mismatches": 0,
+            "validation_decision_mismatches": 0
+          },
+          "gpu_hours": null,
+          "updated_at": "2026-10-25T15:27:10.045345+00:00"
+        }
+      },
+      "evidence": [
+        "runs/repair_2026_10_25/r1_bf16/summary.json",
+        "runs/repair_2026_10_25/r1_validation/summary.json"
+      ],
+      "metrics": {
+        "test_decision_mismatches": 0,
+        "validation_decision_mismatches": 0
+      },
+      "gpu_hours": null,
+      "stop_reason": "\u4ec5\u9a8c\u6536\u672b\u5c42 raw-h \u5b9e\u73b0\u95ed\u73af\uff1b\u4e0d\u5305\u542b\u9694\u79bb GPU \u6027\u80fd\u7ed3\u8bba",
+      "next_trigger": "\u9700\u8981\u6027\u80fd\u58f0\u660e\u65f6\u9884\u7ea6\u9694\u79bb GPU"
+    },
+    "E12": {
+      "run_id": "E12_expert_self_bidding",
+      "title": "expert_self_bidding",
+      "status": "stopped_by_evidence",
+      "precondition": "E01_labels_and_equivalence_screen",
+      "components": {
+        "repaired_adapter_retrain": {
+          "status": "stopped_by_evidence",
+          "evidence": [
+            "runs/repair_2026_10_25/e12_bidding/e12_bidding_summary.json"
+          ],
+          "metrics": {
+            "central_same_cell_mse": 12.878859519958496,
+            "bidding_same_cell_mse": 12.912939071655273,
+            "bidding_baseline_anchor_improvement": 0.0001297183334827423
+          },
+          "gpu_hours": null,
+          "updated_at": "2026-10-25T15:27:10.045654+00:00"
+        }
+      },
+      "evidence": [
+        "runs/repair_2026_10_25/e12_bidding/e12_bidding_summary.json"
+      ],
+      "metrics": {
+        "central_same_cell_mse": 12.878859519958496,
+        "bidding_same_cell_mse": 12.912939071655273,
+        "bidding_baseline_anchor_improvement": 0.0001297183334827423
+      },
+      "gpu_hours": null,
+      "stop_reason": "\u91cd\u8bad\u540e\u672a\u7a33\u5b9a\u4f18\u4e8e central restricted \u5bf9\u7167",
+      "next_trigger": "\u6709\u65b0\u7684\u5408\u6cd5\u8f93\u5165\u4ef7\u503c\u8bc1\u636e\u540e\u518d\u505a\u7ed3\u6784\u7b5b\u67e5"
+    }
+  }
+}

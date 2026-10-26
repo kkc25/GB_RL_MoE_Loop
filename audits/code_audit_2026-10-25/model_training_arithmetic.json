@@ -1,0 +1,56 @@
+{
+  "commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "configuration_arithmetic": {
+    "e00_debug67_b0": {
+      "parameters": 67170816,
+      "ffn_flops_per_token_at_R1": 18874368,
+      "ffn_flops_per_token_at_R4": 23592960
+    },
+    "e00_debug67_b1": {
+      "parameters": 67170816,
+      "ffn_flops_per_token_at_R1": 18874368,
+      "ffn_flops_per_token_at_R4": 23592960
+    },
+    "e00_debug67_b2": {
+      "parameters": 67170816,
+      "ffn_flops_per_token_at_R1": 18874368,
+      "ffn_flops_per_token_at_R4": 23592960
+    },
+    "e00_dense_b3": {
+      "parameters": 48247296,
+      "ffn_flops_per_token_at_R1": 37748736,
+      "ffn_flops_per_token_at_R4": 37748736
+    },
+    "e00_dense_b4": {
+      "parameters": 104870400,
+      "ffn_flops_per_token_at_R1": 150994944,
+      "ffn_flops_per_token_at_R4": 150994944
+    },
+    "e00_dense_b5": {
+      "parameters": 48247808,
+      "ffn_flops_per_token_at_R1": 37748736,
+      "ffn_flops_per_token_at_R4": 47185920
+    },
+    "e00_m105_b2": {
+      "parameters": 104919552,
+      "ffn_flops_per_token_at_R1": 37748736,
+      "ffn_flops_per_token_at_R4": 47185920
+    }
+  },
+  "m105_input_tokens_per_update": 1023.9921357403975,
+  "m105_supervised_tokens_per_update": 1022.0176536244202,
+  "m105_ledger_named_expert_calls": 1350009856,
+  "m105_actual_expert_token_pairs_including_padding": 2700019712,
+  "b0_ledger_named_expert_calls": 60002304,
+  "b0_actual_expert_token_pairs_including_padding": 120004608,
+  "validation_tokens": 16342,
+  "sampler_reproduction": {
+    "manifest_number_of_sequences": 97657,
+    "steps": 12,
+    "identical_sequence_order": true,
+    "rebuild_every_update_seconds": 0.504656260000047,
+    "one_iterator_seconds": 0.03600316799929715,
+    "time_ratio_for_these_K_steps": 14.016995949075897,
+    "scope": "audit_host_CPU_only_not_GPU_performance_estimate"
+  }
+}

@@ -218,13 +218,22 @@ def gamma_summary(gamma: torch.Tensor) -> dict:
     }
 
 
-def reference_sensitivity(costs: torch.Tensor, anchors: tuple[tuple[int, int], ...] = SENSITIVITY_ANCHORS) -> dict:
+def reference_sensitivity(costs: torch.Tensor, anchors: tuple[tuple[int, int], ...] = SENSITIVITY_ANCHORS,
+                          eps: float = 1e-6) -> dict:
     """Gamma stability under anchor changes, on the given (held-out) costs.
 
     Per anchor: mean over states of Gamma, then across anchors: spread of the
     per-pair mean Gamma and the fraction of (a, b) pairs whose mean Gamma
     changes sign between anchors.  A Gamma that only exists for one anchor is
     a reference artifact, not an interaction.
+
+    Sign flips are STRICT with a numerical zero band: a pair counts as a flip
+    only if its mean Gamma exceeds ``eps`` under at least one anchor and falls
+    below ``-eps`` under another.  Pairs whose mean Gamma ever lies inside the
+    zero band [-eps, eps] are reported separately as uncertain/zero.  The
+    historical inclusive definition (any >0 together with any <=0, so a
+    positive-to-zero transition already counted as a flip) is retained under
+    an explicit name for comparison with earlier outputs only.
     """
     per_anchor = []
     pair_means = []
@@ -234,13 +243,22 @@ def reference_sensitivity(costs: torch.Tensor, anchors: tuple[tuple[int, int], .
         pair_means.append(mean_over_states)
         per_anchor.append({"a0": a0, "b0": b0, **gamma_summary(gamma)})
     stacked = torch.stack(pair_means)
-    positive = stacked > 0
-    sign_flip = (positive.any(dim=0) & (~positive).any(dim=0)).float().mean().item()
+    strictly_positive = stacked > eps
+    strictly_negative = stacked < -eps
+    strict_flip = strictly_positive.any(dim=0) & strictly_negative.any(dim=0)
+    zero_band = (stacked.abs() <= eps).any(dim=0)
+    inclusive_positive = stacked > 0
+    inclusive_flip = inclusive_positive.any(dim=0) & (~inclusive_positive).any(dim=0)
     return {
         "anchors": per_anchor,
         "pair_mean_std_across_anchors": stacked.std(dim=0, unbiased=False).mean().item(),
         "pair_mean_abs_across_anchors": stacked.abs().mean().item(),
-        "sign_flip_pair_fraction": sign_flip,
+        "sign_flip_pair_fraction": strict_flip.float().mean().item(),
+        "sign_flip_definition": ("strict: a pair flips only if some anchor has mean Gamma > eps "
+                                 "and another has mean Gamma < -eps"),
+        "sign_flip_eps": eps,
+        "zero_or_uncertain_pair_fraction": zero_band.float().mean().item(),
+        "inclusive_sign_flip_pair_fraction_positive_to_zero_counts": inclusive_flip.float().mean().item(),
     }
 
 

@@ -1,0 +1,9 @@
+{
+  "mode": "original",
+  "torch_version": "2.5.1+cpu",
+  "tests_run": 3,
+  "failures": 2,
+  "errors": 1,
+  "successful": false,
+  "repository_changed": false
+}

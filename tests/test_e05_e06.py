@@ -228,6 +228,58 @@ class TestE06SoftAndRounding(unittest.TestCase):
         self.assertIn("queue", rounded["reason"])
 
 
+class TestE06SoftFeasibilityReporting(unittest.TestCase):
+    """The soft transport is a relaxation of the distinct Top-2 problem: the
+    per-edge bound P <= 1 is not enforced, so feasibility must be reported
+    separately for the relaxed margins and the exact integer problem, and the
+    upper-bound violation must reach the summary."""
+
+    def test_upper_bound_violation_reported_next_to_hard_feasibility(self):
+        # Audit counterexample: one token, k=2, capacity (2,2), cost (0,100).
+        # The relaxed solution approaches (2, 0); every legal distinct Top-2
+        # assignment pays 100.
+        soft = M.soft_transport(np.array([[0.0, 100.0]]), np.array([2, 2]),
+                                eps=1.0, iters=1000, k=2)
+        self.assertGreater(soft["max_upper_bound_violation"], 0.9)
+        self.assertTrue(soft["relaxed_feasible"])
+        self.assertTrue(soft["hard_integer_feasible"])
+        self.assertAlmostEqual(soft["hard_integer_objective"], 100.0, places=9)
+        self.assertLess(soft["objective_linear"], 1.0)  # relaxation is cheaper
+        self.assertIn("not", soft["semantics"])
+
+    def test_structural_infeasibility_reported_separately(self):
+        # Total slots suffice (4 >= 2) but only one distinct expert is allowed:
+        # the integer problem is infeasible while relaxed margins still hold.
+        allowed = np.array([[True, False]])
+        costs = np.array([[0.0, 1.0]])
+        capacity = np.array([2, 2])
+        soft = M.soft_transport(costs, capacity, 1.0, 50, allowed=allowed, k=2)
+        hard = M.solve_additive_assignment(costs, capacity, allowed=allowed, k=2)
+        self.assertFalse(hard["feasible"])
+        self.assertFalse(soft["hard_integer_feasible"])
+        self.assertTrue(soft["relaxed_feasible"])
+        # the forbidden-edge residual is reported (near zero here: the slack
+        # row absorbs the mass instead of routing it over the blocked edge)
+        self.assertGreaterEqual(soft["max_forbidden_edge_mass"], 0.0)
+
+    def test_insufficient_total_slots_marks_both_infeasible(self):
+        soft = M.soft_transport(np.zeros((3, 2)), np.array([1, 1]), 1.0, 5, k=2)
+        self.assertFalse(soft["relaxed_feasible"])
+        self.assertFalse(soft["hard_integer_feasible"])
+
+    def test_run_e06_summary_carries_soft_violations(self):
+        out = M.run_e06(seed=0)
+        self.assertIn("soft_reference_semantics", out)
+        for row in out["soft_and_rounding"]:
+            self.assertIn("max_upper_bound_violation", row)
+            self.assertIn("max_forbidden_edge_mass", row)
+            self.assertIn("relaxed_feasible", row)
+            self.assertIn("hard_integer_feasible", row)
+            self.assertTrue(row["relaxed_feasible"])
+            self.assertTrue(row["hard_integer_feasible"])
+            self.assertTrue(np.isfinite(row["max_upper_bound_violation"]))
+
+
 class TestE06CausalSanity(unittest.TestCase):
     def setUp(self):
         rng = np.random.default_rng(29)

@@ -1,0 +1,14 @@
+{
+  "source_commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "repository_git_blob_matches": 390,
+  "production_sources_unchanged": true,
+  "python_syntax_valid": true,
+  "json_parse_valid": true,
+  "markdown_code_fences_balanced": true,
+  "local_link_checks": 43,
+  "fixed_commit_source_link_checks": 74,
+  "matrix_experiments": 13,
+  "patch_git_apply_check": "passed",
+  "new_training_executed": false,
+  "archive_policy": "Only audit deliverables; excludes repository copy, dependencies, checkpoints, pycache and pytest temporary files."
+}

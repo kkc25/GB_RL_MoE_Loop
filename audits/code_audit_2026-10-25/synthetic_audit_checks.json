@@ -1,0 +1,99 @@
+{
+  "repository_commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "execution": "CPU NumPy and pure Python; no model weights or GPU; e07_replay pure AST functions extracted to avoid importing Torch",
+  "exact_trainer_missing_probability": {
+    "costs": [
+      1.0,
+      2.0
+    ],
+    "p_action_1": 0.8,
+    "correct_gradient": 0.15999999999999998,
+    "implemented_gradient": -0.20000000000000007,
+    "objective_before": 1.8,
+    "objective_after_implemented_step": 1.803180809119022,
+    "objective_after_correct_step": 1.7974277078731222,
+    "source": "train/exact.py:30-33"
+  },
+  "offline_order_dependence": {
+    "equal_depth_gain_original": 10.0,
+    "equal_depth_gain_reversed": 0.0,
+    "rolling_dp_gain_original": 103.0,
+    "rolling_dp_gain_reordered": 102.0,
+    "source": "experiments/e07_replay.py:579-581,612-613"
+  },
+  "zero_oracle_gap_hidden": {
+    "true_gains": [
+      [
+        -1.0
+      ],
+      [
+        -1.0
+      ]
+    ],
+    "predicted_gains": [
+      [
+        1.0
+      ],
+      [
+        1.0
+      ]
+    ],
+    "budget": 1,
+    "oracle_value": 0.0,
+    "heuristic_value": -1.0,
+    "true_absolute_regret": 1.0,
+    "reported": {
+      "dp_window": 2,
+      "n_instances_per_tier": 1,
+      "upper_bound_note": "Exact DP on realized gains over dp_window-request sub-windows; the computable-range upper bound only. The joint DP over the full 64-request window is outside the computable range, and the rolling_window_dp allocator is an explicit approximation, not the joint optimum. A relative gap above 1 means the heuristic's realized total gain is negative — allocations chosen on predicted gains can lose value on mispredicted requests.",
+      "per_tier": [
+        {
+          "budget_avg_rounds": 1.5,
+          "sub_window_budget_rounds": 1,
+          "mean_rel_gap_vs_exact_dp": {
+            "equal_depth": 0.0,
+            "single_step_index": 0.0,
+            "two_step_package": 0.0
+          },
+          "max_rel_gap_vs_exact_dp": {
+            "equal_depth": 0.0,
+            "single_step_index": 0.0,
+            "two_step_package": 0.0
+          }
+        }
+      ]
+    },
+    "source": "experiments/e07_replay.py:539"
+  },
+  "full_window_dp_is_tractable": {
+    "random_small_cases_vs_repository_exact_dp": 100,
+    "maximum_error": 1.7763568394002505e-15,
+    "large_n": 64,
+    "large_h": 3,
+    "large_budget": 192,
+    "runtime_seconds_this_cpu": 0.0013740129998041084,
+    "value": 55.220153046647255,
+    "used_extra_rounds": 90,
+    "source": "experiments/e07_replay.py:283-290,508-552"
+  },
+  "soft_transport_not_top2_feasible": {
+    "P": [
+      [
+        1.999000499750125,
+        1.4880303904084242e-40
+      ]
+    ],
+    "feasible_flag": true,
+    "row_residual": 0.0009995002498750516,
+    "edge_upper_bound_violation": 0.999000499750125,
+    "soft_linear_objective": 1.4880303904084243e-38,
+    "distinct_top2_exact_objective": 100.0,
+    "note": "Helper exposes the violation but run_e06 drops it from summary; hard flow and rounding remain capacity safe."
+  },
+  "soft_feasible_flag_ignores_structural_infeasibility": {
+    "soft_feasible": true,
+    "hard_feasible": false,
+    "required_distinct_experts": 2,
+    "allowed_distinct_experts": 1
+  }
+}

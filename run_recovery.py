@@ -83,6 +83,19 @@ def main() -> None:
             best_checkpoint = torch.load(best_path, map_location=device, weights_only=False)
             model.load_state_dict(best_checkpoint["model"])
             summary["checkpoint_selection"] = "best_validation"
+    else:
+        checkpoint_path = Path(run.resume) if run.resume else output_dir / "best_validation.pt"
+        if not checkpoint_path.exists():
+            raise FileNotFoundError(f"evaluate mode requires a trained checkpoint: {checkpoint_path}")
+        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+        missing = {"model", "data_hash", "update"} - checkpoint.keys()
+        if missing:
+            raise ValueError(f"checkpoint {checkpoint_path} missing fields: {sorted(missing)}")
+        if checkpoint["data_hash"] != manifest["sha256"]:
+            raise ValueError("checkpoint data hash does not match current task")
+        model.load_state_dict(checkpoint["model"])
+        summary["checkpoint_selection"] = str(checkpoint_path)
+        summary["checkpoint_update"] = checkpoint["update"]
     final_metrics = {}
     for split, dataset in datasets.items():
         final_metrics[split] = evaluate_recovery(model, dataset, recovery_collate, config, device, run.fixed_depth)

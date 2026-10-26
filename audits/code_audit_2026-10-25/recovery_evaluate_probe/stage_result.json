@@ -1,0 +1,44 @@
+{
+  "stage": "c0_identity",
+  "data_hash": "bf34a8c5aadf0da515291d7b5d0b191506cb26cbfc1a45b5dbba765aa04ab7df",
+  "d0_pass": true,
+  "splits": {
+    "train": 97
+  },
+  "environment": {
+    "python": "3.12.14",
+    "torch": "2.5.1+cpu",
+    "cuda": null,
+    "device": "cpu",
+    "parameters": 722560,
+    "moe_layers": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "metrics": {
+    "train": {
+      "ce_full": 6.259341525048325,
+      "ce_answer_conditional": 4.582840437741623,
+      "answer_mass": 0.18703159843523479,
+      "correct_count": 0,
+      "eval_count": 97,
+      "accuracy": 0.0,
+      "depth": 1
+    }
+  },
+  "ledger": {
+    "optimizer_updates": 0,
+    "supervised_targets": 0,
+    "input_tokens": 0,
+    "rollouts": 0,
+    "expert_calls": 0,
+    "elapsed_seconds": 0.0,
+    "allocated_gpu_hours": 0.0,
+    "lost_compute_seconds": 0.0,
+    "peak_memory_bytes": 0
+  },
+  "stage_pass": false
+}

@@ -1,0 +1,16 @@
+{
+  "split": "test",
+  "states": 1024,
+  "sequences": 2,
+  "tau": -0.004153502614874598,
+  "raw_offline_decision_mismatches": 0,
+  "normalized_offline_decision_mismatches": 217,
+  "raw_vs_normalized_decision_changes": 217,
+  "max_raw_h_replay_diff": 5.277308464050293,
+  "max_raw_offline_delta_diff": 0.0,
+  "max_raw_ce_vs_selected_cost_diff": 0.7262003421783447,
+  "raw_mean_rounds": 2.4501953125,
+  "normalized_mean_rounds": 2.11328125,
+  "raw_mean_ce": 5.036136314612406,
+  "normalized_mean_ce": 5.03641907219918
+}

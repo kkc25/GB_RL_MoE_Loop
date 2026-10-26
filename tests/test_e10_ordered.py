@@ -307,5 +307,44 @@ class PredictorTests(unittest.TestCase):
         self.assertLessEqual(oracle["mean_oracle_pair_is_baseline"], 1.0)
 
 
+class StrictSignFlipTests(unittest.TestCase):
+    """Sign flips must require a strictly positive (> eps) AND strictly
+    negative (< -eps) anchor mean; positive-to-zero transitions are reported
+    separately in the zero band, not counted as flips."""
+
+    def _costs(self, matrix):
+        # One state, so the cross-state pair mean equals the Gamma value.
+        return torch.tensor(matrix, dtype=torch.float32).unsqueeze(0)
+
+    def test_positive_to_zero_is_not_a_strict_flip(self):
+        # Pair (2,2): Gamma = +1 under anchor (0,0), exactly 0 under (1,1).
+        costs = self._costs([[0.0, 0.0, 0.0],
+                             [0.0, 0.0, 0.0],
+                             [0.0, -1.0, -1.0]])
+        report = reference_sensitivity(costs, anchors=((0, 0), (1, 1)), eps=1e-6)
+        self.assertEqual(report["sign_flip_pair_fraction"], 0.0)
+        self.assertEqual(report["sign_flip_eps"], 1e-6)
+        self.assertGreater(report["zero_or_uncertain_pair_fraction"], 0.0)
+        # the historical inclusive definition DID count this pair
+        self.assertGreater(
+            report["inclusive_sign_flip_pair_fraction_positive_to_zero_counts"], 0.0)
+
+    def test_positive_to_negative_is_a_strict_flip(self):
+        # Pair (2,2): Gamma = +1 under anchor (0,0), -2 under anchor (1,1).
+        costs = self._costs([[0.0, 0.0, 0.0],
+                             [0.0, 0.0, 0.0],
+                             [0.0, -3.0, -1.0]])
+        report = reference_sensitivity(costs, anchors=((0, 0), (1, 1)), eps=1e-6)
+        self.assertGreater(report["sign_flip_pair_fraction"], 0.0)
+
+    def test_default_eps_used_when_not_passed(self):
+        costs = self._costs([[0.0, 0.0, 0.0],
+                             [0.0, 0.0, 0.0],
+                             [0.0, -3.0, -1.0]])
+        report = reference_sensitivity(costs, anchors=((0, 0), (1, 1)))
+        self.assertIn("sign_flip_eps", report)
+        self.assertGreater(report["sign_flip_pair_fraction"], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()

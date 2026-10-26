@@ -1,0 +1,11 @@
+........../workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/tests/test_e08_cde.py:250: ResourceWarning: unclosed file <_io.TextIOWrapper name='/workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/tmpxg7gy3gb/e08.json' mode='r' encoding='utf-8'>
+  loaded = json.load(open(out, encoding="utf-8"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.usage: python -m unittest [-h] [--output OUTPUT] [--only ONLY] [--seed SEED]
+python -m unittest: error: unknown sub-experiments: ['c9']
+..................
+----------------------------------------------------------------------
+Ran 29 tests in 3.649s
+
+OK
+{"output": "/workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/tmpxg7gy3gb/e08.json", "sections": ["d1", "e3"], "total_wall_time_s": 0.01548616500076605}

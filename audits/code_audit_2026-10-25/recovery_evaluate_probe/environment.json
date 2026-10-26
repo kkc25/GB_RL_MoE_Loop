@@ -1,0 +1,13 @@
+{
+  "python": "3.12.14",
+  "torch": "2.5.1+cpu",
+  "cuda": null,
+  "device": "cpu",
+  "parameters": 722560,
+  "moe_layers": [
+    0,
+    1,
+    2,
+    3
+  ]
+}

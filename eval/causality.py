@@ -7,25 +7,22 @@ strict tolerances. There is no KV cache in the current implementation, so the
 checks cover the no-cache reference path. Every check function returns a plain
 dict; `run()` aggregates them into a JSON-able report and `main()` prints it.
 
-Known core-file issues documented by this module (not fixed here, per task
-constraints; see the report fields and tests/test_model_policy.py):
+Notes on earlier core-file issues (all resolved in production code):
 
-* ``Controller.initial_memory`` hardcodes the default (float32) dtype, so a
-  routed forward under ``model.double()`` raises a GRU dtype RuntimeError.
-  ``build_pair`` works around it with an instance-level dtype patch so the
-  FP64 checks below exercise the real math.
-* With several adaptive layers, ``route_layer`` shares ``rounds`` across
-  layers, so ``max_calls`` caps the *total* loop iterations of the whole
-  route and any budget above ``max_calls`` is unreachable
-  (``check_multi_adaptive`` reports ``budget_fully_usable``).
-* With ``target_only=True`` and several adaptive layers, non-final adaptive
-  layers index flattened ``batch*length`` token states with episode indices
-  in ``[0, batch)``: most tokens are never routed there
-  (``check_multi_adaptive_target_only`` reports the dropped FFN calls).
-* Sampled routing draws all active episodes from one shared generator per
-  round, so sampling is prefix-invariant (prefix tokens keep their position
-  in the active set) but not batch-invariant (inserting a sequence shifts
-  every later episode's draw). Reported as informational metrics.
+* ``Controller.initial_memory`` now allocates via ``new_zeros`` on the GRU
+  weight and inherits the module dtype. ``patch_initial_memory_dtype`` below
+  is a redundant legacy workaround retained only for API compatibility;
+  ``build_pair(patch_memory_dtype=False)`` exercises the same FP64 math.
+* ``route_layer`` resets ``rounds`` per adaptive layer and reserves budget
+  for the remaining adaptive layers, so ``max_calls`` caps per-layer calls
+  and budgets above it are reachable (``check_multi_adaptive`` reports
+  ``budget_fully_usable``).
+* ``target_only=True`` with several adaptive layers is rejected by
+  ``ModelConfig`` validation; ``run()`` records that rejection as expected
+  behaviour in ``multi_adaptive_target_only_probe`` instead of crashing.
+* Sampled routing derives per-episode random keys from the input content, so
+  draws no longer shift when batch composition changes
+  (``check_sampled_batch_invariance`` still reports the measured diffs).
 """
 
 from __future__ import annotations
@@ -243,8 +240,9 @@ def check_batch_invariance(model, controller, items, budget=3, depth=2) -> dict:
 
 
 def check_sampled_batch_invariance(model, controller, items, budget=3, seed=5) -> dict:
-    """Informational: sampled routing shares one RNG stream per round, so
-    batch composition shifts the draws of later episodes."""
+    """Sampled draws derive from content-hashed per-episode keys, so batch
+    composition must not change a sequence's route; any residual diff is
+    reported here."""
     batch = affine_collate(items)
     ids, labels = batch["input_ids"], batch["labels"]
     with torch.no_grad():
@@ -491,9 +489,12 @@ def check_multi_adaptive(model, controller, ids, labels, budgets=(2, 3, 4, 5, 6)
 
 
 def check_multi_adaptive_target_only(ids, labels, budget=6, seed=0) -> dict:
-    """Probe: target_only=True with adaptive_layers=(1, 3). Non-final adaptive
-    layers should route every token (>= 1 FFN each), so every non-target
-    position should reach `layers` calls."""
+    """Probe: target_only=True with adaptive_layers=(1, 3). This configuration
+    is illegal: ModelConfig rejects it by raising ValueError, and that
+    rejection is the expected behaviour (run() records it instead of
+    crashing; the production constraint is deliberately not relaxed). If the
+    constraint is ever lifted, the probe below measures the routed call
+    structure directly."""
     model, controller = build_pair(adaptive_layers=(1, 3), target_only=True, seed=seed)
     with torch.no_grad():
         old = force_continue(controller)
@@ -528,6 +529,17 @@ def run(seed: int = 0) -> dict:
     model_fs, controller_fs = build_pair(target_only=False, seed=seed)
     model_multi, controller_multi = build_pair(adaptive_layers=(1, 3), target_only=False, seed=seed)
 
+    try:
+        target_only_probe = check_multi_adaptive_target_only(ids, labels, seed=seed)
+    except ValueError as error:
+        # The illegal target-only multi-adaptive configuration is rejected by
+        # ModelConfig; record the rejection as expected behaviour.
+        target_only_probe = {
+            "config_rejected": True,
+            "rejection_expected": True,
+            "error": str(error),
+        }
+
     return {
         "dtype": "float64",
         "device": "cpu",
@@ -541,7 +553,7 @@ def run(seed: int = 0) -> dict:
         "zero_delta_greedy_vs_fixed": check_zero_delta_greedy(model_to, controller_to, ids, labels),
         "replay": check_replay(model_to, controller_to, ids, labels, seed=seed),
         "multi_adaptive": check_multi_adaptive(model_multi, controller_multi, ids, labels),
-        "multi_adaptive_target_only_probe": check_multi_adaptive_target_only(ids, labels, seed=seed),
+        "multi_adaptive_target_only_probe": target_only_probe,
     }
 
 

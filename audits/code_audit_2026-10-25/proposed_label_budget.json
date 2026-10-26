@@ -1,0 +1,45 @@
+{
+  "scope": "Algorithm counts only, no GPU time estimates; prefix and cache costs excluded and must be measured. Future proposed rows are not executed experiments.",
+  "counts": [
+    {
+      "name": "uploaded_e01",
+      "states": 10240,
+      "actions_per_state": 28,
+      "rounds": 4,
+      "pair_token_calls": 1146880,
+      "individual_expert_token_calls": 2293760,
+      "head_readouts": 573440,
+      "proposed": false
+    },
+    {
+      "name": "proposed_coverage_pilot",
+      "states": 16000,
+      "actions_per_state": 4,
+      "rounds": 4,
+      "pair_token_calls": 256000,
+      "individual_expert_token_calls": 512000,
+      "head_readouts": 128000,
+      "proposed": true
+    },
+    {
+      "name": "proposed_main_subset",
+      "states": 140000,
+      "actions_per_state": 4,
+      "rounds": 4,
+      "pair_token_calls": 2240000,
+      "individual_expert_token_calls": 4480000,
+      "head_readouts": 1120000,
+      "proposed": true
+    },
+    {
+      "name": "proposed_main_full",
+      "states": 140000,
+      "actions_per_state": 28,
+      "rounds": 4,
+      "pair_token_calls": 15680000,
+      "individual_expert_token_calls": 31360000,
+      "head_readouts": 7840000,
+      "proposed": true
+    }
+  ]
+}

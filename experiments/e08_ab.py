@@ -1007,6 +1007,39 @@ def run_b3(seed=0, p=97, router_steps=4000, expert_steps=1500,
     acc_rep, _ = rollout(repeated_seqs, x0_test, exact_fn)
     acc_extra, pl_extra = rollout(extra_seqs, x0_test, exact_fn)
 
+    # --- fixed-task forced-path intervention (causal order contribution) ---
+    # Input x0 and the target compose(s, x0) of the ORIGINAL program are held
+    # fixed; only the executed expert order is forced.  Accuracy is the
+    # fraction of forced executions still hitting the original target.  Unlike
+    # the controls above (which change both the program description and its
+    # correct answer), this isolates the causal contribution of order on a
+    # fixed task.  Deterministic; exact experts; no router involved.
+    def forced_path_accuracy(seq_list, x0_list, force_fn):
+        correct, total = 0, 0
+        for s in seq_list:
+            target_for = {int(x0): _b3_compose(s, int(x0), a, b, p) for x0 in x0_list}
+            forced = force_fn(s)
+            for x0 in x0_list:
+                x = _b3_compose(forced, int(x0), a, b, p)
+                correct += int(x == target_for[int(x0)])
+                total += 1
+        return correct / total if total else 0.0
+
+    len4_holdout = [s for s in holdout_seqs if len(s) == 4]
+    rng_forced = np.random.default_rng(seed + 3)
+    forced_random = lambda s: tuple(int(e) for e in rng_forced.integers(0, 4, size=len(s)))
+    fixed_task_intervention = {
+        "semantics": ("input x0 and target compose(s, x0) of the ORIGINAL program are held "
+                      "fixed; only the executed expert order is forced. Accuracy = fraction "
+                      "of forced executions still hitting the original (fixed) target."),
+        "n_cases": len(len4_holdout) * len(x0_test),
+        "forced_correct_path_sanity_acc": forced_path_accuracy(len4_holdout, x0_test, lambda s: s),
+        "forced_reversed_path_acc_vs_original_target":
+            forced_path_accuracy(len4_holdout, x0_test, lambda s: tuple(reversed(s))),
+        "forced_random_path_acc_vs_original_target":
+            forced_path_accuracy(len4_holdout, x0_test, forced_random),
+    }
+
     # --- phase 2: small MLP approximate experts ---
     # Scalar + cyclic input encoding; the target is the output angle on the
     # circle (sin, cos), decoded by nearest class angle.  Trained on 60/97
@@ -1077,7 +1110,13 @@ def run_b3(seed=0, p=97, router_steps=4000, expert_steps=1500,
                 "rollout_acc_train_combos": acc_train,
                 "rollout_acc_holdout_combos": acc_hold,
                 "per_length_holdout": pl_hold,
-                "controls": {
+                "fixed_task_forced_path_intervention": fixed_task_intervention,
+                "controls_changed_program_and_target": {
+                    "note": ("These controls change BOTH the program description and its "
+                             "correct answer; they measure generalization to another program "
+                             "family, NOT the causal contribution of order on a fixed task. "
+                             "For the fixed-task order intervention (same input, same target, "
+                             "forced action path) see fixed_task_forced_path_intervention."),
                     "reversed_paths": acc_rev,
                     "repeated_same_expert": acc_rep,
                     "random_equal_length_paths": acc_rand,

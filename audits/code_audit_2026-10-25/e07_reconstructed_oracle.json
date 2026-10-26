@@ -1,0 +1,127 @@
+{
+  "scope": "Oracle reconstructed from uploaded rounded (6-decimal) E01 JSONL labels, not a deployment policy or actual intermediate-depth labels",
+  "n_states": 1024,
+  "window_indices": [
+    40,
+    64,
+    82,
+    83,
+    89,
+    104,
+    105,
+    118,
+    125,
+    147,
+    155,
+    163,
+    169,
+    205,
+    244,
+    247,
+    273,
+    276,
+    295,
+    308,
+    337,
+    374,
+    401,
+    446,
+    457,
+    460,
+    461,
+    466,
+    469,
+    527,
+    557,
+    558,
+    569,
+    595,
+    609,
+    621,
+    648,
+    663,
+    665,
+    694,
+    722,
+    733,
+    742,
+    744,
+    753,
+    776,
+    777,
+    795,
+    797,
+    798,
+    799,
+    813,
+    818,
+    837,
+    856,
+    868,
+    903,
+    908,
+    935,
+    948,
+    957,
+    964,
+    991,
+    1009
+  ],
+  "stop_nll": 5.335356609375,
+  "T4_nll": 5.32318328125,
+  "positive_tail_gains": 39,
+  "profiles": {
+    "diminishing": [
+      {
+        "budget_extra_rounds": 32,
+        "oracle_gain": 1.6350369999999999,
+        "oracle_nll": 5.30980915625,
+        "used_extra_rounds": 32
+      },
+      {
+        "budget_extra_rounds": 64,
+        "oracle_gain": 1.9728225714285719,
+        "oracle_nll": 5.304531256696428,
+        "used_extra_rounds": 64
+      },
+      {
+        "budget_extra_rounds": 128,
+        "oracle_gain": 2.1378660000000034,
+        "oracle_nll": 5.301952453125,
+        "used_extra_rounds": 117
+      },
+      {
+        "budget_extra_rounds": 192,
+        "oracle_gain": 2.1378660000000034,
+        "oracle_nll": 5.301952453125,
+        "used_extra_rounds": 117
+      }
+    ],
+    "delayed": [
+      {
+        "budget_extra_rounds": 32,
+        "oracle_gain": 1.541957714285714,
+        "oracle_nll": 5.311263520089286,
+        "used_extra_rounds": 32
+      },
+      {
+        "budget_extra_rounds": 64,
+        "oracle_gain": 1.9175774285714295,
+        "oracle_nll": 5.305394462053572,
+        "used_extra_rounds": 64
+      },
+      {
+        "budget_extra_rounds": 128,
+        "oracle_gain": 2.1378660000000034,
+        "oracle_nll": 5.301952453125,
+        "used_extra_rounds": 117
+      },
+      {
+        "budget_extra_rounds": 192,
+        "oracle_gain": 2.1378660000000034,
+        "oracle_nll": 5.301952453125,
+        "used_extra_rounds": 117
+      }
+    ]
+  }
+}

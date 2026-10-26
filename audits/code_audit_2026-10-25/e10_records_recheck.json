@@ -1,0 +1,70 @@
+{
+  "scope": "Coverage is exact from uploaded records. Gamma signs are an exploratory recomputation from rounded six-decimal costs, not a corrected full-precision experiment.",
+  "source_commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "arithmetic": "numpy.float64",
+  "coverage": {
+    "train": {
+      "states": 32,
+      "document_counts": {
+        "219": 32
+      },
+      "sequence_counts": {
+        "181": 32
+      }
+    },
+    "validation": {
+      "states": 16,
+      "document_counts": {
+        "187008": 16
+      },
+      "sequence_counts": {
+        "3306": 16
+      }
+    },
+    "test": {
+      "states": 16,
+      "document_counts": {
+        "120588": 16
+      },
+      "sequence_counts": {
+        "2086": 16
+      }
+    }
+  },
+  "source_sha256": {
+    "records_train.jsonl": "0fcc2bc09675cb61f0cc912a72617c71ee53793cae978eee43938c63e0778c86",
+    "records_validation.jsonl": "9c8695252cf2b57e168f6ca0b7f7f7967947be8e60c04ab859fd925dd89b58b6",
+    "records_test.jsonl": "bd2b7a17cbf7e44abadbb366833a3c6fa0168052093b88012100975cb0b1a23d"
+  },
+  "signs": {
+    "anchors": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "original_full_precision_summary_fraction": 0.5,
+    "recomputed_original_boolean_rule_on_rounded_costs": 0.5038265306122449,
+    "epsilon_nat": 1e-06,
+    "strict_positive_negative_fraction_on_rounded_costs": 0.41836734693877553,
+    "strict_positive_negative_pairs": 328,
+    "all_pairs": 784,
+    "interpretation": "The zero-band illustrates sensitivity and corrects the boolean definition on this serialized table. It does not recover the missing full-precision Gamma tensor; use original states_test.pt before publishing corrected full-precision statistics."
+  }
+}

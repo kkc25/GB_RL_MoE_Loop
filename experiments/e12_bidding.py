@@ -5,12 +5,21 @@ E12 plan, linear per-expert bids are a central linear router, so this script
 compares *nonlinear* cost predictors on the E01 same-hash labels:
 
 * ``central`` — one MLP reads the legal deploy-time input ``h`` and predicts
-  all 28 candidate Top-2 costs (the E01 value-student architecture).
+  all 28 candidate Top-2 costs (the E01 value-student architecture).  Its
+  unrestricted deployment (argmin over all candidates) is reported separately
+  as ``central_argmin``.
+* ``central_restricted`` — the same central MLP deployed under the exact
+  bidding contract: the anchor is fixed by the same legal h-rule and the
+  choice is restricted to the same ``experts - 1`` pairs ``{anchor, e}``, so
+  the aligned comparison varies only the cost predictor, not the anchors,
+  candidate set, or optimizer.
 * ``bidding`` — 8 per-expert small adapter MLPs.  An anchor expert is first
   fixed by a legal h-rule; adapter ``e`` then reads ``h`` plus the anchor
   one-hot and predicts the cost of pair ``{anchor, e}`` (conditional marginal
   bid, in CE units — the same labels as E01).  Only 7 bids per state are
-  deployed; no expert output is executed to produce a bid.
+  deployed; no expert output is executed to produce a bid.  Each adapter is
+  an independent module (per-expert parameters, the expert axis is never
+  summed in the batched einsum).
 * ``bidding_summary`` — same adapters with an extra per-expert summary input
   (learned embedding by default, or real expert-weight statistics with
   ``--summary-mode checkpoint --checkpoint ...``).
@@ -18,12 +27,15 @@ compares *nonlinear* cost predictors on the E01 same-hash labels:
   sequence index) appended, as an input-dimension control.
 
 All arms use the same candidates, the same E01 labels, and the same training
-budget (epochs, lr, batch-over-states, optimizer, seed).  Parameters are
-matched as closely as integer hidden widths allow and the exact difference is
-reported.  Deployment selections are really executed against the measured
-path costs.  This is a joint supervised prediction problem with a shared
-objective: no incentive compatibility, dominant strategy, or market-mechanism
-claim is made anywhere.
+budget (epochs, lr, batch-over-states, optimizer with explicit shared weight
+decay, seed).  Parameters are matched as closely as integer hidden widths
+allow and the exact difference is reported.  Deployment selections are really
+executed against the measured path costs.  Trained adapter weights and their
+configs are saved next to the summary (``adapters_{arm}.pt``, disable with
+``--no-save-adapters``) so the repaired formulation is what gets reused — old
+pre-repair weights must not be loaded into the corrected einsum.  This is a
+joint supervised prediction problem with a shared objective: no incentive
+compatibility, dominant strategy, or market-mechanism claim is made anywhere.
 
 Example:
 
@@ -144,9 +156,16 @@ class ExpertBidAdapters(nn.Module):
         self.w3 = nn.Parameter(torch.randn(experts, hidden_dim, 1) * hidden_dim**-0.5)
         self.b3 = nn.Parameter(torch.zeros(experts, 1))
 
-    def _apply(self, rows: torch.Tensor) -> torch.Tensor:
-        """rows (..., experts, input_dim) -> bids (..., experts)."""
-        hidden = F.gelu(torch.einsum("...ei,oih->...oh", rows, self.w1) + self.b1)
+    def _forward_rows(self, rows: torch.Tensor) -> torch.Tensor:
+        """rows (..., experts, input_dim) -> bids (..., experts).
+
+        Each expert's row is transformed only by that expert's own weights
+        (the expert axis ``o`` is preserved, never summed), so the adapters
+        are independent modules evaluated in one batched kernel.  Named
+        ``_forward_rows`` rather than ``_apply`` so ``nn.Module._apply``
+        (used by ``.to()``/``.double()``/``.cuda()``) keeps working.
+        """
+        hidden = F.gelu(torch.einsum("...oi,oih->...oh", rows, self.w1) + self.b1)
         hidden = F.gelu(torch.einsum("...oh,ohk->...ok", hidden, self.w2) + self.b2)
         return (torch.einsum("...ok,okj->...oj", hidden, self.w3) + self.b3).squeeze(-1)
 
@@ -166,12 +185,12 @@ class ExpertBidAdapters(nn.Module):
         """Bids for every (anchor, second) orientation: (B, experts, experts)."""
         eye = torch.eye(self.experts, device=h.device, dtype=h.dtype)
         anchor_onehot = eye.unsqueeze(0).expand(h.shape[0], self.experts, self.experts)
-        return self._apply(self._rows(h, anchor_onehot))
+        return self._forward_rows(self._rows(h, anchor_onehot))
 
     def bids_for_anchor(self, h: torch.Tensor, anchors: torch.Tensor) -> torch.Tensor:
         """Conditional bids of every second expert given anchors: (B, experts)."""
         anchor_onehot = F.one_hot(anchors, self.experts).to(h.dtype)
-        return self._apply(self._rows(h, anchor_onehot))
+        return self._forward_rows(self._rows(h, anchor_onehot))
 
 
 def central_parameter_count(input_dim: int, hidden_dim: int, n_actions: int) -> int:
@@ -206,6 +225,7 @@ def fit_anchor_scorer(
     lr: float,
     batch_size: int,
     seed: int,
+    weight_decay: float = 0.0,
     validation: tuple[torch.Tensor, torch.Tensor] | None = None,
 ) -> dict:
     """Linear h-rule picking the anchor expert.
@@ -221,7 +241,7 @@ def fit_anchor_scorer(
     target = torch.zeros(h.shape[0], experts).scatter_(1, best_pairs, 0.5)
     torch.manual_seed(seed)
     scorer = nn.Linear(h.shape[1], experts)
-    optimizer = torch.optim.AdamW(scorer.parameters(), lr=lr)
+    optimizer = torch.optim.AdamW(scorer.parameters(), lr=lr, weight_decay=weight_decay)
     generator = torch.Generator().manual_seed(seed)
     history, updates = [], 0
     best_loss, best_state = float("inf"), None
@@ -266,6 +286,7 @@ def fit_bid_adapters(
     lr: float,
     batch_size: int,
     seed: int,
+    weight_decay: float = 0.0,
     summary_mode: str = "none",
     summary_dim: int = 9,
     checkpoint_summary: torch.Tensor | None = None,
@@ -273,11 +294,14 @@ def fit_bid_adapters(
 ) -> dict:
     """Fit per-expert bid adapters by MSE on conditional pair costs.
 
-    Mirrors ``fit_value_student``: same standardization, optimizer, lr, seed,
-    epochs and batch-over-states schedule, best-validation weight selection.
-    Each state contributes every (anchor, second) orientation so the adapters
-    stay calibrated for whichever anchor the legal h-rule picks at deployment;
-    supervision still comes only from the same per-pair E01 labels.
+    Mirrors ``fit_value_student``: same standardization, optimizer (AdamW with
+    the same explicit weight decay — the audit found the adapters previously
+    trained with the AdamW default 0.01 against the central student's 0.0),
+    lr, seed, epochs and batch-over-states schedule, best-validation weight
+    selection.  Each state contributes every (anchor, second) orientation so
+    the adapters stay calibrated for whichever anchor the legal h-rule picks
+    at deployment; supervision still comes only from the same per-pair E01
+    labels.
     """
     experts = pa.shape[0]
     off_diagonal = ~torch.eye(experts, dtype=torch.bool)
@@ -288,7 +312,7 @@ def fit_bid_adapters(
     adapters = ExpertBidAdapters(
         h.shape[1], experts, hidden_dim, summary_mode, summary_dim, checkpoint_summary
     )
-    optimizer = torch.optim.AdamW(adapters.parameters(), lr=lr)
+    optimizer = torch.optim.AdamW(adapters.parameters(), lr=lr, weight_decay=weight_decay)
     generator = torch.Generator().manual_seed(seed)
     history, updates = [], 0
     best_mse, best_state = float("inf"), None
@@ -340,6 +364,28 @@ def bidding_actions(
     return pa[anchors, seconds], seconds
 
 
+@torch.no_grad()
+def central_restricted_actions(
+    central_predictions: torch.Tensor,
+    anchors: torch.Tensor,
+    pa: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Central MLP deployed under the bidding contract: same anchors, same candidates.
+
+    The unrestricted central arm argmins over all actions; here the central
+    predictions are restricted to the ``experts - 1`` pairs containing the
+    anchor — the exact candidate set the bidding arms see — so the two
+    deployments differ only in the cost predictor, not in the action space.
+    Returns (actions, seconds) like ``bidding_actions``.
+    """
+    experts = pa.shape[0]
+    cells = pa[anchors.unsqueeze(-1), torch.arange(experts, device=pa.device).unsqueeze(0)]
+    scores = central_predictions.gather(1, cells.clamp(min=0))
+    scores = scores.masked_fill(cells < 0, float("inf"))
+    seconds = scores.argmin(dim=-1)
+    return pa[anchors, seconds], seconds
+
+
 def checkpoint_expert_summary(checkpoint_path: str | Path, experts: int) -> torch.Tensor:
     """Per-expert weight statistics of the last adaptive layer's expert pool.
 
@@ -381,6 +427,8 @@ def run_experiment(
     summary_mode: str = "learned",
     summary_dim: int = 9,
     checkpoint: str | Path | None = None,
+    weight_decay: float = 0.0,
+    save_adapters: bool = True,
 ) -> dict:
     started = time.monotonic()
     states = load_states(input_dir)
@@ -395,7 +443,11 @@ def run_experiment(
     y = {split: states[split][label].float() for split in SPLITS}
 
     budget = {"epochs": epochs, "lr": lr, "batch_size": batch_size, "seed": seed,
-              "optimizer": "AdamW", "schedule": "batch-over-states, shared by all arms"}
+              "optimizer": "AdamW", "weight_decay": weight_decay,
+              "optimizer_note": "weight decay is passed explicitly and identically to every arm "
+                                "(central, control, anchor scorer, bid adapters); the audit found the "
+                                "adapters previously inherited the AdamW default 0.01 vs the central 0.0",
+              "schedule": "batch-over-states, shared by all arms"}
     report_systems: dict[str, dict] = {}
     runtimes: dict[str, float] = {}
 
@@ -403,12 +455,15 @@ def run_experiment(
     tic = time.monotonic()
     central = fit_value_student(
         h["train"], y["train"], hidden_dim=hidden_dim, epochs=epochs, lr=lr,
-        batch_size=batch_size, seed=seed, validation=(h["validation"], y["validation"]),
+        batch_size=batch_size, seed=seed, weight_decay=weight_decay,
+        validation=(h["validation"], y["validation"]),
     )
     runtimes["central"] = time.monotonic() - tic
     central_params = sum(p.numel() for p in central.student.parameters())
     report_systems["central"] = {
         "architecture": "single MLP h -> all-candidate costs (E01 value-student architecture)",
+        "candidate_space": f"unrestricted: all {n_actions} candidates at deployment "
+                           "(restricted-central deployments with the bidding candidate set are separate arms)",
         "input_dim": h["train"].shape[1], "hidden_dim": hidden_dim,
         "parameters": central_params,
         "macs_per_state": mlp_macs(h["train"].shape[1], hidden_dim, n_actions),
@@ -421,7 +476,7 @@ def run_experiment(
     tic = time.monotonic()
     anchor_fit = fit_anchor_scorer(
         h["train"], y["train"], actions, epochs=epochs, lr=lr, batch_size=batch_size,
-        seed=seed, validation=(h["validation"], y["validation"]),
+        seed=seed, weight_decay=weight_decay, validation=(h["validation"], y["validation"]),
     )
     runtimes["anchor_scorer"] = time.monotonic() - tic
     scorer_params = sum(p.numel() for p in anchor_fit["scorer"].parameters())
@@ -448,8 +503,9 @@ def run_experiment(
         adapter_hidden = match_adapter_hidden(central_params, adapter_input, experts)
         fit = fit_bid_adapters(
             h["train"], y["train"], pa, hidden_dim=adapter_hidden, epochs=epochs, lr=lr,
-            batch_size=batch_size, seed=seed, summary_mode=mode, summary_dim=summary_dim,
-            checkpoint_summary=checkpoint_summary, validation=(h["validation"], y["validation"]),
+            batch_size=batch_size, seed=seed, weight_decay=weight_decay, summary_mode=mode,
+            summary_dim=summary_dim, checkpoint_summary=checkpoint_summary,
+            validation=(h["validation"], y["validation"]),
         )
         runtimes[arm] = time.monotonic() - tic
         bidding_results[arm] = {"fit": fit, "hidden": adapter_hidden, "input": adapter_input}
@@ -460,7 +516,8 @@ def run_experiment(
     wide = {split: torch.cat([h[split], extra[split]], dim=-1) for split in SPLITS}
     control = fit_value_student(
         wide["train"], y["train"], hidden_dim=hidden_dim, epochs=epochs, lr=lr,
-        batch_size=batch_size, seed=seed, validation=(wide["validation"], y["validation"]),
+        batch_size=batch_size, seed=seed, weight_decay=weight_decay,
+        validation=(wide["validation"], y["validation"]),
     )
     runtimes["central_irrelevant"] = time.monotonic() - tic
     report_systems["central_irrelevant"] = {
@@ -493,6 +550,7 @@ def run_experiment(
         deployed_macs = mlp_macs(h["train"].shape[1], experts, experts) + (experts - 1) * mlp_macs(record["input"], record["hidden"], 1)
         report_systems[arm] = {
             "architecture": f"{experts} per-expert adapter MLPs; conditional bid for pair {{anchor, e}}",
+            "candidate_space": f"restricted: anchor fixed by a legal h-rule, then the {experts - 1} pairs containing it",
             "input_dim": record["input"], "hidden_dim": record["hidden"],
             "summary_mode": mode if arm == "bidding_summary" else "none",
             "parameters": adapter_params,
@@ -516,6 +574,11 @@ def run_experiment(
     }
     deployed_cell_mse: dict[str, dict] = {}
     for rule_name, anchors in anchor_rules.items():
+        # central model deployed under the exact bidding contract (same anchors,
+        # same experts-1 candidate cells) — the aligned comparator; the
+        # unrestricted central_argmin arm above stays listed separately.
+        restricted, _ = central_restricted_actions(central_test, anchors, pa)
+        selections[f"central_restricted_{rule_name}_anchor"] = restricted
         for arm, record in bidding_results.items():
             fit = record["fit"]
             selected, _ = bidding_actions(fit["adapters"], h["test"], fit["mean"], fit["std"], anchors, pa)
@@ -578,6 +641,18 @@ def run_experiment(
         },
         "mse_comparison": mse_comparison,
         "deployed_cell_mse": deployed_cell_mse,
+        "deployment_alignment": {
+            "aligned_comparison": "bidding arms vs central_restricted_* arms: identical anchors per rule, "
+                                  "identical experts-1 candidate cells {anchor, e}, identical optimizer "
+                                  "settings; the only difference is the cost predictor",
+            "unrestricted_central": "central_argmin / central_irrelevant_argmin are unrestricted: they "
+                                    f"select from all {n_actions} candidates; listed separately and never "
+                                    "mixed into the aligned comparison",
+            "central_restricted_macs_note": "one central MLP forward per state plus a masked gather; "
+                                            "no anchor scorer is needed by central itself, but the same "
+                                            "anchor rule output is consumed, so scorer overhead applies "
+                                            "to both sides of the aligned comparison equally",
+        },
         "policies": policies,
         "oracle": {**oracle, "note": "label-informed lower bound; reported separately, never a deploy gain"},
         "anchor_rules": {
@@ -599,6 +674,29 @@ def run_experiment(
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
         (output_dir / "e12_bidding_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+        if save_adapters:
+            for arm, record in bidding_results.items():
+                fit = record["fit"]
+                torch.save(
+                    {
+                        "state_dict": fit["adapters"].state_dict(),
+                        "config": {
+                            "h_dim": h["train"].shape[1],
+                            "experts": experts,
+                            "hidden_dim": record["hidden"],
+                            "input_dim": record["input"],
+                            "summary_mode": report_systems[arm]["summary_mode"],
+                            "summary_dim": summary_dim,
+                            "label": label,
+                            "backbone_hash": backbone_hash,
+                            "training_budget": budget,
+                            "best_validation_mse": fit["best_validation_mse"],
+                        },
+                        "mean": fit["mean"],
+                        "std": fit["std"],
+                    },
+                    output_dir / f"adapters_{arm}.pt",
+                )
     return summary
 
 
@@ -615,11 +713,16 @@ def main() -> None:
     parser.add_argument("--summary-mode", choices=("learned", "checkpoint"), default="learned")
     parser.add_argument("--summary-dim", type=int, default=9)
     parser.add_argument("--checkpoint", help="E00 checkpoint for --summary-mode checkpoint")
+    parser.add_argument("--weight-decay", type=float, default=0.0,
+                        help="AdamW weight decay, passed explicitly and identically to every arm")
+    parser.add_argument("--no-save-adapters", action="store_true",
+                        help="do not write adapters_{arm}.pt weight+config files to the output dir")
     args = parser.parse_args()
     summary = run_experiment(
         args.input_dir, args.output_dir, hidden_dim=args.hidden_dim, epochs=args.epochs,
         lr=args.lr, batch_size=args.batch_size, seed=args.seed, label=args.label,
         summary_mode=args.summary_mode, summary_dim=args.summary_dim, checkpoint=args.checkpoint,
+        weight_decay=args.weight_decay, save_adapters=not args.no_save_adapters,
     )
     print(json.dumps(summary, indent=2))
 

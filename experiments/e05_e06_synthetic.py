@@ -10,9 +10,11 @@ small instances, and runs a synchronous best-response oscillation gate.
 E06 (causal capacity-constrained assignment): exact integer min-cost flow for
 the additive proxy-cost version (each token needs k=2 distinct experts,
 expert capacities are upper bounds), exact enumeration for the small
-set-version with true pair costs, a log-domain soft (entropy-ish) reference
-with residual validation, capacity-preserving sequential rounding/repair, and
-causal sanity checks (suffix invariance + recorded batch dependence).
+set-version with true pair costs, a log-domain soft (entropy-ish) RELAXED
+reference with full residual reporting (row / column / per-edge upper bound /
+forbidden-edge mass) and relaxed-vs-integer feasibility reported separately,
+capacity-preserving sequential rounding/repair, and causal sanity checks
+(suffix invariance + recorded batch dependence).
 
 The real-LM serving part of both experiments is deliberately NOT executed
 here; this module is the fixed-state synthetic validation only. Pure
@@ -507,20 +509,34 @@ def fit_additive_per_token(set_costs, candidates, n_experts):
 # ---------------------------------------------------------------------------
 
 def soft_transport(costs, capacity, eps, iters, allowed=None, k=2):
-    """Entropy-smoothed soft reference ( Sinkhorn / IPF in the log domain )
+    """Entropy-smoothed RELAXED reference (Sinkhorn / IPF in the log domain)
     with a slack row: column sums are fixed to exactly C_e, and a slack row
     with zero-cost edges absorbs the unused capacity sum(C) - k*N. This keeps
     the real rows at "at most C_e" per expert; equal column margins without
     the slack would force fixed occupation of every expert by real tokens,
     which is a different objective. Marginal residuals are reported after the
-    requested number of iterations."""
+    requested number of iterations.
+
+    This is a relaxation of the distinct Top-2 integer problem: the per-edge
+    bound P <= 1 is NOT enforced, so the returned plan can be a point outside
+    the legal Top-2 feasible region.  The result therefore separates:
+
+    * ``relaxed_feasible`` — the relaxed margin problem had enough total
+      capacity (says nothing about legal Top-2 feasibility),
+    * ``hard_integer_feasible`` / ``hard_integer_objective`` — feasibility and
+      objective of the exact integer problem on the same instance,
+    * residual diagnostics: ``max_row_residual``, ``max_col_excess``,
+      ``max_upper_bound_violation`` (per-edge P <= 1) and
+      ``max_forbidden_edge_mass`` (mass on edges outside the candidate set).
+    """
     costs = np.asarray(costs, dtype=float)
     n, e_n = costs.shape
     capacity = np.asarray(capacity, dtype=float)
     allowed = np.ones((n, e_n), dtype=bool) if allowed is None else allowed
     slack = float(capacity.sum() - k * n)
     if slack < -TOL:
-        return {"feasible": False, "reason": "total slots < k*N; must queue/stop"}
+        return {"relaxed_feasible": False, "hard_integer_feasible": False,
+                "reason": "total slots < k*N; must queue/stop"}
 
     blocked = 1e6  # large finite cost keeps forbidden/absorbing edges at ~0 mass
     if slack > TOL:
@@ -550,16 +566,24 @@ def soft_transport(costs, capacity, eps, iters, allowed=None, k=2):
     log_p = log_k + log_a[:, None] + log_b[None, :]
     p = np.exp(log_p)[:n]
     rows, cols = p.sum(axis=1), p.sum(axis=0)
+    forbidden = ~allowed
+    hard = solve_additive_assignment(costs, capacity, allowed, k)
     return {
         "P": p,
         "objective_linear": float(np.sum(costs * p)),
         "max_row_residual": float(np.max(np.abs(rows - k))),
         "max_col_excess": float(np.max(np.maximum(0.0, cols - capacity))),
         "max_upper_bound_violation": float(np.max(np.maximum(0.0, p - 1.0))),
+        "max_forbidden_edge_mass": float(np.max(p[forbidden])) if forbidden.any() else 0.0,
         "slack_capacity": slack,
         "eps": eps,
         "iters": iters,
-        "feasible": True,
+        "relaxed_feasible": True,
+        "hard_integer_feasible": bool(hard["feasible"]),
+        "hard_integer_objective": hard["objective"],
+        "semantics": ("relaxed transport margins only; the per-edge P <= 1 bound of the "
+                      "distinct Top-2 problem is NOT enforced, so this is not a legal "
+                      "Top-2 feasible point even when relaxed_feasible is True"),
     }
 
 
@@ -770,6 +794,10 @@ def run_e06(seed=0):
                 "eps_over_std": eps_mult, "iters": iters,
                 "max_row_residual": soft["max_row_residual"],
                 "max_col_excess": soft["max_col_excess"],
+                "max_upper_bound_violation": soft["max_upper_bound_violation"],
+                "max_forbidden_edge_mass": soft["max_forbidden_edge_mass"],
+                "relaxed_feasible": soft["relaxed_feasible"],
+                "hard_integer_feasible": soft["hard_integer_feasible"],
                 "fractional_linear_objective": soft["objective_linear"],
                 "rounded_feasible": rounded["feasible"],
                 "rounded_objective": rounded.get("objective"),
@@ -779,6 +807,14 @@ def run_e06(seed=0):
                 row["integrality_gap_vs_exact"] = rounded["objective"] - exact["objective"]
             rounding_rows.append(row)
     out["soft_and_rounding"] = rounding_rows
+    out["soft_reference_semantics"] = (
+        "The soft transport is a numerical relaxation: row/column margins are fitted but "
+        "the per-edge P <= 1 bound of the distinct Top-2 integer problem is not enforced. "
+        "relaxed_feasible only reports the relaxed margin problem; legal Top-2 feasibility "
+        "is reported separately as hard_integer_feasible, and max_upper_bound_violation / "
+        "max_forbidden_edge_mass quantify how far the soft plan sits outside the legal "
+        "feasible region. The integer min-cost flow and the rounding/repair output remain "
+        "hard-capacity safe regardless.")
 
     out["causal_sanity"] = causal_sanity(costs, capacity, suffix_values, allowed, k)
     return out

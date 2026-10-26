@@ -1,0 +1,9 @@
+{
+  "mode": "patched",
+  "torch_version": "2.5.1+cpu",
+  "tests_run": 3,
+  "failures": 0,
+  "errors": 0,
+  "successful": true,
+  "repository_changed": false
+}

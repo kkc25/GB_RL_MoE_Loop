@@ -66,6 +66,7 @@ class PathCosts:
     baseline_action: torch.Tensor
     actions: torch.Tensor
     rounds: int
+    global_action_ids: torch.Tensor | None = None
 
 
 def last_adaptive_layer(model) -> int:
@@ -200,8 +201,19 @@ def counterfactual_path_costs(
         actions = enumerate_top2_actions(experts, device=device)
     else:
         actions = actions.to(device)
-    n_actions = actions.shape[0]
+    if actions.ndim not in (2, 3) or actions.shape[-1] != 2:
+        raise ValueError("actions must have shape (n_actions, 2) or (n_states, n_actions, 2)")
+    n_actions = actions.shape[-2]
     n_states = h.shape[0]
+    global_action_ids = pair_to_action(actions, experts=experts)
+    if actions.ndim == 2:
+        local_action_ids = torch.full((experts * (experts - 1) // 2,), -1, dtype=torch.long, device=device)
+        local_action_ids[global_action_ids] = torch.arange(n_actions, device=device)
+    else:
+        if actions.shape[0] != n_states:
+            raise ValueError("per-state actions must share the state dimension")
+        local_action_ids = torch.full((n_states, experts * (experts - 1) // 2), -1, dtype=torch.long, device=device)
+        local_action_ids[torch.arange(n_states, device=device).unsqueeze(1), global_action_ids] = torch.arange(n_actions, device=device)
     immediate = torch.empty(n_states, n_actions, dtype=torch.float32, device=device)
     q_pi0 = torch.empty(n_states, n_actions, dtype=torch.float32, device=device)
     baseline_action = torch.empty(n_states, dtype=torch.long, device=device)
@@ -212,14 +224,25 @@ def counterfactual_path_costs(
         with autocast_context(device, dtype):
             normalized = block.ffn_norm(hc)
             logits = block.executor.gate_logits(normalized)
-            baseline_action[start : start + size] = pair_to_action(baseline_top2_pairs(logits.float()), experts=experts)
+            baseline_global = pair_to_action(baseline_top2_pairs(logits.float()), experts=experts)
+            if actions.ndim == 2:
+                baseline_local = local_action_ids[baseline_global]
+            else:
+                baseline_local = local_action_ids[torch.arange(start, start + size, device=device), baseline_global]
+            if bool((baseline_local < 0).any()):
+                raise ValueError("candidate actions must contain every state's baseline action")
+            baseline_action[start : start + size] = baseline_local
             expanded = hc.unsqueeze(1).expand(size, n_actions, hc.shape[-1]).reshape(-1, hc.shape[-1])
             forced = torch.arange(n_actions, device=device).repeat(size)
             current = expanded
             for round_index in range(rounds):
                 normalized = block.ffn_norm(current)
                 if round_index == 0:
-                    update, _, _, _ = block.executor(normalized, forced)
+                    if actions.ndim == 2:
+                        update, _, _, _ = block.executor(normalized, forced)
+                    else:
+                        expanded_actions = actions[start : start + size].reshape(-1, 2)
+                        update, _, _, _ = block.executor(normalized, pairs=expanded_actions)
                 else:
                     update, _, _, _ = block.executor(normalized)
                 current = current + gamma * update
@@ -230,7 +253,38 @@ def counterfactual_path_costs(
         repeated_targets = tc.unsqueeze(1).expand(size, n_actions).reshape(-1)
         immediate[start : start + size] = readout_ce(model, after_first, repeated_targets, readout_chunk, ledger).reshape(size, n_actions)
         q_pi0[start : start + size] = readout_ce(model, current, repeated_targets, readout_chunk, ledger).reshape(size, n_actions)
-    return PathCosts(immediate, q_pi0, baseline_action, actions, rounds)
+    return PathCosts(immediate, q_pi0, baseline_action, actions, rounds, global_action_ids)
+
+
+def candidate_actions(model, h: torch.Tensor, candidates: int = 4) -> torch.Tensor:
+    if candidates < 1:
+        raise ValueError("candidates must be positive")
+    layer = last_adaptive_layer(model)
+    block = model.blocks[layer]
+    normalized = block.ffn_norm(h)
+    logits = block.executor.gate_logits(normalized).float()
+    baseline = baseline_top2_pairs(logits)
+    all_actions = enumerate_top2_actions(model.config.experts_per_layer, device=h.device)
+    scores = logits[:, all_actions].sum(dim=-1)
+    order = torch.argsort(scores, dim=-1, descending=True)
+    output = []
+    for row, baseline_pair in enumerate(baseline):
+        selected = [baseline_pair]
+        for action_index in order[row].tolist():
+            candidate = all_actions[action_index]
+            if not any(torch.equal(candidate, previous) for previous in selected):
+                selected.append(candidate)
+            if len(selected) == candidates - 1:
+                break
+        for action_index in reversed(order[row].tolist()):
+            candidate = all_actions[action_index]
+            if not any(torch.equal(candidate, previous) for previous in selected):
+                selected.append(candidate)
+                break
+        if len(selected) < candidates:
+            raise ValueError("not enough distinct legal candidates")
+        output.append(torch.stack(selected))
+    return torch.stack(output)
 
 
 def random_selection(n_states: int, n_actions: int, seed: int, device: torch.device) -> torch.Tensor:

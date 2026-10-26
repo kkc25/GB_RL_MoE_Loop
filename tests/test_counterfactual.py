@@ -22,6 +22,7 @@ from data.packed_lm import PackedLMDataset
 from eval.counterfactual import (
     CounterfactualLedger,
     cache_last_ffn_input,
+    candidate_actions,
     counterfactual_path_costs,
     evaluate_policies,
     extract_states,
@@ -139,6 +140,35 @@ class CounterfactualTests(unittest.TestCase):
         torch.testing.assert_close(chunked.immediate, self.costs.immediate, rtol=1e-5, atol=1e-6)
         torch.testing.assert_close(chunked.q_pi0, self.costs.q_pi0, rtol=1e-5, atol=1e-6)
         self.assertTrue(torch.equal(chunked.baseline_action, self.costs.baseline_action))
+
+    def test_custom_action_subset_preserves_pairs_and_global_mapping(self):
+        pairs = self.costs.actions[self.costs.baseline_action].unique(dim=0)
+        custom = counterfactual_path_costs(self.model, self.states["h"], self.states["targets"], rounds=4, actions=pairs)
+        from model.top2 import pair_to_action
+        expected = pair_to_action(pairs, experts=EXPERTS)
+        self.assertTrue(torch.equal(custom.actions, pairs))
+        self.assertTrue(torch.equal(custom.global_action_ids, expected))
+        self.assertTrue(bool(((custom.baseline_action >= 0) & (custom.baseline_action < pairs.shape[0])).all()))
+        torch.testing.assert_close(custom.immediate, self.costs.immediate[:, expected])
+        torch.testing.assert_close(custom.q_pi0, self.costs.q_pi0[:, expected])
+
+    def test_per_state_actions_use_state_specific_mapping(self):
+        pairs = self.costs.actions[self.costs.baseline_action].unsqueeze(1)
+        custom = counterfactual_path_costs(self.model, self.states["h"], self.states["targets"], rounds=4, actions=pairs)
+        from model.top2 import pair_to_action
+        expected = pair_to_action(pairs, experts=EXPERTS)
+        rows = torch.arange(self.states["h"].shape[0])
+        self.assertTrue(torch.equal(custom.global_action_ids, expected))
+        self.assertTrue(bool(((custom.baseline_action >= 0) & (custom.baseline_action < pairs.shape[1])).all()))
+        torch.testing.assert_close(custom.immediate, self.costs.immediate[rows, self.costs.baseline_action].unsqueeze(1))
+        torch.testing.assert_close(custom.q_pi0, self.costs.q_pi0[rows, self.costs.baseline_action].unsqueeze(1))
+
+    def test_candidate_actions_include_baseline_and_exploration(self):
+        candidates = candidate_actions(self.model, self.states["h"], candidates=4)
+        self.assertEqual(candidates.shape, (self.states["h"].shape[0], 4, 2))
+        for row, baseline in enumerate(self.costs.actions[self.costs.baseline_action]):
+            self.assertTrue(torch.equal(candidates[row, 0], baseline))
+            self.assertEqual(len({tuple(pair) for pair in candidates[row].tolist()}), 4)
 
     def test_states_only_at_supervised_positions(self):
         mask = self.labels != -100
@@ -260,6 +290,7 @@ class StudentTests(unittest.TestCase):
         n_states = self.states["h"].shape[0]
         self.assertEqual(ledger.candidate_pair_calls, n_states * N_ACTIONS * 4)
         self.assertEqual(ledger.head_readouts, n_states * N_ACTIONS * 2)
+
 
 
 if __name__ == "__main__":

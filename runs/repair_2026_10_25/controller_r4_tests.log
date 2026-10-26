@@ -1,0 +1,27 @@
+test_returns_metrics_for_every_depth (tests.test_r4_quality.DepthMetricsTests.test_returns_metrics_for_every_depth) ... ok
+test_estimate_is_token_weighted_ratio_of_sums (tests.test_controller_corpus.DocumentPairedBootstrapTests.test_estimate_is_token_weighted_ratio_of_sums) ... ok
+test_input_validation (tests.test_controller_corpus.DocumentPairedBootstrapTests.test_input_validation) ... ok
+test_interval_covers_true_effect_and_is_deterministic (tests.test_controller_corpus.DocumentPairedBootstrapTests.test_interval_covers_true_effect_and_is_deterministic) ... ok
+test_interval_is_document_level_not_token_level (tests.test_controller_corpus.DocumentPairedBootstrapTests.test_interval_is_document_level_not_token_level) ... ok
+test_exclusion_is_group_level (tests.test_controller_corpus.ExclusionTests.test_exclusion_is_group_level) ... ok
+test_load_exclusion_hashes_reads_doc_and_text_hashes (tests.test_controller_corpus.ExclusionTests.test_load_exclusion_hashes_reads_doc_and_text_hashes) ... ok
+test_case_punctuation_whitespace_variants_share_group (tests.test_controller_corpus.NearDuplicateTests.test_case_punctuation_whitespace_variants_share_group) ... ok
+test_distinct_texts_usually_distinct_groups (tests.test_controller_corpus.NearDuplicateTests.test_distinct_texts_usually_distinct_groups) ... ok
+test_exact_duplicates_share_role (tests.test_controller_corpus.NearDuplicateTests.test_exact_duplicates_share_role) ... ok
+test_same_group_same_role_regardless_of_source_order (tests.test_controller_corpus.NearDuplicateTests.test_same_group_same_role_regardless_of_source_order) ... ok
+test_deterministic_across_runs (tests.test_controller_corpus.PrepareControllerCorpusTests.test_deterministic_across_runs) ... ok
+test_exact_budget_raises_when_pool_too_small (tests.test_controller_corpus.PrepareControllerCorpusTests.test_exact_budget_raises_when_pool_too_small) ... ok
+test_exclusion_file_removes_docs_from_every_role (tests.test_controller_corpus.PrepareControllerCorpusTests.test_exclusion_file_removes_docs_from_every_role) ... ok
+test_roles_are_document_disjoint_and_cover_all_docs (tests.test_controller_corpus.PrepareControllerCorpusTests.test_roles_are_document_disjoint_and_cover_all_docs) ... ok
+test_roles_are_written_and_readable_by_packed_lm (tests.test_controller_corpus.PrepareControllerCorpusTests.test_roles_are_written_and_readable_by_packed_lm) ... ok
+test_tokenizer_is_never_trained_or_written (tests.test_controller_corpus.PrepareControllerCorpusTests.test_tokenizer_is_never_trained_or_written) ... ok
+test_intersection_reporting (tests.test_controller_corpus.StateSamplingTests.test_intersection_reporting) ... ok
+test_plan_covers_documents_before_repeats (tests.test_controller_corpus.StateSamplingTests.test_plan_covers_documents_before_repeats) ... ok
+test_plan_is_deterministic_and_raises_when_exhausted (tests.test_controller_corpus.StateSamplingTests.test_plan_is_deterministic_and_raises_when_exhausted) ... ok
+test_sample_states_matches_gather_states_contract (tests.test_controller_corpus.StateSamplingTests.test_sample_states_matches_gather_states_contract) ... ok
+test_sampled_states_match_dataset_and_stats (tests.test_controller_corpus.StateSamplingTests.test_sampled_states_match_dataset_and_stats) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.111s
+
+OK

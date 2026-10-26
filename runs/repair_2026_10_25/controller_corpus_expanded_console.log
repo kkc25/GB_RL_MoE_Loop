@@ -1,0 +1,116 @@
+{
+  "pipeline_version": "controller-corpus-v1",
+  "created_utc": "2026-10-25T15:10:41.232416+00:00",
+  "source": "HuggingFaceFW/fineweb-edu:sample-10BT",
+  "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+  "config": {
+    "seq_len": 1024,
+    "controller_train_tokens": 1000000,
+    "selection_tokens": 400000,
+    "calibration_tokens": 400000,
+    "newtest_tokens": 400000,
+    "selection_pool_bytes": 4800000,
+    "calibration_pool_bytes": 4800000,
+    "newtest_pool_bytes": 4800000,
+    "role_salt": "controller-split-v1\u0000",
+    "bos_token": "<|bos|>",
+    "eos_token": "<|eos|>"
+  },
+  "environment": {
+    "python": "3.12.15",
+    "numpy": "2.5.2"
+  },
+  "n_documents": 726000,
+  "n_excluded_documents": 105549,
+  "role_documents": {
+    "controller_train": 617385,
+    "selection": 994,
+    "calibration": 1084,
+    "newtest": 988
+  },
+  "document_list_file": "documents.jsonl",
+  "document_list_sha256": "f0b3284e9c63e1bc59ab01dd1b405c315c00b609187cf26adfedd20483a780b8",
+  "exclusion": {
+    "documents_files": [
+      "runs/repair_2026_10_25/controller_corpus/exclusions/0.jsonl",
+      "runs/repair_2026_10_25/controller_corpus/exclusions/1.jsonl"
+    ],
+    "documents_sha256": [
+      "9f5cc5685bccfc16f250cc8c9e520380dcdea7a67442ff323a08c4b2ee7a0560",
+      "0ba1211a4f6d778cc8d2940575ca0fc56b842a9f1cfd66a757985971691f701b"
+    ],
+    "n_doc_hashes": 105144,
+    "n_text_hashes": 105129
+  },
+  "tokenizer": {
+    "source_shards": [
+      "sample/10BT/000_00000.parquet"
+    ],
+    "path": "runs/data/fineweb_edu_100m/tokenizer.json",
+    "sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+    "vocab_size": 32768,
+    "trained_by": "caller"
+  },
+  "splits": {
+    "newtest": {
+      "n_sequences": 391,
+      "seq_len": 1024,
+      "n_tokens": 400000,
+      "n_padding": 384,
+      "n_documents": 385,
+      "input_ids_file": "newtest.input_ids.u16.bin",
+      "segment_ids_file": "newtest.segment_ids.i32.bin",
+      "doc_map_file": "newtest.doc_map.jsonl",
+      "input_ids_dtype": "uint16",
+      "segment_ids_dtype": "int32",
+      "input_ids_sha256": "369acc79719feccb66ea69cf3956e74d15274f98ad9f47d09339e4452e276199",
+      "segment_ids_sha256": "f46bad4f1d0172aabd2b1dbebd9606b4d8da5f73330841a7b5a9f45f90b649b0",
+      "doc_map_sha256": "e0835b05f9c772fc7697e19c8a8668ae88ae3350cdc4198b52a6ba9db18f9431"
+    },
+    "calibration": {
+      "n_sequences": 391,
+      "seq_len": 1024,
+      "n_tokens": 400000,
+      "n_padding": 384,
+      "n_documents": 405,
+      "input_ids_file": "calibration.input_ids.u16.bin",
+      "segment_ids_file": "calibration.segment_ids.i32.bin",
+      "doc_map_file": "calibration.doc_map.jsonl",
+      "input_ids_dtype": "uint16",
+      "segment_ids_dtype": "int32",
+      "input_ids_sha256": "58326a2dac3dabed533016d5e95a6d33463b451ab77ca7661d6be8615a191c7e",
+      "segment_ids_sha256": "f53958ee5a121cb64f3dd0515eac1fe19a15050a5cb1cd7bd7f96755c1292b6b",
+      "doc_map_sha256": "f9b7400b9e60020e0492cf933defa66c17f4c25945eae3bd0fe22c778a7a1559"
+    },
+    "selection": {
+      "n_sequences": 391,
+      "seq_len": 1024,
+      "n_tokens": 400000,
+      "n_padding": 384,
+      "n_documents": 412,
+      "input_ids_file": "selection.input_ids.u16.bin",
+      "segment_ids_file": "selection.segment_ids.i32.bin",
+      "doc_map_file": "selection.doc_map.jsonl",
+      "input_ids_dtype": "uint16",
+      "segment_ids_dtype": "int32",
+      "input_ids_sha256": "d64db02f15b6603f3b92d970de923614023dd398cea4ab750d3e1708c1c60c38",
+      "segment_ids_sha256": "f0f294f1d6fc1a2712096d4a76df2e187e55862937d7a799886b32f80ebde4f6",
+      "doc_map_sha256": "76f5f1b2aaae5b19522d44c0f5a561748985ba6be73e98f93452c517a2215a73"
+    },
+    "controller_train": {
+      "n_sequences": 977,
+      "seq_len": 1024,
+      "n_tokens": 1000000,
+      "n_padding": 448,
+      "n_documents": 873,
+      "input_ids_file": "controller_train.input_ids.u16.bin",
+      "segment_ids_file": "controller_train.segment_ids.i32.bin",
+      "doc_map_file": "controller_train.doc_map.jsonl",
+      "input_ids_dtype": "uint16",
+      "segment_ids_dtype": "int32",
+      "input_ids_sha256": "fb92139354881a85cc141af7c5e497b1767f4f0c0a72152f4c95a30addbb21c7",
+      "segment_ids_sha256": "2d23f4dd9a3097bc97ed33744104769a7c6029550811724979e79595c13d3cea",
+      "doc_map_sha256": "ef541d254e2baea079be141742cebb95b65e93d554645f6b0290a31f864ac230"
+    }
+  }
+}

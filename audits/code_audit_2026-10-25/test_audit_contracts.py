@@ -1,0 +1,85 @@
+"""Minimal regression tests for two audit fixes; small CPU models, no checkpoint."""
+from __future__ import annotations
+
+import unittest
+
+import torch
+from torch.nn import functional as F
+
+from config import ModelConfig
+from eval.counterfactual import cache_last_ffn_input
+from eval.dynamic_halting import DynamicHaltingPolicy
+from experiments.e12_bidding import ExpertBidAdapters
+from model import LoopMoE
+from train.value_student import ValueStudent, predict
+
+
+class AuditContractTests(unittest.TestCase):
+    def test_finite_threshold_uses_same_features_as_calibration(self):
+        torch.manual_seed(3)
+        config = ModelConfig(
+            layers=2, hidden_size=32, attention_heads=2, head_dim=16,
+            vocab_size=64, intermediate_size=24, experts_per_layer=4,
+            top_k=2, adaptive_layers=(1,), max_calls=4, target_only=False,
+        )
+        model = LoopMoE(config).eval()
+        students = {}
+        for name in ("immediate", "q_pi0"):
+            student = ValueStudent(32, 6, 8)
+            with torch.no_grad():
+                for parameter in student.parameters():
+                    parameter.zero_()
+                if name == "immediate":
+                    student.net[0].weight[0, 0] = 1
+                    student.net[2].weight[0, 0] = 1
+                    student.net[4].weight[:, 0] = 1
+            students[name] = {"student": student, "mean": torch.zeros(32), "std": torch.ones(32)}
+        input_ids = torch.randint(0, 64, (1, 7))
+        segments = torch.zeros_like(input_ids)
+        h = cache_last_ffn_input(model, input_ids, segments)
+        raw_gain = predict(students["immediate"]["student"], h.reshape(-1, 32), torch.zeros(32), torch.ones(32))[:, 0]
+        normalized = model.blocks[1].ffn_norm(h)
+        wrong_gain = predict(students["immediate"]["student"], normalized.reshape(-1, 32), torch.zeros(32), torch.ones(32))[:, 0]
+        index = (raw_gain - wrong_gain).abs().argmax()
+        tau = float((raw_gain[index] + wrong_gain[index]) / 2)
+        expected_rounds = 1 + 3 * (raw_gain > tau).long()
+        logits, rounds = DynamicHaltingPolicy(students, tau).forward(model, input_ids, segments)
+        torch.testing.assert_close(rounds.flatten(), expected_rounds)
+        with torch.no_grad():
+            expected_h, _ = model.fixed_depth(h, model.blocks[1], expected_rounds, None, model.gammas[1])
+            expected_logits = F.linear(model.final_norm(expected_h), model.embedding.weight)
+        torch.testing.assert_close(logits, expected_logits, rtol=1e-5, atol=1e-6)
+
+    def test_each_expert_reads_only_its_own_summary(self):
+        adapters = ExpertBidAdapters(
+            1, 2, 1, summary_mode="checkpoint", checkpoint_summary=torch.tensor([[2.0], [7.0]])
+        )
+        with torch.no_grad():
+            adapters.w1.zero_()
+            adapters.w1[:, -1, 0] = torch.tensor([3.0, 5.0])
+            adapters.w2.fill_(1.0)
+            adapters.w3.fill_(1.0)
+        h = torch.zeros(1, 1)
+        anchors = torch.zeros(1, dtype=torch.long)
+        before = adapters.bids_for_anchor(h, anchors)
+        expected = F.gelu(F.gelu(torch.tensor([[6.0, 35.0]])))
+        torch.testing.assert_close(before, expected)
+        with torch.no_grad():
+            adapters.summary[1, 0] += 1.0
+        after = adapters.bids_for_anchor(h, anchors)
+        torch.testing.assert_close(before[:, 0], after[:, 0])
+        self.assertNotEqual(float(before[0, 1]), float(after[0, 1]))
+
+    def test_module_to_and_dtype_conversion_remain_available(self):
+        adapters = ExpertBidAdapters(2, 3, 4)
+        moved = adapters.to(device="cpu", dtype=torch.float64)
+        self.assertIs(moved, adapters)
+        self.assertTrue(all(p.dtype == torch.float64 for p in adapters.parameters()))
+        output = adapters.bids_for_anchor(torch.zeros(2, 2, dtype=torch.float64), torch.tensor([0, 1]))
+        self.assertEqual(output.dtype, torch.float64)
+        self.assertEqual(tuple(output.shape), (2, 3))
+
+
+if __name__ == "__main__":
+    torch.set_num_threads(1)
+    unittest.main()

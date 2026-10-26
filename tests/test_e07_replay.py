@@ -183,6 +183,77 @@ class TestAllocators(unittest.TestCase):
         self.assertLessEqual(sum(state), 3)
 
 
+class TestZeroOracleGapReporting(unittest.TestCase):
+    """Audit counterexample: oracle gain 0, heuristic realized gain -1.  The
+    absolute regret (1.0) must be reported and the relative gap must be null,
+    not 0."""
+
+    def run_gap(self):
+        window = {"requests": [{}, {}], "extra_rounds": 1}
+        return replay.small_window_dp_gap(
+            window, [[-1.0], [-1.0]], [[1.0], [1.0]], [1.5], 2, 1, 0)
+
+    def test_abs_regret_survives_zero_oracle(self):
+        row = self.run_gap()["per_tier"][0]
+        self.assertEqual(row["n_zero_optimal_instances"], 1)
+        for name in ("equal_depth", "single_step_index", "two_step_package"):
+            self.assertAlmostEqual(
+                row["mean_abs_regret_vs_exact_dp"][name], 1.0, places=12, msg=name)
+            self.assertIsNone(row["mean_rel_gap_vs_exact_dp"][name], name)
+            self.assertIsNone(row["max_rel_gap_vs_exact_dp"][name], name)
+
+    def test_positive_oracle_still_reports_rel_gap(self):
+        window = {"requests": [{}, {}], "extra_rounds": 1}
+        out = replay.small_window_dp_gap(
+            window, [[2.0], [1.0]], [[0.0], [1.0]], [1.5], 2, 1, 0)
+        row = out["per_tier"][0]
+        self.assertEqual(row["n_zero_optimal_instances"], 0)
+        # oracle picks the gain-2 request; the index heuristic follows the
+        # prediction and picks the gain-1 request: abs regret 1, rel gap 0.5
+        self.assertAlmostEqual(
+            row["mean_abs_regret_vs_exact_dp"]["single_step_index"], 1.0, places=9)
+        self.assertAlmostEqual(
+            row["mean_rel_gap_vs_exact_dp"]["single_step_index"], 0.5, places=9)
+
+
+class TestOfflineReorderSensitivity(unittest.TestCase):
+    """Offline allocators are NOT all order-invariant: the equal-depth
+    remainder and the rolling-window DP chunking follow the arrival order."""
+
+    def test_equal_depth_remainder_depends_on_order(self):
+        deltas = [[10.0], [0.0]]
+        forward = replay.equal_depth_allocation(deltas, 1)
+        reversed_ = replay.equal_depth_allocation([deltas[1], deltas[0]], 1)
+        self.assertNotEqual(forward[0], reversed_[0])
+
+    def test_rolling_window_dp_chunking_depends_on_order(self):
+        a = replay.rolling_window_dp_allocation([[1.0], [100.0], [2.0], [3.0]], 2, 2)
+        b = replay.rolling_window_dp_allocation([[1.0], [2.0], [100.0], [3.0]], 2, 2)
+        self.assertNotEqual(a[0], b[0])
+
+    def test_reorder_sensitivity_covers_offline_allocators(self):
+        requests = [
+            {"state_index": i, "arrival": i, "stop_cost": 6.0, "continue_cost": 5.0,
+             "true_delta": 10.0 if i == 0 else 0.0,
+             "pred_delta": 10.0 if i == 0 else 0.0,
+             "position": i, "doc_id": 0}
+            for i in range(4)
+        ]
+        window = {"rounds": 2, "extra_rounds": 1, "requests": requests}
+        deltas = [[10.0], [0.0], [0.0], [0.0]]
+        out = replay.reorder_sensitivity(window, deltas, deltas, 1, 2, n_seeds=2, seed=0)
+        for ordering in ("shortest_first", "longest_first", "grouped_by_doc", "shuffle_0"):
+            self.assertIn("offline", out["per_ordering"][ordering], ordering)
+            self.assertIn("equal_depth", out["per_ordering"][ordering]["offline"], ordering)
+            self.assertIn("rolling_window_dp", out["per_ordering"][ordering]["offline"], ordering)
+        short_first = out["per_ordering"]["shortest_first"]["offline"]["equal_depth"]
+        long_first = out["per_ordering"]["longest_first"]["offline"]["equal_depth"]
+        self.assertAlmostEqual(short_first["realized_total_gain"], 10.0, places=12)
+        self.assertAlmostEqual(long_first["realized_total_gain"], 0.0, places=12)
+        self.assertIn("order-dependent", out["note"])  # no longer claims all order-invariant
+        self.assertIn("equal_depth", out["offline_mean_nll_range"])
+
+
 class TestOnlineLedger(unittest.TestCase):
     def make_window(self, n=12):
         rng = random.Random(17)
@@ -361,6 +432,14 @@ class TestCLI(unittest.TestCase):
                     self.assertIn("quartile_mean_nll", alloc[name]["stratified_nll"])
                 self.assertLessEqual(alloc["single_step_index"]["used_extra_rounds"],
                                      tier["extra_rounds_budget"])
+                oracle = tier["full_window_label_informed_oracle"]
+                self.assertFalse(oracle["deployable"])
+                self.assertLessEqual(oracle["used_extra_rounds"], tier["extra_rounds_budget"])
+                # label-informed exact oracle dominates every deployable allocator
+                for name in ("equal_depth", "random", "single_step_index",
+                             "two_step_package", "tail_index", "rolling_window_dp"):
+                    self.assertLessEqual(oracle["mean_nll"],
+                                         alloc[name]["mean_nll"] + 1e-9, name)
             dp = block["small_window_exact_dp_gap"]
             self.assertEqual(len(dp["per_tier"]), 4)
             self.assertIn("approximation", dp["upper_bound_note"])

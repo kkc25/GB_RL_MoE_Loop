@@ -1,0 +1,8 @@
+test_each_expert_reads_only_its_own_summary (audit_regression_tests.AuditContractTests.test_each_expert_reads_only_its_own_summary) ... ok
+test_finite_threshold_uses_same_features_as_calibration (audit_regression_tests.AuditContractTests.test_finite_threshold_uses_same_features_as_calibration) ... ok
+test_module_to_and_dtype_conversion_remain_available (audit_regression_tests.AuditContractTests.test_module_to_and_dtype_conversion_remain_available) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.010s
+
+OK

@@ -1,0 +1,1138 @@
+{
+  "intended_repository_commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "source_sha256": {
+    "experiments/e07_replay.py": "fb477d3af77aedc3c0092bc736837c09f4ce2b26491327338b42260eb5c8641a",
+    "data/controlled.py": "02b1e9d14d3a06910802e496c47b7d0aec99a3f843fcdbfba293586a527def3d",
+    "experiments/e09_controlled.py": "f0db1ff8072dbfcd7753c5af86ed5b2aacc07b96bd4df1a60ddac57bed48f9a0",
+    "runs/e01/m105_100m/records_test.jsonl": "2b2a3d5132b1f923441f1c12fdc9c5c3fb623c7690c09f9831a5afa0a0c13134",
+    "runs/e07/m105_replay/e07_replay.json": "bfa1369f613f0d579f967ca74e44fbde8d9d172b2bcd7fa53609562b85d4edd9",
+    "runs/e03/m105_100m/e03_summary.json": "e6d7168a2af4a676e084f523191079d946337f3084abaf9017d1220e8e960f21"
+  },
+  "e07": {
+    "scope": "Offline label-informed oracle for a known separable window; rounded E01 endpoint labels and assumed interpolation, not real intermediate-depth labels or a deployable/online policy.",
+    "n_states": 1024,
+    "seed": 20261025,
+    "window_indices": [
+      40,
+      64,
+      82,
+      83,
+      89,
+      104,
+      105,
+      118,
+      125,
+      147,
+      155,
+      163,
+      169,
+      205,
+      244,
+      247,
+      273,
+      276,
+      295,
+      308,
+      337,
+      374,
+      401,
+      446,
+      457,
+      460,
+      461,
+      466,
+      469,
+      527,
+      557,
+      558,
+      569,
+      595,
+      609,
+      621,
+      648,
+      663,
+      665,
+      694,
+      722,
+      733,
+      742,
+      744,
+      753,
+      776,
+      777,
+      795,
+      797,
+      798,
+      799,
+      813,
+      818,
+      837,
+      856,
+      868,
+      903,
+      908,
+      935,
+      948,
+      957,
+      964,
+      991,
+      1009
+    ],
+    "window_matches_uploaded_e07": true,
+    "backbone_hash_matches_uploaded_e03": true,
+    "stop_nll": 5.335356609375,
+    "T4_nll": 5.32318328125,
+    "positive_tail_gains": 39,
+    "extra_rounds_per_request": 3,
+    "method": {
+      "original_code": "Unmodified AST functions profile_weights and trajectory from experiments/e07_replay.py",
+      "audit_solver": "prefix_knapsack imported from sibling reproduce_synthetic_audit.py; independent O(N*B*H) multiple-choice prefix knapsack with optional stop",
+      "assumptions": "Fixed, additive, per-request prefix gains; full window and gains known before allocation; no inter-request coupling, streaming credit constraints, or GPU latency model.",
+      "rounded_label_precision": "The uploaded JSONL serializes losses to six decimal places; no missing .pt state tensor is reconstructed."
+    },
+    "profiles": {
+      "diminishing": [
+        {
+          "budget_extra_rounds": 32,
+          "oracle_gain": 1.6350369999999999,
+          "oracle_nll": 5.30980915625,
+          "used_extra_rounds": 32,
+          "allocation": [
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            2,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            3,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            2,
+            2,
+            0,
+            1,
+            3,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            3
+          ]
+        },
+        {
+          "budget_extra_rounds": 64,
+          "oracle_gain": 1.9728225714285719,
+          "oracle_nll": 5.304531256696428,
+          "used_extra_rounds": 64,
+          "allocation": [
+            0,
+            0,
+            3,
+            0,
+            2,
+            0,
+            3,
+            0,
+            2,
+            2,
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            3,
+            2,
+            0,
+            0,
+            1,
+            3,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            2,
+            0,
+            1,
+            0,
+            0,
+            2,
+            2,
+            3,
+            3,
+            0,
+            2,
+            3,
+            2,
+            0,
+            2,
+            2,
+            1,
+            0,
+            3
+          ]
+        },
+        {
+          "budget_extra_rounds": 128,
+          "oracle_gain": 2.1378660000000034,
+          "oracle_nll": 5.301952453125,
+          "used_extra_rounds": 117,
+          "allocation": [
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3
+          ]
+        },
+        {
+          "budget_extra_rounds": 192,
+          "oracle_gain": 2.1378660000000034,
+          "oracle_nll": 5.301952453125,
+          "used_extra_rounds": 117,
+          "allocation": [
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3
+          ]
+        }
+      ],
+      "delayed": [
+        {
+          "budget_extra_rounds": 32,
+          "oracle_gain": 1.541957714285714,
+          "oracle_nll": 5.311263520089286,
+          "used_extra_rounds": 32,
+          "allocation": [
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            3
+          ]
+        },
+        {
+          "budget_extra_rounds": 64,
+          "oracle_gain": 1.9175774285714295,
+          "oracle_nll": 5.305394462053572,
+          "used_extra_rounds": 64,
+          "allocation": [
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            3,
+            1,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3
+          ]
+        },
+        {
+          "budget_extra_rounds": 128,
+          "oracle_gain": 2.1378660000000034,
+          "oracle_nll": 5.301952453125,
+          "used_extra_rounds": 117,
+          "allocation": [
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3
+          ]
+        },
+        {
+          "budget_extra_rounds": 192,
+          "oracle_gain": 2.1378660000000034,
+          "oracle_nll": 5.301952453125,
+          "used_extra_rounds": 117,
+          "allocation": [
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            0,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            3,
+            0,
+            0,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            0,
+            3,
+            3,
+            3,
+            0,
+            3
+          ]
+        }
+      ]
+    }
+  },
+  "e09": {
+    "scope": "Current NumPy controlled.py and original E09 pure estimator functions; NOT legacy Torch train/exact.py, neural LM RL, or a rerun of training.",
+    "execution": "Direct import of data/controlled.py avoids unrelated data/__init__.py Torch imports; two original E09 function AST nodes are executed unchanged with this module bound as C.",
+    "rloo_vs_exact_max_abs": 5.134781488891349e-16,
+    "exact_vs_finite_difference_6_coordinates_max_abs": 7.788201507319403e-12,
+    "finite_difference_epsilon": 1e-05,
+    "finite_difference_coordinates": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        11
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        3
+      ],
+      [
+        4,
+        4
+      ]
+    ],
+    "terminal_paths_per_instance": [
+      84,
+      84,
+      84,
+      84,
+      4,
+      20
+    ],
+    "total_probability_per_instance": [
+      1.0000000000000002,
+      1.0,
+      1.0,
+      0.9999999999999999,
+      1.0,
+      1.0000000000000002
+    ],
+    "per_instance": [
+      {
+        "instance": "one_step_exact",
+        "budget": 3,
+        "terminal_paths": 84,
+        "probability_mass": 1.0000000000000002,
+        "expected_objective": 0.2736880476923995,
+        "rloo_vs_exact_max_abs": 1.5959455978986625e-16,
+        "original_e09_rloo_moment_bias_max_abs": 1.5959455978986625e-16,
+        "mean_score_max_abs": 1.3530843112619095e-16,
+        "finite_difference_coordinates": [
+          {
+            "coordinate": [
+              0,
+              0
+            ],
+            "analytic": -0.04330858565129508,
+            "finite_difference": -0.04330858565104733,
+            "absolute_error": 2.477462679451037e-13
+          },
+          {
+            "coordinate": [
+              0,
+              11
+            ],
+            "analytic": -0.08901000173550554,
+            "finite_difference": -0.08901000173311412,
+            "absolute_error": 2.391420395042587e-12
+          },
+          {
+            "coordinate": [
+              1,
+              1
+            ],
+            "analytic": -0.007379394609120744,
+            "finite_difference": -0.007379394609263733,
+            "absolute_error": 1.4298891931607827e-13
+          },
+          {
+            "coordinate": [
+              2,
+              2
+            ],
+            "analytic": 0.0014071801926771638,
+            "finite_difference": 0.0014071801918147384,
+            "absolute_error": 8.62425365497077e-13
+          },
+          {
+            "coordinate": [
+              3,
+              3
+            ],
+            "analytic": 0.0027402719689187944,
+            "finite_difference": 0.0027402719704472385,
+            "absolute_error": 1.528444038001453e-12
+          },
+          {
+            "coordinate": [
+              4,
+              4
+            ],
+            "analytic": 0.022999928220068064,
+            "finite_difference": 0.022999928217526385,
+            "absolute_error": 2.5416786730847463e-12
+          }
+        ]
+      },
+      {
+        "instance": "one_step_near",
+        "budget": 3,
+        "terminal_paths": 84,
+        "probability_mass": 1.0,
+        "expected_objective": 0.2661440190801577,
+        "rloo_vs_exact_max_abs": 5.134781488891349e-16,
+        "original_e09_rloo_moment_bias_max_abs": 5.134781488891349e-16,
+        "mean_score_max_abs": 1.3921155894713877e-16,
+        "finite_difference_coordinates": [
+          {
+            "coordinate": [
+              0,
+              0
+            ],
+            "analytic": -0.04557020750216305,
+            "finite_difference": -0.04557020750195483,
+            "absolute_error": 2.082153893745442e-13
+          },
+          {
+            "coordinate": [
+              0,
+              11
+            ],
+            "analytic": -0.08976624066546462,
+            "finite_difference": -0.08976624066292514,
+            "absolute_error": 2.5394825131641596e-12
+          },
+          {
+            "coordinate": [
+              1,
+              1
+            ],
+            "analytic": -0.007304542403510896,
+            "finite_difference": -0.007304542398722801,
+            "absolute_error": 4.788095267493908e-12
+          },
+          {
+            "coordinate": [
+              2,
+              2
+            ],
+            "analytic": 0.00151579744165537,
+            "finite_difference": 0.0015157974431190266,
+            "absolute_error": 1.4636566698228437e-12
+          },
+          {
+            "coordinate": [
+              3,
+              3
+            ],
+            "analytic": 0.0025122060658212984,
+            "finite_difference": 0.0025122060681725955,
+            "absolute_error": 2.3512971084049816e-12
+          },
+          {
+            "coordinate": [
+              4,
+              4
+            ],
+            "analytic": 0.023059024180528482,
+            "finite_difference": 0.023059024181759643,
+            "absolute_error": 1.2311610064763556e-12
+          }
+        ]
+      },
+      {
+        "instance": "two_step_complementary",
+        "budget": 3,
+        "terminal_paths": 84,
+        "probability_mass": 1.0,
+        "expected_objective": 0.6523754647924489,
+        "rloo_vs_exact_max_abs": 2.498001805406602e-16,
+        "original_e09_rloo_moment_bias_max_abs": 2.498001805406602e-16,
+        "mean_score_max_abs": 7.979727989493313e-17,
+        "finite_difference_coordinates": [
+          {
+            "coordinate": [
+              0,
+              0
+            ],
+            "analytic": 0.03540553868029224,
+            "finite_difference": 0.0354055386786456,
+            "absolute_error": 1.6466411567606087e-12
+          },
+          {
+            "coordinate": [
+              0,
+              11
+            ],
+            "analytic": 0.07152620413399978,
+            "finite_difference": 0.07152620413730659,
+            "absolute_error": 3.3068131566338366e-12
+          },
+          {
+            "coordinate": [
+              1,
+              1
+            ],
+            "analytic": 0.012298989954036443,
+            "finite_difference": 0.01229898995425138,
+            "absolute_error": 2.1493744284395433e-13
+          },
+          {
+            "coordinate": [
+              2,
+              2
+            ],
+            "analytic": 0.006576977231672514,
+            "finite_difference": 0.006576977229499902,
+            "absolute_error": 2.1726119167619906e-12
+          },
+          {
+            "coordinate": [
+              3,
+              3
+            ],
+            "analytic": -0.007157490937989921,
+            "finite_difference": -0.0071574909388250054,
+            "absolute_error": 8.350846056326411e-13
+          },
+          {
+            "coordinate": [
+              4,
+              4
+            ],
+            "analytic": -0.03993150919735277,
+            "finite_difference": -0.03993150919368027,
+            "absolute_error": 3.6724998042636514e-12
+          }
+        ]
+      },
+      {
+        "instance": "two_step_complementary_2",
+        "budget": 3,
+        "terminal_paths": 84,
+        "probability_mass": 0.9999999999999999,
+        "expected_objective": 0.6473233940633045,
+        "rloo_vs_exact_max_abs": 7.979727989493313e-17,
+        "original_e09_rloo_moment_bias_max_abs": 8.326672684688674e-17,
+        "mean_score_max_abs": 1.5959455978986625e-16,
+        "finite_difference_coordinates": [
+          {
+            "coordinate": [
+              0,
+              0
+            ],
+            "analytic": 0.039460416757381205,
+            "finite_difference": 0.03946041675639833,
+            "absolute_error": 9.828735048067472e-13
+          },
+          {
+            "coordinate": [
+              0,
+              11
+            ],
+            "analytic": 0.041881111039874706,
+            "finite_difference": 0.04188111104030945,
+            "absolute_error": 4.347425197614996e-13
+          },
+          {
+            "coordinate": [
+              1,
+              1
+            ],
+            "analytic": 0.004404369986153126,
+            "finite_difference": 0.004404369979837952,
+            "absolute_error": 6.315174078119767e-12
+          },
+          {
+            "coordinate": [
+              2,
+              2
+            ],
+            "analytic": 0.003171134042007097,
+            "finite_difference": 0.0031711340497952985,
+            "absolute_error": 7.788201507319403e-12
+          },
+          {
+            "coordinate": [
+              3,
+              3
+            ],
+            "analytic": -0.005306335020734937,
+            "finite_difference": -0.005306335021382224,
+            "absolute_error": 6.472869115703439e-13
+          },
+          {
+            "coordinate": [
+              4,
+              4
+            ],
+            "analytic": -0.011422286061851944,
+            "finite_difference": -0.011422286066986585,
+            "absolute_error": 5.134640976289795e-12
+          }
+        ]
+      },
+      {
+        "instance": "budget_one",
+        "budget": 1,
+        "terminal_paths": 4,
+        "probability_mass": 1.0,
+        "expected_objective": 0.7853821776163419,
+        "rloo_vs_exact_max_abs": 2.7755575615628914e-17,
+        "original_e09_rloo_moment_bias_max_abs": 2.7755575615628914e-17,
+        "mean_score_max_abs": 2.7755575615628914e-17,
+        "finite_difference_coordinates": [
+          {
+            "coordinate": [
+              0,
+              0
+            ],
+            "analytic": 0.0,
+            "finite_difference": 0.0,
+            "absolute_error": 0.0
+          },
+          {
+            "coordinate": [
+              0,
+              11
+            ],
+            "analytic": 0.0,
+            "finite_difference": 0.0,
+            "absolute_error": 0.0
+          },
+          {
+            "coordinate": [
+              1,
+              1
+            ],
+            "analytic": 0.0037336649647276973,
+            "finite_difference": 0.003733664971639072,
+            "absolute_error": 6.911374684365201e-12
+          },
+          {
+            "coordinate": [
+              2,
+              2
+            ],
+            "analytic": -0.023372737772137223,
+            "finite_difference": -0.02337273777852644,
+            "absolute_error": 6.3892155455214095e-12
+          },
+          {
+            "coordinate": [
+              3,
+              3
+            ],
+            "analytic": 0.0,
+            "finite_difference": 0.0,
+            "absolute_error": 0.0
+          },
+          {
+            "coordinate": [
+              4,
+              4
+            ],
+            "analytic": -0.026643842976443233,
+            "finite_difference": -0.026643842970797135,
+            "absolute_error": 5.646098172329417e-12
+          }
+        ]
+      },
+      {
+        "instance": "budget_two",
+        "budget": 2,
+        "terminal_paths": 20,
+        "probability_mass": 1.0000000000000002,
+        "expected_objective": 0.6664486785726119,
+        "rloo_vs_exact_max_abs": 5.551115123125783e-17,
+        "original_e09_rloo_moment_bias_max_abs": 5.551115123125783e-17,
+        "mean_score_max_abs": 4.5102810375396984e-17,
+        "finite_difference_coordinates": [
+          {
+            "coordinate": [
+              0,
+              0
+            ],
+            "analytic": 0.02404607565525946,
+            "finite_difference": 0.024046075658423757,
+            "absolute_error": 3.164295214741486e-12
+          },
+          {
+            "coordinate": [
+              0,
+              11
+            ],
+            "analytic": 0.05997502337965731,
+            "finite_difference": 0.05997502338095372,
+            "absolute_error": 1.2964143647486992e-12
+          },
+          {
+            "coordinate": [
+              1,
+              1
+            ],
+            "analytic": 0.01654729218588436,
+            "finite_difference": 0.016547292186475104,
+            "absolute_error": 5.907427325091419e-13
+          },
+          {
+            "coordinate": [
+              2,
+              2
+            ],
+            "analytic": 0.0030923036330051832,
+            "finite_difference": 0.0030923036353769358,
+            "absolute_error": 2.371752533952831e-12
+          },
+          {
+            "coordinate": [
+              3,
+              3
+            ],
+            "analytic": -0.0034118008173614845,
+            "finite_difference": -0.003411800814090426,
+            "absolute_error": 3.2710583373896096e-12
+          },
+          {
+            "coordinate": [
+              4,
+              4
+            ],
+            "analytic": -0.03934703769573521,
+            "finite_difference": -0.039347037689152486,
+            "absolute_error": 6.58272047981967e-12
+          }
+        ]
+      }
+    ]
+  },
+  "comparison_to_prior_audit": {
+    "e07": {
+      "previous_file": "e07_reconstructed_oracle.json",
+      "passed": true,
+      "max_abs_numeric_difference": 0.0
+    },
+    "e09": {
+      "previous_file": "e09_gradient_recheck.json",
+      "passed": true,
+      "probability_mass_max_abs_difference": 0.0,
+      "previous_rloo_vs_exact_max_abs": 5.134781488891349e-16,
+      "previous_six_coordinate_fd_max_abs": 5.385994601703192e-12,
+      "finite_difference_comparison": "The historical compact JSON did not record coordinate indices. This script fixes and publishes six coordinates; compare the <1e-7 gate, not bitwise equality of the old numerical-error scalar."
+    }
+  }
+}

@@ -65,6 +65,79 @@ class TestExactDP(unittest.TestCase):
         self.assertEqual(sum(rounds), 0)
 
 
+class TestPrefixKnapsack(unittest.TestCase):
+    """Complete offline oracle: exact separable prefix DP, O(N B H)."""
+
+    def test_matches_exact_dp_on_random_instances_with_negative_gains(self):
+        rng = random.Random(20261025)
+        for _ in range(100):
+            n, h = rng.randint(1, 5), rng.randint(1, 4)
+            deltas = [[rng.uniform(-2.0, 2.0) for _ in range(h)] for _ in range(n)]
+            budget = rng.randint(0, n * h)
+            reference, _ = e07.exact_dp(deltas, budget)
+            value, alloc = e07.prefix_knapsack(deltas, budget)
+            self.assertEqual(len(alloc), n)
+            self.assertLessEqual(sum(alloc), budget)
+            for i, k in enumerate(alloc):
+                self.assertLessEqual(k, len(deltas[i]))
+            achieved = sum(sum(deltas[i][:k]) for i, k in enumerate(alloc))
+            self.assertAlmostEqual(achieved, value, places=9)
+            self.assertAlmostEqual(reference, value, places=9)
+
+    def test_budget_may_be_left_unspent(self):
+        deltas = [[-1.0, -2.0], [0.5, -1.0]]
+        value, alloc = e07.prefix_knapsack(deltas, 4)
+        self.assertAlmostEqual(value, 0.5, places=9)
+        self.assertEqual(alloc, [0, 1])
+
+    def test_zero_budget_and_all_negative(self):
+        value, alloc = e07.prefix_knapsack([[-1.0], [-2.0]], 0)
+        self.assertEqual(value, 0.0)
+        self.assertEqual(alloc, [0, 0])
+        value, alloc = e07.prefix_knapsack([[-1.0], [-2.0]], 2)
+        self.assertEqual(value, 0.0)
+        self.assertEqual(alloc, [0, 0])
+
+    def test_full_window_scale_is_tractable(self):
+        rng = random.Random(1)
+        deltas = [[rng.uniform(-1.0, 1.0) for _ in range(3)] for _ in range(64)]
+        value, alloc = e07.prefix_knapsack(deltas, 192)
+        self.assertLessEqual(sum(alloc), 192)
+        self.assertTrue(value == value)  # finite
+
+
+class TestZeroOptimalReporting(unittest.TestCase):
+    """When the oracle optimum is 0, absolute regret must survive and the
+    relative gap must be null instead of a misleading 0."""
+
+    def test_absolute_regret_kept_and_rel_gap_null(self):
+        deltas = [[-1.0, -1.0], [-1.0, -1.0]]
+        rng = random.Random(0)
+        row = e07.evaluate_instance(deltas, 1, rng)
+        self.assertAlmostEqual(row["optimal"], 0.0, places=12)
+        blind = row["heuristics"]["round_robin"]
+        self.assertAlmostEqual(blind["value"], -1.0, places=12)
+        self.assertAlmostEqual(blind["abs_regret"], 1.0, places=12)
+        self.assertIsNone(blind["rel_gap"])
+        idx = row["heuristics"]["index_d1_c1"]
+        self.assertAlmostEqual(idx["abs_regret"], 0.0, places=12)
+        self.assertIsNone(idx["rel_gap"])
+
+    def test_positive_optimum_still_reports_rel_gap(self):
+        inst = e07.delayed_benefit_instances()["deep_delay"]
+        row = e07.evaluate_instance(inst["deltas"], inst["budget"], random.Random(0))
+        idx = row["heuristics"]["index_d1_c1"]
+        self.assertGreater(idx["rel_gap"], 0.5)
+        self.assertAlmostEqual(idx["abs_regret"], 5.1 - 0.85, places=9)
+
+    def test_gap_curve_reports_abs_regret_and_zero_optimal_count(self):
+        curve = e07.dp_gap_curve(seed=3, n_instances=4, budgets=(2,))["curve"][0]
+        for name, h in curve["heuristics"].items():
+            self.assertIn("mean_abs_regret", h, name)
+            self.assertIn("max_abs_regret", h, name)
+            self.assertGreaterEqual(h["mean_abs_regret"], -1e-12, name)
+
+
 class TestTrajectories(unittest.TestCase):
     def test_diminishing_greedy_is_optimal(self):
         deltas = [[1.0, 0.6, 0.3, 0.1], [0.8, 0.5, 0.2, 0.05]]

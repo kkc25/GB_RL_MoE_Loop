@@ -1,0 +1,35 @@
+test_returns_metrics_for_every_depth (tests.test_r4_quality.DepthMetricsTests.test_returns_metrics_for_every_depth) ... ok
+test_cached_h_matches_normal_baseline_forward (tests.test_counterfactual.CounterfactualTests.test_cached_h_matches_normal_baseline_forward) ... ok
+test_candidate_actions_include_baseline_and_exploration (tests.test_counterfactual.CounterfactualTests.test_candidate_actions_include_baseline_and_exploration) ... ok
+test_chunking_does_not_change_costs (tests.test_counterfactual.CounterfactualTests.test_chunking_does_not_change_costs) ... ok
+test_custom_action_subset_preserves_pairs_and_global_mapping (tests.test_counterfactual.CounterfactualTests.test_custom_action_subset_preserves_pairs_and_global_mapping) ... ok
+test_forced_baseline_then_baseline_continuation_equals_baseline (tests.test_counterfactual.CounterfactualTests.test_forced_baseline_then_baseline_continuation_equals_baseline) ... ok
+test_no_attention_after_cached_h (tests.test_counterfactual.CounterfactualTests.test_no_attention_after_cached_h) ... ok
+test_path_cost_shapes_and_candidate_set (tests.test_counterfactual.CounterfactualTests.test_path_cost_shapes_and_candidate_set) ... ok
+test_per_state_actions_use_state_specific_mapping (tests.test_counterfactual.CounterfactualTests.test_per_state_actions_use_state_specific_mapping) ... ok
+test_states_only_at_supervised_positions (tests.test_counterfactual.CounterfactualTests.test_states_only_at_supervised_positions) ... ok
+test_gathered_states_stay_inside_their_split_file_and_docs (tests.test_counterfactual.SplitIsolationTests.test_gathered_states_stay_inside_their_split_file_and_docs) ... ok
+test_ledger_counts_real_work (tests.test_counterfactual.StudentTests.test_ledger_counts_real_work) ... ok
+test_oracle_is_not_a_deploy_policy (tests.test_counterfactual.StudentTests.test_oracle_is_not_a_deploy_policy) ... ok
+test_student_input_is_only_the_legal_state (tests.test_counterfactual.StudentTests.test_student_input_is_only_the_legal_state) ... ok
+test_students_fit_and_select_legal_actions (tests.test_counterfactual.StudentTests.test_students_fit_and_select_legal_actions) ... ok
+test_each_expert_reads_only_its_own_summary (tests.test_e12_bidding.AuditCounterexampleTests.test_each_expert_reads_only_its_own_summary) ... ok
+test_module_to_and_dtype_conversion_remain_available (tests.test_e12_bidding.AuditCounterexampleTests.test_module_to_and_dtype_conversion_remain_available) ... ok
+test_selection_contains_anchor_and_excludes_self (tests.test_e12_bidding.BiddingSelectionTests.test_selection_contains_anchor_and_excludes_self) ... ok
+test_summary_modes_change_input_dim (tests.test_e12_bidding.BiddingSelectionTests.test_summary_modes_change_input_dim) ... ok
+test_restricted_differs_from_unrestricted_only_in_candidate_space (tests.test_e12_bidding.CentralRestrictedAlignmentTests.test_restricted_differs_from_unrestricted_only_in_candidate_space) ... ok
+test_restricted_selection_matches_anchor_candidates_and_argmin (tests.test_e12_bidding.CentralRestrictedAlignmentTests.test_restricted_selection_matches_anchor_candidates_and_argmin) ... ok
+test_checkpoint_summary_mode_requires_checkpoint (tests.test_e12_bidding.EndToEndTests.test_checkpoint_summary_mode_requires_checkpoint) ... ok
+test_deterministic_given_seed (tests.test_e12_bidding.EndToEndTests.test_deterministic_given_seed) ... ok
+test_end_to_end_summary (tests.test_e12_bidding.EndToEndTests.test_end_to_end_summary) ... ok
+test_matched_hidden_at_least_one (tests.test_e12_bidding.HiddenMatchingTests.test_matched_hidden_at_least_one) ... ok
+test_matched_hidden_within_five_percent (tests.test_e12_bidding.HiddenMatchingTests.test_matched_hidden_within_five_percent) ... ok
+test_hash_mismatch_raises (tests.test_e12_bidding.LoadStatesTests.test_hash_mismatch_raises) ... ok
+test_missing_file_raises (tests.test_e12_bidding.LoadStatesTests.test_missing_file_raises) ... ok
+test_covers_all_actions (tests.test_e12_bidding.PairActionMatrixTests.test_covers_all_actions) ... ok
+test_matches_pair_to_action (tests.test_e12_bidding.PairActionMatrixTests.test_matches_pair_to_action) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 7.647s
+
+OK

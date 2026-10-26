@@ -1,0 +1,47 @@
+{
+  "source_commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "repository_integrity": {
+    "files_verified": 390,
+    "changed_tracked_files": 0
+  },
+  "original_suite": {
+    "passed": 424,
+    "duration_seconds": 83.15,
+    "source": "existing_tests.log"
+  },
+  "minimal_regressions_original": {
+    "mode": "original",
+    "torch_version": "2.5.1+cpu",
+    "tests_run": 3,
+    "failures": 2,
+    "errors": 1,
+    "successful": false,
+    "repository_changed": false
+  },
+  "minimal_regressions_patched_in_memory": {
+    "mode": "patched",
+    "torch_version": "2.5.1+cpu",
+    "tests_run": 3,
+    "failures": 0,
+    "errors": 0,
+    "successful": true,
+    "repository_changed": false
+  },
+  "audit_environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "torch": "2.5.1+cpu",
+    "pytest": "8.3.5",
+    "tokenizers": "0.21.4",
+    "cuda_available": false
+  },
+  "original_run_environment": {
+    "python": "3.12.15",
+    "torch": "2.12.1+cu130",
+    "device": "RTX A6000"
+  },
+  "trained_checkpoint_used": false,
+  "gpu_training_or_latency_rerun": false,
+  "remote_repository_changed": false,
+  "limits": "Micro-model counterexamples and record recomputations establish scoped findings, not corrected real-checkpoint performance."
+}

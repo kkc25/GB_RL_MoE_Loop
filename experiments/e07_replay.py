@@ -25,13 +25,15 @@ Compared allocators (decisions on predicted gains, evaluated on realized):
 * two_step_package: fixed two-step package d2/c2 reserving two rounds,
 * tail_index: indivisible full-continuation package, I = d_tail / c_tail,
 * rolling_window_dp: rolling-horizon exact DP over arrival-ordered chunks of
-  ``dp_window`` requests on predicted gains — an explicit approximation,
-  because the joint DP over 64 requests x R rounds is outside the computable
-  range; the computable-range upper bound is the small-window exact DP below.
+  ``dp_window`` requests on predicted gains — an explicit approximation of
+  the joint allocation; the exact full-window optimum on realized gains is
+  tractable separately via the separable prefix DP (prefix_knapsack, O(N B H))
+  and is reported per tier as the label-informed oracle (never deployable).
 
 The small-window exact DP (``dp_window`` requests per instance, realized
-gains) is reported per budget tier as the computable-range upper bound only,
-with the realized-value gap of every heuristic measured against it.
+gains) is reported per budget tier as a per-instance gap diagnostic:
+absolute regret is always reported, and the relative gap is null on
+zero-optimum instances instead of being masked as 0.
 
 Hard prefix ledger: the online single-step index allocator is replayed as a
 stream — each request arrival supplies its share of the tier's expert-call
@@ -287,7 +289,8 @@ def rolling_window_dp_allocation(deltas, budget, dp_window):
     share of the remaining budget (scaled by remaining capacity); the exact DP
     of e07_synthetic is solved inside the chunk on predicted gains and the
     unspent remainder rolls forward.  This is NOT the joint optimum over the
-    full window; the computable-range upper bound is the small-window DP.
+    full window; the exact full-window oracle on realized gains is computed
+    separately by e07_synthetic.prefix_knapsack (O(N B H)).
     """
     n = len(deltas)
     state = [0] * n
@@ -507,13 +510,17 @@ def online_ledger_replay(window, pred_deltas, true_deltas, budget, top_k,
 
 def small_window_dp_gap(window, true_deltas, pred_deltas, budget_rounds_tiers,
                         dp_window, n_instances, seed):
-    """Exact DP on realized gains over small sub-windows (upper bound only).
+    """Exact DP on realized gains over small sub-windows (diagnostic reference).
 
     Heuristic allocations are chosen on predicted gains and evaluated on
     realized gains; their realized value is compared to the exact-DP optimum
-    of the same sub-window.  The full 64-request window is outside the
-    computable range of this state-space DP, so no full-window exact optimum
-    is claimed.
+    of the same sub-window.  The absolute regret is always reported; the
+    relative gap is null on instances whose optimum is zero (dividing by ~0
+    would hide negative realized value behind a reported gap of 0).  The
+    exact full-window oracle is tractable separately via
+    ``e07_synthetic.prefix_knapsack`` (O(N B H)) and is reported per tier in
+    the main output; this small-window DP is kept as a per-instance gap
+    diagnostic.
     """
     rng = random.Random(seed + 1)
     requests = window["requests"]
@@ -524,35 +531,53 @@ def small_window_dp_gap(window, true_deltas, pred_deltas, budget_rounds_tiers,
         sub_budget = min(int(round((avg_rounds - 1.0) * dp_window)),
                          dp_window * capacity_per_request)
         agg = {}
+        n_zero_optimal = 0
         for _ in range(n_instances):
             idx = sorted(rng.sample(range(n), min(dp_window, n)))
             sub_true = [true_deltas[i] for i in idx]
             sub_pred = [pred_deltas[i] for i in idx]
             opt, _ = e07syn.exact_dp(sub_true, sub_budget)
+            zero_optimal = opt <= 1e-12
+            n_zero_optimal += int(zero_optimal)
             for name, alloc in (
                     ("equal_depth", lambda d: e07syn.round_robin_allocation(d, sub_budget)[1]),
                     ("single_step_index", lambda d: e07syn.index_allocation(d, sub_budget)[1]),
                     ("two_step_package", lambda d: e07syn.two_step_package_allocation(d, sub_budget)[1])):
                 state = alloc(sub_pred)
                 realized = sum(sub_true[i][h] for i in range(len(idx)) for h in range(state[i]))
-                a = agg.setdefault(name, [])
-                a.append((opt - realized) / opt if opt > 1e-12 else 0.0)
+                abs_regret = opt - realized
+                a = agg.setdefault(name, {"regrets": [], "gaps": []})
+                a["regrets"].append(abs_regret)
+                a["gaps"].append(None if zero_optimal else abs_regret / opt)
         out.append({
             "budget_avg_rounds": avg_rounds,
             "sub_window_budget_rounds": sub_budget,
-            "mean_rel_gap_vs_exact_dp": {name: statistics.fmean(v) for name, v in agg.items()},
-            "max_rel_gap_vs_exact_dp": {name: max(v) for name, v in agg.items()},
+            "n_zero_optimal_instances": n_zero_optimal,
+            "mean_abs_regret_vs_exact_dp": {
+                name: statistics.fmean(v["regrets"]) for name, v in agg.items()},
+            "max_abs_regret_vs_exact_dp": {
+                name: max(v["regrets"]) for name, v in agg.items()},
+            "mean_rel_gap_vs_exact_dp": {
+                name: (statistics.fmean(g for g in v["gaps"] if g is not None)
+                       if any(g is not None for g in v["gaps"]) else None)
+                for name, v in agg.items()},
+            "max_rel_gap_vs_exact_dp": {
+                name: (max(g for g in v["gaps"] if g is not None)
+                       if any(g is not None for g in v["gaps"]) else None)
+                for name, v in agg.items()},
         })
     return {
         "dp_window": dp_window,
         "n_instances_per_tier": n_instances,
         "upper_bound_note": ("Exact DP on realized gains over dp_window-request sub-windows; "
-                             "the computable-range upper bound only. The joint DP over the full "
-                             "64-request window is outside the computable range, and the "
-                             "rolling_window_dp allocator is an explicit approximation, not "
-                             "the joint optimum. A relative gap above 1 means the heuristic's "
-                             "realized total gain is negative — allocations chosen on predicted "
-                             "gains can lose value on mispredicted requests."),
+                             "a per-instance gap diagnostic. The exact full-window oracle is "
+                             "computed separately by prefix_knapsack (separable prefix DP, "
+                             "O(N B H)) and reported per tier; the rolling_window_dp allocator "
+                             "remains an explicit approximation, not the joint optimum. "
+                             "Absolute regret is always reported; relative gaps are null on "
+                             "zero-optimum instances. A relative gap above 1 means the "
+                             "heuristic's realized total gain is negative — allocations chosen "
+                             "on predicted gains can lose value on mispredicted requests."),
         "per_tier": out,
     }
 
@@ -573,15 +598,23 @@ def stream_aligned_window(window, arrival_order):
     return dict(window, requests=requests)
 
 
-def reorder_sensitivity(window, pred_deltas, true_deltas, budget, top_k, n_seeds, seed):
-    """Arrival-order sensitivity of the online index allocator.
+def reorder_sensitivity(window, pred_deltas, true_deltas, budget, top_k, n_seeds, seed,
+                        dp_window=8):
+    """Arrival-order sensitivity of the online AND offline allocators.
 
-    Offline allocators are order-invariant by construction; only the online
-    ledger allocator depends on the arrival order, so the sensitivity is
-    measured there.  Orderings: shuffles plus adversarial length/doc mixes.
+    The online ledger allocator depends on the arrival order by construction.
+    Offline allocators are NOT all order-invariant: the equal-depth
+    round-robin remainder follows the arrival order and rolling_window_dp
+    chunks the window in arrival order, so both can change their allocation
+    (and realized gain) under reordering.  All offline allocators are
+    re-evaluated under every ordering; the index allocators
+    (single_step_index, two_step_package, tail_index) are order-invariant by
+    construction and serve as invariance controls.  Orderings: shuffles plus
+    adversarial length/doc mixes.
     """
     requests = window["requests"]
     rng = random.Random(seed + 2)
+    rng_offline = random.Random(seed + 3)
     variants = {}
     for s in range(n_seeds):
         order = list(range(len(requests)))
@@ -600,21 +633,50 @@ def reorder_sensitivity(window, pred_deltas, true_deltas, budget, top_k, n_seeds
         stream = stream_aligned_window(window, order)
         metrics = evaluate_allocation(stream, true_deltas, state, steps, top_k,
                                       arrival_aligned=True)
+        # offline allocators re-run on the reordered window: allocation
+        # decisions and realized gains can change with the arrival order
+        perm_pred = [pred_deltas[i] for i in order]
+        perm_true = [true_deltas[i] for i in order]
+        offline = {}
+        for alloc_name, (_, perm_state, _, _) in run_offline_allocators(
+                perm_pred, budget, rng_offline, dp_window).items():
+            gain_by_orig = [0.0] * len(order)
+            for j, orig in enumerate(order):
+                gain_by_orig[orig] = sum(perm_true[j][:perm_state[j]])
+            nll = [requests[i]["stop_cost"] - gain_by_orig[i] for i in range(len(order))]
+            offline[alloc_name] = {
+                "mean_nll": statistics.fmean(nll),
+                "realized_total_gain": sum(gain_by_orig),
+                "used_extra_rounds": int(sum(perm_state)),
+            }
         rows[name] = {
             "mean_nll": metrics["mean_nll"],
             "used_extra_rounds": metrics["used_extra_rounds"],
             "mean_waiting_epochs": metrics["completion"]["mean_waiting_epochs"],
             "ledger_violations": violations,
+            "offline": offline,
         }
     nlls = [row["mean_nll"] for row in rows.values()]
+    offline_names = sorted(rows[next(iter(rows))]["offline"])
     return {
         "budget_extra_rounds": budget,
-        "note": ("Only the online ledger allocator depends on arrival order; the offline "
-                 "allocators are order-invariant by construction and are not repeated."),
+        "note": ("Both the online ledger allocator and the offline allocators are "
+                 "re-evaluated under every ordering. The online allocator is "
+                 "order-dependent by construction; among the offline allocators, "
+                 "equal_depth (round-robin remainder follows arrival order) and "
+                 "rolling_window_dp (arrival-ordered chunk boundaries) are "
+                 "order-dependent, while single_step_index, two_step_package and "
+                 "tail_index are order-invariant by construction and act as "
+                 "invariance controls."),
         "adversarial_orderings": ["longest_first", "shortest_first", "grouped_by_doc"],
         "per_ordering": rows,
         "mean_nll_range": [min(nlls), max(nlls)],
         "mean_nll_std": statistics.pstdev(nlls),
+        "offline_mean_nll_range": {
+            name: [min(row["offline"][name]["mean_nll"] for row in rows.values()),
+                   max(row["offline"][name]["mean_nll"] for row in rows.values())]
+            for name in offline_names
+        },
     }
 
 
@@ -679,6 +741,24 @@ def run(input_dir, e03_summary_path, window_size=64,
                 metrics = evaluate_allocation(window, true_deltas, state, steps, top_k)
                 metrics["predicted_total_gain"] = pred_total
                 allocator_rows[name] = metrics
+            # exact full-window label-informed oracle (separable prefix DP,
+            # O(N B H)); a lower bound on NLL in this interpolation
+            # environment, never a deployable policy
+            oracle_gain, oracle_rounds = e07syn.prefix_knapsack(true_deltas, budget)
+            oracle_gains = [sum(true_deltas[i][:oracle_rounds[i]]) for i in range(len(requests))]
+            oracle_nll = [requests[i]["stop_cost"] - oracle_gains[i] for i in range(len(requests))]
+            tier_oracle = {
+                "realized_total_gain": oracle_gain,
+                "mean_nll": statistics.fmean(oracle_nll),
+                "used_extra_rounds": int(sum(oracle_rounds)),
+                "rounds_per_request": [int(k) for k in oracle_rounds],
+                "deployable": False,
+                "note": ("Label-informed exact offline oracle on realized gains "
+                         "(prefix_knapsack; separable, budget may be left unspent). "
+                         "This is a lower bound on achievable NLL inside the "
+                         "endpoint-interpolated environment, not a deploy gain and "
+                         "not a new LM result."),
+            }
             # hard streaming ledger for the online single-step index allocator
             entries, violations, on_state, on_steps = online_ledger_replay(
                 window, pred_deltas, true_deltas, budget, top_k)
@@ -695,7 +775,8 @@ def run(input_dir, e03_summary_path, window_size=64,
                     "violation_count": len(violations),
                 },
             }
-            tier_rows[tier_key] = {**tier, "allocators": allocator_rows}
+            tier_rows[tier_key] = {**tier, "allocators": allocator_rows,
+                                   "full_window_label_informed_oracle": tier_oracle}
         dp_gap = small_window_dp_gap(window, true_deltas, pred_deltas, budget_rounds_tiers,
                                      dp_window, n_dp_instances, seed)
         mid_tier = sorted(tiers, key=lambda k: tiers[k]["extra_rounds_budget"])[len(tiers) // 2 - 1]
@@ -706,7 +787,7 @@ def run(input_dir, e03_summary_path, window_size=64,
             "small_window_exact_dp_gap": dp_gap,
             "sensitivity": {
                 "reorder": reorder_sensitivity(window, pred_deltas, true_deltas, mid_budget,
-                                               top_k, n_reorder_seeds, seed),
+                                               top_k, n_reorder_seeds, seed, dp_window),
                 "batch_size": batch_size_sensitivity(window, pred_deltas, true_deltas, mid_budget,
                                                      top_k, batch_sizes),
                 "length_mix": {
@@ -759,8 +840,10 @@ def run(input_dir, e03_summary_path, window_size=64,
             LATENCY_NOTE,
             "Requests are states sampled without replacement from the frozen test split; quality is "
             "mean per-request NLL at the baseline action, budget is counted in Top-2 expert calls.",
-            "The oracle (realized-delta) allocation is not run on the full window; the small-window "
-            "exact DP on realized gains is the computable-range upper bound reference only.",
+            "The exact full-window oracle on realized gains IS computed per tier via the separable "
+            "prefix DP (prefix_knapsack, O(N B H)); it is a label-informed lower bound on NLL in "
+            "this interpolation environment, never a deployable policy. The small-window exact DP "
+            "gap block remains as a per-instance realized-gap diagnostic.",
         ],
     }
     return sanitize(summary)

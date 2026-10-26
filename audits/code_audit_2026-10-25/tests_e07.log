@@ -1,0 +1,10 @@
+................
+----------------------------------------------------------------------
+Ran 16 tests in 2.344s
+
+OK
+wrote /workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/tmpdi5mq_9h/e07.json
+service_load: not_executed
+seqtopk counterexample violation: True
+ledger prefix invariant holds: True
+worst max_rel_gap over curve: 1.2802

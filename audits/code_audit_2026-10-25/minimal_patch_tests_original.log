@@ -1,0 +1,54 @@
+test_each_expert_reads_only_its_own_summary (audit_regression_tests.AuditContractTests.test_each_expert_reads_only_its_own_summary) ... FAIL
+test_finite_threshold_uses_same_features_as_calibration (audit_regression_tests.AuditContractTests.test_finite_threshold_uses_same_features_as_calibration) ... FAIL
+test_module_to_and_dtype_conversion_remain_available (audit_regression_tests.AuditContractTests.test_module_to_and_dtype_conversion_remain_available) ... ERROR
+
+======================================================================
+ERROR: test_module_to_and_dtype_conversion_remain_available (audit_regression_tests.AuditContractTests.test_module_to_and_dtype_conversion_remain_available)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/0f24fc616bd0/code_audit_2026-10-25/test_audit_contracts.py", line 75, in test_module_to_and_dtype_conversion_remain_available
+    moved = adapters.to(device="cpu", dtype=torch.float64)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/0f24fc616bd0/.audit_deps/torch/nn/modules/module.py", line 1340, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/0f24fc616bd0/GB_RL_MoE_Loop/experiments/e12_bidding.py", line 149, in _apply
+    hidden = F.gelu(torch.einsum("...ei,oih->...oh", rows, self.w1) + self.b1)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/0f24fc616bd0/.audit_deps/torch/functional.py", line 402, in einsum
+    return _VF.einsum(equation, operands)  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: expected Tensor as element 0 in argument 1, but got function
+
+======================================================================
+FAIL: test_each_expert_reads_only_its_own_summary (audit_regression_tests.AuditContractTests.test_each_expert_reads_only_its_own_summary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/0f24fc616bd0/code_audit_2026-10-25/test_audit_contracts.py", line 66, in test_each_expert_reads_only_its_own_summary
+    torch.testing.assert_close(before, expected)
+  File "/workspace/scratch/0f24fc616bd0/.audit_deps/torch/testing/_comparison.py", line 1530, in assert_close
+    raise error_metas[0].to_error(msg)
+AssertionError: Tensor-likes are not close!
+
+Mismatched elements: 2 / 2 (100.0%)
+Greatest absolute difference: 21.0 at index (0, 0) (up to 1e-05 allowed)
+Greatest relative difference: 3.5 at index (0, 0) (up to 1.3e-06 allowed)
+
+======================================================================
+FAIL: test_finite_threshold_uses_same_features_as_calibration (audit_regression_tests.AuditContractTests.test_finite_threshold_uses_same_features_as_calibration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/0f24fc616bd0/code_audit_2026-10-25/test_audit_contracts.py", line 47, in test_finite_threshold_uses_same_features_as_calibration
+    torch.testing.assert_close(rounds.flatten(), expected_rounds)
+  File "/workspace/scratch/0f24fc616bd0/.audit_deps/torch/testing/_comparison.py", line 1530, in assert_close
+    raise error_metas[0].to_error(msg)
+AssertionError: Tensor-likes are not equal!
+
+Mismatched elements: 1 / 7 (14.3%)
+Greatest absolute difference: 3 at index (4,)
+Greatest relative difference: 3.0 at index (4,)
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.012s
+
+FAILED (failures=2, errors=1)

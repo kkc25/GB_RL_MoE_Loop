@@ -1,0 +1,14 @@
+--- a/eval/dynamic_halting.py
++++ b/eval/dynamic_halting.py
+@@ -27,8 +27,9 @@
+         normalized = block.ffn_norm(h)
+         flat_normalized = normalized.reshape(-1, normalized.shape[-1])
+         actions = block.executor.baseline_actions(flat_normalized)
+-        stop_cost = predict(self.students["immediate"]["student"], flat_normalized, self.students["immediate"]["mean"], self.students["immediate"]["std"])
+-        continue_cost = predict(self.students["q_pi0"]["student"], flat_normalized, self.students["q_pi0"]["mean"], self.students["q_pi0"]["std"])
++        flat_h = h.reshape(-1, h.shape[-1])
++        stop_cost = predict(self.students["immediate"]["student"], flat_h, self.students["immediate"]["mean"], self.students["immediate"]["std"])
++        continue_cost = predict(self.students["q_pi0"]["student"], flat_h, self.students["q_pi0"]["mean"], self.students["q_pi0"]["std"])
+         rows = torch.arange(actions.shape[0], device=actions.device)
+         delta = stop_cost[rows, actions] - continue_cost[rows, actions]
+         continue_mask = delta > self.tau

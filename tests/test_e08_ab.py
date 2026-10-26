@@ -181,6 +181,29 @@ class TestB3OrderedComposition(unittest.TestCase):
         self.assertIn("EXTRAPOLATION", extra["label"])
         self.assertEqual(set(extra["per_length"]), {5, 6})
 
+    def test_fixed_task_forced_path_intervention(self):
+        # Same input x0 and same target compose(s, x0); only the executed
+        # expert order is forced.  This is the causal order intervention.
+        interv = self.res["metrics"]["phase1_exact_experts"][
+            "fixed_task_forced_path_intervention"]
+        self.assertIn("fixed", interv["semantics"])
+        # sanity: forcing the correct path must hit the original target
+        self.assertAlmostEqual(interv["forced_correct_path_sanity_acc"], 1.0)
+        # forcing a wrong order on the SAME task must break the answer
+        self.assertLess(interv["forced_reversed_path_acc_vs_original_target"], 0.5)
+        self.assertLess(interv["forced_random_path_acc_vs_original_target"], 0.5)
+        self.assertGreater(interv["n_cases"], 0)
+
+    def test_program_changed_controls_renamed_and_labeled(self):
+        # The old reverse/random/repeat controls change BOTH the program and
+        # its correct answer; the metric group name must say so.
+        p1 = self.res["metrics"]["phase1_exact_experts"]
+        self.assertNotIn("controls", p1)
+        renamed = p1["controls_changed_program_and_target"]
+        self.assertIn("program", renamed["note"])
+        for key in ("reversed_paths", "repeated_same_expert", "random_equal_length_paths"):
+            self.assertIn(key, renamed)
+
 
 class TestCLI(unittest.TestCase):
     def test_cli_writes_json_with_required_fields(self):

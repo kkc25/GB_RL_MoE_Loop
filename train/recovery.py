@@ -7,7 +7,7 @@ from torch.nn import functional as F
 
 from eval.recovery_metrics import query_loss_and_metrics
 from train.common import MetricWriter, autocast_context
-from train.recovery_common import RecoveryLedger, query_labels, recovery_checkpoint, sha256_file
+from train.recovery_common import RecoveryLedger, query_labels, recovery_checkpoint, restore_ledger_fields, restore_rng_state, sha256_file
 
 
 def batch_indices(size: int, batch_size: int, update: int, seed: int, shuffle: bool) -> list[int]:
@@ -93,21 +93,40 @@ def train_recovery(model, datasets: dict, collate, config, device: torch.device,
         eps=1e-8,
     )
     start_update = 0
+    best_validation_loss = float("inf")
+    schedule = {"updates": run.updates, "learning_rate": run.learning_rate, "warmup_updates": run.warmup_updates}
     if run.resume:
         checkpoint = torch.load(run.resume, map_location=device, weights_only=False)
         if checkpoint["data_hash"] != data_hash:
             raise ValueError("checkpoint data hash does not match current task")
         model.load_state_dict(checkpoint["model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
-        restored_ledger = RecoveryLedger(**checkpoint["ledger"])
+        restored_ledger = RecoveryLedger(**restore_ledger_fields(checkpoint["ledger"], config.model.top_k))
         ledger.__dict__.update(restored_ledger.__dict__)
         start_update = checkpoint["update"]
+        best_validation_loss = checkpoint.get("best_validation_loss")
+        if best_validation_loss is None:
+            best_validation_loss = float("inf")
+        previous_schedule = checkpoint.get("schedule")
+        if previous_schedule is not None and previous_schedule != schedule:
+            ledger.schedule_phases.append({"schedule": previous_schedule, "ended_at_update": start_update})
+            writer.write(phase="schedule", update=start_update, previous_schedule=previous_schedule, current_schedule=schedule)
+        restore_rng_state(checkpoint)
     started = time.monotonic()
+    last_accounted = started
+
+    def accumulate_elapsed() -> None:
+        nonlocal last_accounted
+        now = time.monotonic()
+        ledger.elapsed_seconds += now - last_accounted
+        if device.type == "cuda":
+            ledger.allocated_gpu_hours += (now - last_accounted) / 3600
+        last_accounted = now
+
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
     model.train()
     answer_ids = torch.arange(5, 5 + train_set.modulus, device=device)
-    best_validation_loss = float("inf")
     for update in range(start_update, run.updates):
         indices = batch_indices(len(train_set), run.batch_size, update, run.seed, run.shuffle_each_epoch)
         batch = move_recovery_batch(collate([train_set[index] for index in indices]), device)
@@ -130,10 +149,12 @@ def train_recovery(model, datasets: dict, collate, config, device: torch.device,
         gradient_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), run.gradient_clip)
         optimizer.step()
         targets = batch["target_answer_ids"].numel()
+        rounds = int(output.calls.sum().item())
         ledger.optimizer_updates += 1
         ledger.supervised_targets += targets
         ledger.input_tokens += int(batch["attention_mask"].sum().item()) if "attention_mask" in batch else batch["input_ids"].numel()
-        ledger.expert_calls += int(output.calls.sum().item())
+        ledger.ffn_rounds += rounds
+        ledger.expert_token_pairs += rounds * config.model.top_k
         if update % run.log_interval == 0:
             writer.write(phase="train", update=update, loss=loss.item(), depth=depth, lr=lr, grad_norm=float(gradient_norm), supervised_targets=ledger.supervised_targets)
         if (update + 1) % run.validation_interval == 0 or update + 1 == run.updates:
@@ -144,14 +165,15 @@ def train_recovery(model, datasets: dict, collate, config, device: torch.device,
                 writer.write(phase="validation", update=update + 1, split=split, **result)
             selection_split = "id_validation" if "id_validation" in validation_results else "train"
             selection_loss = validation_results[selection_split]["ce_full"]
+            accumulate_elapsed()
+            if device.type == "cuda":
+                ledger.peak_memory_bytes = max(ledger.peak_memory_bytes, torch.cuda.max_memory_allocated(device))
             if selection_loss < best_validation_loss:
                 best_validation_loss = selection_loss
-                recovery_checkpoint(f"{run.output_dir}/best_validation.pt", config, model, optimizer, update + 1, ledger, data_hash)
+                recovery_checkpoint(f"{run.output_dir}/best_validation.pt", config, model, optimizer, update + 1, ledger, data_hash, best_validation_loss, schedule)
             model.train()
-            recovery_checkpoint(f"{run.output_dir}/latest.pt", config, model, optimizer, update + 1, ledger, data_hash)
-    elapsed = time.monotonic() - started
-    ledger.elapsed_seconds += elapsed
-    ledger.allocated_gpu_hours += elapsed / 3600 if device.type == "cuda" else 0.0
+            recovery_checkpoint(f"{run.output_dir}/latest.pt", config, model, optimizer, update + 1, ledger, data_hash, best_validation_loss, schedule)
+    accumulate_elapsed()
     if device.type == "cuda":
         ledger.peak_memory_bytes = max(ledger.peak_memory_bytes, torch.cuda.max_memory_allocated(device))
     ledger.save(f"{run.output_dir}/cost_ledger.json")

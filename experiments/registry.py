@@ -66,6 +66,33 @@ def initial_registry() -> dict:
     }
 
 
+def aggregate_status(components: dict) -> str:
+    """Experiment-level status derived from all components, never the last one.
+
+    "finished" requires every component finished; otherwise the most severe
+    non-finished status wins, so a blocked/stopped/failed component is not
+    hidden by a finished sibling regardless of update order.
+    """
+    statuses = {component.get("status") for component in components.values()}
+    statuses.discard(None)
+    if not statuses:
+        return "planned"
+    if statuses == {"finished"}:
+        return "finished"
+    for status in ("failed", "blocked_by_precondition", "stopped_by_evidence", "running", "planned"):
+        if status in statuses:
+            return status
+    return "finished"
+
+
+def aggregate_gpu_hours(components: dict) -> float | None:
+    """Sum component GPU hours; unknown (None) if any component lacks them."""
+    hours = [component.get("gpu_hours") for component in components.values()]
+    if any(value is None for value in hours):
+        return None
+    return sum(hours)
+
+
 class Registry:
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
@@ -81,13 +108,13 @@ class Registry:
         temporary.write_text(json.dumps(self.data, indent=2) + "\n")
         os.replace(temporary, self.path)
 
-    def update(self, experiment: str, component: str, status: str, evidence: list[str] | None = None, metrics: dict | None = None, gpu_hours: float = 0.0, stop_reason: str | None = None, next_trigger: str | None = None) -> None:
+    def update(self, experiment: str, component: str, status: str, evidence: list[str] | None = None, metrics: dict | None = None, gpu_hours: float | None = None, stop_reason: str | None = None, next_trigger: str | None = None) -> None:
         record = self.data["experiments"][experiment]
-        record["status"] = status
         record["components"][component] = {"status": status, "evidence": evidence or [], "metrics": metrics or {}, "gpu_hours": gpu_hours, "updated_at": now()}
+        record["status"] = aggregate_status(record["components"])
         record["evidence"] = sorted(set(record["evidence"] + (evidence or [])))
         record["metrics"].update(metrics or {})
-        record["gpu_hours"] = sum(item["gpu_hours"] for item in record["components"].values())
+        record["gpu_hours"] = aggregate_gpu_hours(record["components"])
         record["stop_reason"] = stop_reason
         record["next_trigger"] = next_trigger
         self.save()
@@ -101,7 +128,7 @@ def main() -> None:
     parser.add_argument("--status", choices=("planned", "running", "finished", "stopped_by_evidence", "blocked_by_precondition", "failed"))
     parser.add_argument("--evidence", action="append", default=[])
     parser.add_argument("--metrics")
-    parser.add_argument("--gpu-hours", type=float, default=0.0)
+    parser.add_argument("--gpu-hours", type=float, default=None, help="recorded GPU hours for this component; omit when unknown")
     parser.add_argument("--stop-reason")
     parser.add_argument("--next-trigger")
     args = parser.parse_args()

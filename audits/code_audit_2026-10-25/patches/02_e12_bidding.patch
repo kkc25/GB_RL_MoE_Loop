@@ -1,0 +1,29 @@
+--- a/experiments/e12_bidding.py
++++ b/experiments/e12_bidding.py
+@@ -144,9 +144,9 @@
+         self.w3 = nn.Parameter(torch.randn(experts, hidden_dim, 1) * hidden_dim**-0.5)
+         self.b3 = nn.Parameter(torch.zeros(experts, 1))
+ 
+-    def _apply(self, rows: torch.Tensor) -> torch.Tensor:
++    def _forward_rows(self, rows: torch.Tensor) -> torch.Tensor:
+         """rows (..., experts, input_dim) -> bids (..., experts)."""
+-        hidden = F.gelu(torch.einsum("...ei,oih->...oh", rows, self.w1) + self.b1)
++        hidden = F.gelu(torch.einsum("...oi,oih->...oh", rows, self.w1) + self.b1)
+         hidden = F.gelu(torch.einsum("...oh,ohk->...ok", hidden, self.w2) + self.b2)
+         return (torch.einsum("...ok,okj->...oj", hidden, self.w3) + self.b3).squeeze(-1)
+ 
+@@ -166,12 +166,12 @@
+         """Bids for every (anchor, second) orientation: (B, experts, experts)."""
+         eye = torch.eye(self.experts, device=h.device, dtype=h.dtype)
+         anchor_onehot = eye.unsqueeze(0).expand(h.shape[0], self.experts, self.experts)
+-        return self._apply(self._rows(h, anchor_onehot))
++        return self._forward_rows(self._rows(h, anchor_onehot))
+ 
+     def bids_for_anchor(self, h: torch.Tensor, anchors: torch.Tensor) -> torch.Tensor:
+         """Conditional bids of every second expert given anchors: (B, experts)."""
+         anchor_onehot = F.one_hot(anchors, self.experts).to(h.dtype)
+-        return self._apply(self._rows(h, anchor_onehot))
++        return self._forward_rows(self._rows(h, anchor_onehot))
+ 
+ 
+ def central_parameter_count(input_dim: int, hidden_dim: int, n_actions: int) -> int:

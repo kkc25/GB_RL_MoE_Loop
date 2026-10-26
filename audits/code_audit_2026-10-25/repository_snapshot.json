@@ -1,0 +1,3573 @@
+{
+  "repository": "kkc25/GB_RL_MoE_Loop",
+  "commit": "f2bef422f7315f30618f00c690bf82810d1e85ac",
+  "tree": {
+    "sha": "62bb1f1e9cd48cff238ea5492338c22536bcf552",
+    "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/62bb1f1e9cd48cff238ea5492338c22536bcf552",
+    "tree": [
+      {
+        "path": ".gitattributes",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4281b1fe02263cdd9ce50ccf65f0f9c3be9ab8b2",
+        "size": 33,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4281b1fe02263cdd9ce50ccf65f0f9c3be9ab8b2"
+      },
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5fad9dd864f8d6470a29cd5430c89001491d2773",
+        "size": 460,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5fad9dd864f8d6470a29cd5430c89001491d2773"
+      },
+      {
+        "path": "Budget_Aware_Adaptive_Expert_Loop_MoE_RL_Experiment_Plan.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e7d361f36486547d9c0630b1db97ce54d86fc5d2",
+        "size": 93123,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e7d361f36486547d9c0630b1db97ce54d86fc5d2"
+      },
+      {
+        "path": "Loop_MoE_Experiment_Report_2026-10-25.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "81825e6e5025e494bb5117ac211caa1b0a10d366",
+        "size": 12454,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/81825e6e5025e494bb5117ac211caa1b0a10d366"
+      },
+      {
+        "path": "analysis",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "bfc1aed7df73cb7c4e3a753feb49631006819f62",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/bfc1aed7df73cb7c4e3a753feb49631006819f62"
+      },
+      {
+        "path": "analysis/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "size": 0,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      },
+      {
+        "path": "analysis/goal_report.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7b106b166692d7254d80d7cedb727ed8cc2b3294",
+        "size": 2208,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7b106b166692d7254d80d7cedb727ed8cc2b3294"
+      },
+      {
+        "path": "analysis/lm_summary.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "752232021383071189c91ec99f2435943256a502",
+        "size": 1241,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/752232021383071189c91ec99f2435943256a502"
+      },
+      {
+        "path": "analysis/recovery_summary.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "97776aada551ef5486bda4cfbb6e58c2a144ef8f",
+        "size": 1513,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/97776aada551ef5486bda4cfbb6e58c2a144ef8f"
+      },
+      {
+        "path": "analysis/report.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f68caf801691189f023bf5395e94b9cba01ac4c1",
+        "size": 2554,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f68caf801691189f023bf5395e94b9cba01ac4c1"
+      },
+      {
+        "path": "config.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8e83c32c3ecc1f22b92e388c268d42ac134aa354",
+        "size": 3928,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8e83c32c3ecc1f22b92e388c268d42ac134aa354"
+      },
+      {
+        "path": "configs",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "1fc58d17e3dd68db706e122cff7af745b8b9f404",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/1fc58d17e3dd68db706e122cff7af745b8b9f404"
+      },
+      {
+        "path": "configs/e00_debug67_b0.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "64fd329a47d55bb2c59dbfe89b8dcb9534206de2",
+        "size": 773,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/64fd329a47d55bb2c59dbfe89b8dcb9534206de2"
+      },
+      {
+        "path": "configs/e00_debug67_b1.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "206cf5995a1f8a57f805d3c0c7037e19fa2fef97",
+        "size": 773,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/206cf5995a1f8a57f805d3c0c7037e19fa2fef97"
+      },
+      {
+        "path": "configs/e00_debug67_b2.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8521faf5cc136f6d8d3aff1c5f4dd8e2926556f6",
+        "size": 832,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8521faf5cc136f6d8d3aff1c5f4dd8e2926556f6"
+      },
+      {
+        "path": "configs/e00_dense_b3.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f5088aa76acafa2001521e3b06b9531cd642900d",
+        "size": 572,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f5088aa76acafa2001521e3b06b9531cd642900d"
+      },
+      {
+        "path": "configs/e00_dense_b4.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6fa38b7317a48d374dd20538e336a0f7c12cf517",
+        "size": 572,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/6fa38b7317a48d374dd20538e336a0f7c12cf517"
+      },
+      {
+        "path": "configs/e00_dense_b5.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7cf7a5f3db3448e12cecbe5d02604d4e140151dd",
+        "size": 644,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7cf7a5f3db3448e12cecbe5d02604d4e140151dd"
+      },
+      {
+        "path": "configs/e00_m105_b2.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a255d7dda9525bd0fd17c5400d5cb3b9c0c5f727",
+        "size": 770,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a255d7dda9525bd0fd17c5400d5cb3b9c0c5f727"
+      },
+      {
+        "path": "configs/main_280m.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1078f67b1139224c76fcaab1fcdffbd2c805b9cf",
+        "size": 1099,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1078f67b1139224c76fcaab1fcdffbd2c805b9cf"
+      },
+      {
+        "path": "configs/p0.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e98fdfa097497eda8f23a60476b549772239d2c4",
+        "size": 1356,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e98fdfa097497eda8f23a60476b549772239d2c4"
+      },
+      {
+        "path": "configs/p0_depth1_diagnostic.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "87eaabbb8660da23f6dd63b409dbc3743b3f0284",
+        "size": 657,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/87eaabbb8660da23f6dd63b409dbc3743b3f0284"
+      },
+      {
+        "path": "configs/p0_smoke.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f64cbd10f57ed91c812003ed68303a0dc1a880ce",
+        "size": 605,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f64cbd10f57ed91c812003ed68303a0dc1a880ce"
+      },
+      {
+        "path": "configs/pilot_126m.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ba4f00c597940032693f9ce79f189d07bf4cabeb",
+        "size": 924,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ba4f00c597940032693f9ce79f189d07bf4cabeb"
+      },
+      {
+        "path": "configs/recovery_c0_fixed_dense.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4749c01ad0a4ee859e19161bda7baa1f274802d8",
+        "size": 576,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4749c01ad0a4ee859e19161bda7baa1f274802d8"
+      },
+      {
+        "path": "configs/recovery_c0_identity_dense.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cbd392af5496504595ff92acd9eb1929035b17c5",
+        "size": 582,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/cbd392af5496504595ff92acd9eb1929035b17c5"
+      },
+      {
+        "path": "configs/recovery_c1_dense.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4e387455f045ec77ec5034a8f5d70f683b790355",
+        "size": 567,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4e387455f045ec77ec5034a8f5d70f683b790355"
+      },
+      {
+        "path": "configs/recovery_c1_dense_generalization.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "15e1549ced2204ece23d027fe2484b147d73a4dc",
+        "size": 605,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/15e1549ced2204ece23d027fe2484b147d73a4dc"
+      },
+      {
+        "path": "configs/recovery_c1_dense_wd.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1d1828a0e11e6e5335b6345a2771d592a9f5532a",
+        "size": 571,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1d1828a0e11e6e5335b6345a2771d592a9f5532a"
+      },
+      {
+        "path": "configs/recovery_c1_moe_final.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "091cc275a5efe35fd0982e0701f752aeb343d3f3",
+        "size": 590,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/091cc275a5efe35fd0982e0701f752aeb343d3f3"
+      },
+      {
+        "path": "configs/recovery_c1_moe_final_wd.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c1987fe060b3a3b16cafcbfb95c8c519539232db",
+        "size": 594,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c1987fe060b3a3b16cafcbfb95c8c519539232db"
+      },
+      {
+        "path": "configs/recovery_c1_moe_full.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "bfbc72632b9b351fbd973344741389a49b9512f7",
+        "size": 570,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/bfbc72632b9b351fbd973344741389a49b9512f7"
+      },
+      {
+        "path": "configs/recovery_c1_moe_full_wd.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1b6af9bef5fef95f69bc739261fd3b8b117f8687",
+        "size": 574,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1b6af9bef5fef95f69bc739261fd3b8b117f8687"
+      },
+      {
+        "path": "data",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "036a4b9103db06141b517ab1fb69b7ffa669c0ce",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/036a4b9103db06141b517ab1fb69b7ffa669c0ce"
+      },
+      {
+        "path": "data/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "88d8d2dd6ecf20ef8e548ae7c6c2709c441e14ed",
+        "size": 1057,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/88d8d2dd6ecf20ef8e548ae7c6c2709c441e14ed"
+      },
+      {
+        "path": "data/affine.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e4ce20d1e76003db29508fd1395398557c6032fc",
+        "size": 12619,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e4ce20d1e76003db29508fd1395398557c6032fc"
+      },
+      {
+        "path": "data/controlled.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "27076ea32e56354e057f7f342279dddeab3a78aa",
+        "size": 21455,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/27076ea32e56354e057f7f342279dddeab3a78aa"
+      },
+      {
+        "path": "data/fineweb.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e46f6d42fa878d76ce7a2abf30380ce523307479",
+        "size": 25061,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e46f6d42fa878d76ce7a2abf30380ce523307479"
+      },
+      {
+        "path": "data/packed_lm.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "74136bad3f9ed52cb8668e6a62f1c57c73ab368b",
+        "size": 13641,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/74136bad3f9ed52cb8668e6a62f1c57c73ab368b"
+      },
+      {
+        "path": "data/prepare_fineweb.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "085b759298fed5bec357d5c20917ae6d5c076f9b",
+        "size": 7876,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/085b759298fed5bec357d5c20917ae6d5c076f9b"
+      },
+      {
+        "path": "data/recovery.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "26def6be9dcb0978b43c611d28c51c48d4674af3",
+        "size": 20776,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/26def6be9dcb0978b43c611d28c51c48d4674af3"
+      },
+      {
+        "path": "eval",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "542c1e359cf5e1c308ea58b11293bedcd29206eb",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/542c1e359cf5e1c308ea58b11293bedcd29206eb"
+      },
+      {
+        "path": "eval/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "size": 0,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      },
+      {
+        "path": "eval/causality.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "50d010a9792b55d6e8f361d83c0061835137bd69",
+        "size": 26573,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/50d010a9792b55d6e8f361d83c0061835137bd69"
+      },
+      {
+        "path": "eval/counterfactual.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c3b99507e746b4654284990da95a766954c91c61",
+        "size": 12896,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c3b99507e746b4654284990da95a766954c91c61"
+      },
+      {
+        "path": "eval/dynamic_halting.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "963ccbb55d5f0c6ea88a9b9384ce97f70673cac2",
+        "size": 2446,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/963ccbb55d5f0c6ea88a9b9384ce97f70673cac2"
+      },
+      {
+        "path": "eval/oracle.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7ffe6c3a7cb171524fa141f373ad12026e8b24b8",
+        "size": 2258,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7ffe6c3a7cb171524fa141f373ad12026e8b24b8"
+      },
+      {
+        "path": "eval/profile.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a18342e29a0cb1e355df8b1f7c80997f9c27906c",
+        "size": 3007,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a18342e29a0cb1e355df8b1f7c80997f9c27906c"
+      },
+      {
+        "path": "eval/profile_dynamic.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b9ce49a27e7758ae56bec065b42a40195c64b3b9",
+        "size": 4583,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b9ce49a27e7758ae56bec065b42a40195c64b3b9"
+      },
+      {
+        "path": "eval/recovery_metrics.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "70c60fdbdc7caed0e5ecf5b89dbaf90f7381866a",
+        "size": 5214,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/70c60fdbdc7caed0e5ecf5b89dbaf90f7381866a"
+      },
+      {
+        "path": "eval/resource_accounting.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7c35ffc6ed6b7db7c33a16eb7d9140a54c35beeb",
+        "size": 3540,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7c35ffc6ed6b7db7c33a16eb7d9140a54c35beeb"
+      },
+      {
+        "path": "eval/verify_router_math.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a8454ac86b9d57cfc8db3846363aa38521a2dfdd",
+        "size": 4897,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a8454ac86b9d57cfc8db3846363aa38521a2dfdd"
+      },
+      {
+        "path": "experiments",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "b4b0c7a58d44b93542bdcf60dae17c6f871382f2",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/b4b0c7a58d44b93542bdcf60dae17c6f871382f2"
+      },
+      {
+        "path": "experiments/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "size": 0,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      },
+      {
+        "path": "experiments/e03_halting.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "556231105d9c3d9608a7f2f208587d99ab16cadd",
+        "size": 21068,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/556231105d9c3d9608a7f2f208587d99ab16cadd"
+      },
+      {
+        "path": "experiments/e05_e06_synthetic.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "00326dacfa71c4a680fabc4d17574aef04276f90",
+        "size": 33510,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/00326dacfa71c4a680fabc4d17574aef04276f90"
+      },
+      {
+        "path": "experiments/e07_replay.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2bd8987d4b5ae413935ac83ca38ca5521b5a666f",
+        "size": 38875,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2bd8987d4b5ae413935ac83ca38ca5521b5a666f"
+      },
+      {
+        "path": "experiments/e07_synthetic.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "16c2cf6f2acd66470f0406332b951412a3b26d41",
+        "size": 16901,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/16c2cf6f2acd66470f0406332b951412a3b26d41"
+      },
+      {
+        "path": "experiments/e08_ab.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "198f1b6b9bdbd5d1ef0aad403cb96bbafb4caa11",
+        "size": 50248,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/198f1b6b9bdbd5d1ef0aad403cb96bbafb4caa11"
+      },
+      {
+        "path": "experiments/e08_cde.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a33fe6c6a8e6100907712287b2101d16bc737f52",
+        "size": 45648,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a33fe6c6a8e6100907712287b2101d16bc737f52"
+      },
+      {
+        "path": "experiments/e09_controlled.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ec3f9ecd108e5b5a7467ff9b802ca693d742e7d5",
+        "size": 29950,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ec3f9ecd108e5b5a7467ff9b802ca693d742e7d5"
+      },
+      {
+        "path": "experiments/e10_ordered.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ba6652d1dc81d2b1fcaa6cd563d5b3b2575defa7",
+        "size": 30494,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ba6652d1dc81d2b1fcaa6cd563d5b3b2575defa7"
+      },
+      {
+        "path": "experiments/e12_bidding.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "da602006bfbf5851e89aa14066a8bcd2f34ecbbd",
+        "size": 30315,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/da602006bfbf5851e89aa14066a8bcd2f34ecbbd"
+      },
+      {
+        "path": "experiments/e12_equivalence.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "afa3b360c79222a37e9c8d23767410764f968035",
+        "size": 1484,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/afa3b360c79222a37e9c8d23767410764f968035"
+      },
+      {
+        "path": "experiments/registry.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "58c9a253b688fc1afc2b2b17a2f7e75838060857",
+        "size": 4469,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/58c9a253b688fc1afc2b2b17a2f7e75838060857"
+      },
+      {
+        "path": "lm_config.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "df4e729710b96c61222fa0a53bcdf56ef84ede51",
+        "size": 1324,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/df4e729710b96c61222fa0a53bcdf56ef84ede51"
+      },
+      {
+        "path": "model",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "907798bb8169a1868f8e1ecc85dad757fc4b4436",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/907798bb8169a1868f8e1ecc85dad757fc4b4436"
+      },
+      {
+        "path": "model/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "18b5fd2c4f11f225dd02ebcd03c034c1e5baa045",
+        "size": 132,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/18b5fd2c4f11f225dd02ebcd03c034c1e5baa045"
+      },
+      {
+        "path": "model/loop.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "913023661b80b32ff0c62f6bcf5f3cc6fa75d96e",
+        "size": 2606,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/913023661b80b32ff0c62f6bcf5f3cc6fa75d96e"
+      },
+      {
+        "path": "model/moe.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "74417a0ec764cbff1ff0b64d0d7f08259ca93d2d",
+        "size": 2970,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/74417a0ec764cbff1ff0b64d0d7f08259ca93d2d"
+      },
+      {
+        "path": "model/top2.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f3544de96280199cb20892af03fef41c8c3be4e8",
+        "size": 4875,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f3544de96280199cb20892af03fef41c8c3be4e8"
+      },
+      {
+        "path": "model/transformer.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1a1c4b15920699f2a63f73ea6ca6a8d8cf08706e",
+        "size": 18242,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1a1c4b15920699f2a63f73ea6ca6a8d8cf08706e"
+      },
+      {
+        "path": "plans",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "358ae4482155cc624d93f40ecb772509bee9cc54",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/358ae4482155cc624d93f40ecb772509bee9cc54"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "4e3324e9209fc478e5a1b1e0c6d8a743b07262c6",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/4e3324e9209fc478e5a1b1e0c6d8a743b07262c6"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/00_research_roadmap.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d0eb52017c5e1f0b76a5996c7c4b834662bb35f6",
+        "size": 12711,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d0eb52017c5e1f0b76a5996c7c4b834662bb35f6"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/DELIVERY_NOTES.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a11c9edfab09f09181982e7570495dd8fbb5fd29",
+        "size": 3879,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a11c9edfab09f09181982e7570495dd8fbb5fd29"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/MANIFEST_SHA256.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f799054a8f8eea77cb446ec03dc411cb88be0d26",
+        "size": 4374,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f799054a8f8eea77cb446ec03dc411cb88be0d26"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "689a43292e735f266f542b15bb057e1eff12786f",
+        "size": 5108,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/689a43292e735f266f542b15bb057e1eff12786f"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/WORK_LOG.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1ca85ad96ddc3abe22c7f7cc6d64fb801e965cd5",
+        "size": 2308,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1ca85ad96ddc3abe22c7f7cc6d64fb801e965cd5"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/code",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "aba5b561c4e1115cd77a69c26115de62bf1994b4",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/aba5b561c4e1115cd77a69c26115de62bf1994b4"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/code/validate_bundle.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "257d372c2eb36e4f169c7f8297858c9a3ce140d8",
+        "size": 2868,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/257d372c2eb36e4f169c7f8297858c9a3ce140d8"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/code/verify_design.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "12df108c325a39cb547b9b13c72937c962678c7b",
+        "size": 4644,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/12df108c325a39cb547b9b13c72937c962678c7b"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/configs",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "c06be526496a64dfdaf7721b80494e37e0e57b6d",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/c06be526496a64dfdaf7721b80494e37e0e57b6d"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/configs/core_experiments.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "85a749de689a93609e04794e861886e29d8acd5e",
+        "size": 3325,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/85a749de689a93609e04794e861886e29d8acd5e"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "bb1ee7467344e1f74d3b3baee6cbc822af472257",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/bb1ee7467344e1f74d3b3baee6cbc822af472257"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E00_feasibility_and_baselines.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "96566b29e488c27c0c4ceedeebc738ba01d940e4",
+        "size": 11541,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/96566b29e488c27c0c4ceedeebc738ba01d940e4"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E01_oracle_and_learnability.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "eba0ce3752591ba3b2460b9c44bfe6c605f8f704",
+        "size": 6713,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/eba0ce3752591ba3b2460b9c44bfe6c605f8f704"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E02_counterfactual_rollout_distillation.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "fed560e8ee693a457ec015775cbacf2c60582ed5",
+        "size": 9288,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/fed560e8ee693a457ec015775cbacf2c60582ed5"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E03_value_calibrated_halting.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a7c193a521263a57828a11205a69f615e8e85347",
+        "size": 5208,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a7c193a521263a57828a11205a69f615e8e85347"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E04_memory_and_transition_graph.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a2c21fa04a643ddb073adae4dbafd58408fd8915",
+        "size": 4784,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a2c21fa04a643ddb073adae4dbafd58408fd8915"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E05_prices_and_congestion_games.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "fc2897e22911ee769d4825fff5b3e57727902a02",
+        "size": 5291,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/fc2897e22911ee769d4825fff5b3e57727902a02"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E06_causal_transport_assignment.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b25ec50cff864d59f84296c3da0fdf296e7d31d5",
+        "size": 4907,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b25ec50cff864d59f84296c3da0fdf296e7d31d5"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E07_budget_scheduling.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "31f33c68062cfa1aa8d00d5083ac4988b50a3f3d",
+        "size": 5206,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/31f33c68062cfa1aa8d00d5083ac4988b50a3f3d"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E08_stability_and_synthetic_mechanisms.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ff3a8afcd315d46d2b60853bcd90de4b283c82ff",
+        "size": 15621,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ff3a8afcd315d46d2b60853bcd90de4b283c82ff"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E09_router_only_policy_gradient.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a8c3831bfa25ebfca944ea7f994f77846a570e26",
+        "size": 4777,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a8c3831bfa25ebfca944ea7f994f77846a570e26"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E10_ordered_complementarity.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d49c362820714f48379072eb904b0dcb8de5a22f",
+        "size": 2532,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d49c362820714f48379072eb904b0dcb8de5a22f"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E11_systems_and_scale_validation.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "70fab41f3563935145a46635194fa50fb876b69f",
+        "size": 6746,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/70fab41f3563935145a46635194fa50fb876b69f"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/experiments/E12_expert_self_bidding.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3d13a14b7ffef3c06234ae2b555118e19ec2be6c",
+        "size": 2607,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/3d13a14b7ffef3c06234ae2b555118e19ec2be6c"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/literature",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "dd4d4a0d02c9c82aba6a2dcb54d32f771728664f",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/dd4d4a0d02c9c82aba6a2dcb54d32f771728664f"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/literature/01_prior_claims_audit.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "960640d1463b8199c128fdc643e33219f1bd30e1",
+        "size": 10564,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/960640d1463b8199c128fdc643e33219f1bd30e1"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/literature/02_literature_map.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e935dafd57a467f11dc89f805cb969a264d812fc",
+        "size": 17824,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e935dafd57a467f11dc89f805cb969a264d812fc"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/literature/03_nearest_neighbor_and_learnability.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c36266122566957b973b6fa41c8320e4847f2773",
+        "size": 11578,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c36266122566957b973b6fa41c8320e4847f2773"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/literature/04_latest_overlap_and_adjustments.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c1c45d6f480e0e24f176c76191a714ed26ce312b",
+        "size": 11151,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c1c45d6f480e0e24f176c76191a714ed26ce312b"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/protocols",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "a89f3a471514d3a05faf2279ac70f7ba98be3149",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/a89f3a471514d3a05faf2279ac70f7ba98be3149"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/protocols/01_common_protocol.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "eaccd44dedc97702d33a07a39138e7d6c91a5899",
+        "size": 10446,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/eaccd44dedc97702d33a07a39138e7d6c91a5899"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/protocols/02_data_and_evaluation.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "580efc7f6b631ead9f9a46ef17e0f13eeaab3f6c",
+        "size": 8175,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/580efc7f6b631ead9f9a46ef17e0f13eeaab3f6c"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/protocols/03_run_registry_and_budget.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "20b0a9ca11ce69dbc55fbec70144a278754ebd61",
+        "size": 6123,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/20b0a9ca11ce69dbc55fbec70144a278754ebd61"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/resources",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "b3dc00c243e0d1bc15f19ac3eb810338b55b54fb",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/b3dc00c243e0d1bc15f19ac3eb810338b55b54fb"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/resources/01_a6000_capacity_and_budget.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "972d94b7c27b2a73265ebab08443937114736881",
+        "size": 13483,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/972d94b7c27b2a73265ebab08443937114736881"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/resources/02_reproducible_execution.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ab2371a231a9adc02c3fa649e75aafb63db996cf",
+        "size": 15329,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ab2371a231a9adc02c3fa649e75aafb63db996cf"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/resources/code",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "aa977d77ef1fa4e6e75cfb16b4c9c5eb99019fe1",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/aa977d77ef1fa4e6e75cfb16b4c9c5eb99019fe1"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/resources/code/analytic_budget_tables.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "bc18332146a122bec587b0e86e83fadfb28b3722",
+        "size": 41526,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/bc18332146a122bec587b0e86e83fadfb28b3722"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/resources/code/estimate_budget.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "605eb2f19db553c48c971547f1901b78673edb07",
+        "size": 3584,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/605eb2f19db553c48c971547f1901b78673edb07"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/resources/code/probe_hardware.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "276e8629e87a87b6ff125fd3ae034d74ce93425a",
+        "size": 1746,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/276e8629e87a87b6ff125fd3ae034d74ce93425a"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/results",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "da3eff8a78f81cdb675209ff7e0e0f7642f9faee",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/da3eff8a78f81cdb675209ff7e0e0f7642f9faee"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/results/artifact_validation.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8dece75a6ee5ed0b7b5e96c4306887fda97610c1",
+        "size": 569,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8dece75a6ee5ed0b7b5e96c4306887fda97610c1"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/results/design_checks.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "98b50761395c9874e72038d3da0e8936b5120e57",
+        "size": 2473,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/98b50761395c9874e72038d3da0e8936b5120e57"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/results/e07_synthetic.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f544acab7cd023d7fadf6ef49b4b985b43065e91",
+        "size": 13797,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f544acab7cd023d7fadf6ef49b4b985b43065e91"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/theory",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "9fb60f019eaef36e3b6a31fb5d84e6b4d1588681",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/9fb60f019eaef36e3b6a31fb5d84e6b4d1588681"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/theory/01_formalization_and_propositions.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8752b4e0b68e3c5aa369b70c8a777235d0039903",
+        "size": 19009,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8752b4e0b68e3c5aa369b70c8a777235d0039903"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/theory/02_counterexamples_and_falsification.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "42f9849e9bad0a684b23b5fab5177c21c498f33b",
+        "size": 12366,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/42f9849e9bad0a684b23b5fab5177c21c498f33b"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/theory/verified_toy_calculations.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "abce2f9282e1fdc19fbc06d25f1850ea4150acc5",
+        "size": 1364,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/abce2f9282e1fdc19fbc06d25f1850ea4150acc5"
+      },
+      {
+        "path": "plans/loop_moe_research_plan_2026-10-25/theory/verify_counterexamples.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a746d96c788fbe291209fc24b2edd7f181385737",
+        "size": 6028,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a746d96c788fbe291209fc24b2edd7f181385737"
+      },
+      {
+        "path": "policy",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "1ebb383117faca3da2ddf19ecda3801c078fff0b",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/1ebb383117faca3da2ddf19ecda3801c078fff0b"
+      },
+      {
+        "path": "policy/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a9b99c31cf736e03241840d00f85400acaf5415e",
+        "size": 215,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a9b99c31cf736e03241840d00f85400acaf5415e"
+      },
+      {
+        "path": "policy/controller.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9c03b2bdf1fc0d07e55bc6287029a390e6d0060a",
+        "size": 4838,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/9c03b2bdf1fc0d07e55bc6287029a390e6d0060a"
+      },
+      {
+        "path": "policy/rollout.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "452aad8e48d22940a96177270c3eee7b259614e5",
+        "size": 1422,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/452aad8e48d22940a96177270c3eee7b259614e5"
+      },
+      {
+        "path": "recovery_config.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b035a29f6d94948eb943981d04967265dd580123",
+        "size": 1564,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b035a29f6d94948eb943981d04967265dd580123"
+      },
+      {
+        "path": "run_e01.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b6310afb43dcfe79902e2b0a65931893ab76c7ed",
+        "size": 9984,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b6310afb43dcfe79902e2b0a65931893ab76c7ed"
+      },
+      {
+        "path": "run_experiment.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8ed8391904c91421238082b7c6e8a24963e2aacf",
+        "size": 4794,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8ed8391904c91421238082b7c6e8a24963e2aacf"
+      },
+      {
+        "path": "run_lm.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ca589bd16742e80aa804cc0d3837ff41d90d5c03",
+        "size": 2760,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ca589bd16742e80aa804cc0d3837ff41d90d5c03"
+      },
+      {
+        "path": "run_recovery.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cdb96189482d85e26b0fff1bce079d4c46017429",
+        "size": 5050,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/cdb96189482d85e26b0fff1bce079d4c46017429"
+      },
+      {
+        "path": "runs",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "965de0f0528020dc7e1dfe58a1add8abe4379536",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/965de0f0528020dc7e1dfe58a1add8abe4379536"
+      },
+      {
+        "path": "runs/bundle_validation",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "be52cdca6f002186181c82c42d4eebaefe15ca33",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/be52cdca6f002186181c82c42d4eebaefe15ca33"
+      },
+      {
+        "path": "runs/bundle_validation/budget_estimate.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2a5bbaad37f628c6e4ed5ec8c0645a2fc8474c74",
+        "size": 1377,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2a5bbaad37f628c6e4ed5ec8c0645a2fc8474c74"
+      },
+      {
+        "path": "runs/bundle_validation/counterexamples.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "abce2f9282e1fdc19fbc06d25f1850ea4150acc5",
+        "size": 1364,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/abce2f9282e1fdc19fbc06d25f1850ea4150acc5"
+      },
+      {
+        "path": "runs/bundle_validation/design_checks.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "98b50761395c9874e72038d3da0e8936b5120e57",
+        "size": 2473,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/98b50761395c9874e72038d3da0e8936b5120e57"
+      },
+      {
+        "path": "runs/bundle_validation/e00_running.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2c8e49f1dd5f3e5ac200d3c7ae792b4f93f2ea87",
+        "size": 7216,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2c8e49f1dd5f3e5ac200d3c7ae792b4f93f2ea87"
+      },
+      {
+        "path": "runs/bundle_validation/e07_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5399b1da55479d90e01989df6b54b51492f62faa",
+        "size": 6974,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5399b1da55479d90e01989df6b54b51492f62faa"
+      },
+      {
+        "path": "runs/bundle_validation/e08_cde_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "16dc8f484421b98c3d5f8bf19fbeee5c4a330278",
+        "size": 9710,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/16dc8f484421b98c3d5f8bf19fbeee5c4a330278"
+      },
+      {
+        "path": "runs/bundle_validation/e08_finished.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a43dc554ccdc119cdf73d3c6347d257138cc7e4a",
+        "size": 10276,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a43dc554ccdc119cdf73d3c6347d257138cc7e4a"
+      },
+      {
+        "path": "runs/bundle_validation/e12_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ca5937742bfa3d61ab1bcf3cb573a204d4130726",
+        "size": 10796,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ca5937742bfa3d61ab1bcf3cb573a204d4130726"
+      },
+      {
+        "path": "runs/bundle_validation/hardware_inventory.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4ea735fbdc29521a1adb0d569d2f1cbbf246c993",
+        "size": 4072,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4ea735fbdc29521a1adb0d569d2f1cbbf246c993"
+      },
+      {
+        "path": "runs/bundle_validation/registry_initialization.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6a374586e39c20ada8416d56c7dee09b89b33b1d",
+        "size": 4889,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/6a374586e39c20ada8416d56c7dee09b89b33b1d"
+      },
+      {
+        "path": "runs/data",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "dbeb2c09fc0b4a2ba245e861180e6d5c5fd27a5a",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/dbeb2c09fc0b4a2ba245e861180e6d5c5fd27a5a"
+      },
+      {
+        "path": "runs/data/fineweb_edu_100m",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "2bbf24317f4ce11092f38371afe6232a4f77f590",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/2bbf24317f4ce11092f38371afe6232a4f77f590"
+      },
+      {
+        "path": "runs/data/fineweb_edu_100m/manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f687d1870354c697a6a385459ad52b26a4e282a2",
+        "size": 3065394,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f687d1870354c697a6a385459ad52b26a4e282a2"
+      },
+      {
+        "path": "runs/data/fineweb_edu_100m/tokenizer.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7b366bada7480211d8fbb0d14bf13e3a098dc3b2",
+        "size": 2323159,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7b366bada7480211d8fbb0d14bf13e3a098dc3b2"
+      },
+      {
+        "path": "runs/data/fineweb_edu_debug",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "d0570788f2c3b5d53917c59ec592c4f2528e23ef",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/d0570788f2c3b5d53917c59ec592c4f2528e23ef"
+      },
+      {
+        "path": "runs/data/fineweb_edu_debug/manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "39aafbbad877123d0c2aea3de9b196934b953e1a",
+        "size": 3065389,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/39aafbbad877123d0c2aea3de9b196934b953e1a"
+      },
+      {
+        "path": "runs/data/fineweb_edu_debug/tokenizer.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7b366bada7480211d8fbb0d14bf13e3a098dc3b2",
+        "size": 2323159,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7b366bada7480211d8fbb0d14bf13e3a098dc3b2"
+      },
+      {
+        "path": "runs/data_fineweb_100m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d54c0d98204f3af8945b65e3b4ec616f6b88aa36",
+        "size": 535,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d54c0d98204f3af8945b65e3b4ec616f6b88aa36"
+      },
+      {
+        "path": "runs/data_fineweb_debug_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1c2ffa2c0b488245c8aaac692b64011894ef16c9",
+        "size": 532,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1c2ffa2c0b488245c8aaac692b64011894ef16c9"
+      },
+      {
+        "path": "runs/e00",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "0add6a7ca0b5fa239526026564bdb7c4c795c8a1",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/0add6a7ca0b5fa239526026564bdb7c4c795c8a1"
+      },
+      {
+        "path": "runs/e00/all_baselines_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "32ada0684fd039e54198ec27f029c44455b6c376",
+        "size": 22001,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/32ada0684fd039e54198ec27f029c44455b6c376"
+      },
+      {
+        "path": "runs/e00/all_lm_comparison.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d74b0aa7270d44817b2d73857c13442de79102c1",
+        "size": 4858,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d74b0aa7270d44817b2d73857c13442de79102c1"
+      },
+      {
+        "path": "runs/e00/all_lm_comparison.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d74b0aa7270d44817b2d73857c13442de79102c1",
+        "size": 4858,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d74b0aa7270d44817b2d73857c13442de79102c1"
+      },
+      {
+        "path": "runs/e00/b0_5m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "size": 0,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      },
+      {
+        "path": "runs/e00/b0_5m_migrated_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0020f3a023922cf59ba8993739db619fa216c6a9",
+        "size": 1094,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/0020f3a023922cf59ba8993739db619fa216c6a9"
+      },
+      {
+        "path": "runs/e00/b0_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2d91a21087de245df6b4d613370170b6d0209274",
+        "size": 1091,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2d91a21087de245df6b4d613370170b6d0209274"
+      },
+      {
+        "path": "runs/e00/b0_migration_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5feaf2e91102ea49ca56e3229879cd04d9767d36",
+        "size": 18147,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5feaf2e91102ea49ca56e3229879cd04d9767d36"
+      },
+      {
+        "path": "runs/e00/b1_5m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "58f70fe9b68a106bb25ee402d86b30cdacc15e09",
+        "size": 1099,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/58f70fe9b68a106bb25ee402d86b30cdacc15e09"
+      },
+      {
+        "path": "runs/e00/b1_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "43c1dfd34de3e667dfaad18cf289bbb5c438c620",
+        "size": 1095,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/43c1dfd34de3e667dfaad18cf289bbb5c438c620"
+      },
+      {
+        "path": "runs/e00/b1_to_b5_5m_comparison.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "16fbc8a6c4e467857d27d8ab9cd0f76dc4387108",
+        "size": 3471,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/16fbc8a6c4e467857d27d8ab9cd0f76dc4387108"
+      },
+      {
+        "path": "runs/e00/b1_to_b5_5m_comparison.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "16fbc8a6c4e467857d27d8ab9cd0f76dc4387108",
+        "size": 3471,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/16fbc8a6c4e467857d27d8ab9cd0f76dc4387108"
+      },
+      {
+        "path": "runs/e00/b2_5m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6e791c7d7af96ad7dd918728d8feb4a214e50a76",
+        "size": 1099,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/6e791c7d7af96ad7dd918728d8feb4a214e50a76"
+      },
+      {
+        "path": "runs/e00/b2_5m_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f0b0c1a4d91ee377d97fd2285d0cad9f4e6797ed",
+        "size": 17639,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f0b0c1a4d91ee377d97fd2285d0cad9f4e6797ed"
+      },
+      {
+        "path": "runs/e00/b2_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8dd32ad68846c0d1a5159ee568f371831601df81",
+        "size": 1098,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8dd32ad68846c0d1a5159ee568f371831601df81"
+      },
+      {
+        "path": "runs/e00/b3_5m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d67e91f313f88ca34cb7bf6b3163b59ac745be1b",
+        "size": 1097,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d67e91f313f88ca34cb7bf6b3163b59ac745be1b"
+      },
+      {
+        "path": "runs/e00/b3_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6bd6374bdca17f2c7b0d7e280ed03a153e6b97a2",
+        "size": 1093,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/6bd6374bdca17f2c7b0d7e280ed03a153e6b97a2"
+      },
+      {
+        "path": "runs/e00/b4_5m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "56dc6281afa76aa92a0381fe30ee8c7a8cb59977",
+        "size": 1103,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/56dc6281afa76aa92a0381fe30ee8c7a8cb59977"
+      },
+      {
+        "path": "runs/e00/b4_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "664378a9c4e19709c58e4eb10d41baebaf197b6a",
+        "size": 1096,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/664378a9c4e19709c58e4eb10d41baebaf197b6a"
+      },
+      {
+        "path": "runs/e00/b5_5m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ac027deb5990153703207fb9715e8286127bf6e2",
+        "size": 1097,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ac027deb5990153703207fb9715e8286127bf6e2"
+      },
+      {
+        "path": "runs/e00/b5_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1c4dfb7bccfbbb094cb50a72b44e91104315fc4d",
+        "size": 1096,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1c4dfb7bccfbbb094cb50a72b44e91104315fc4d"
+      },
+      {
+        "path": "runs/e00/completed_baselines.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "99eb5d2a1f814336a6a4ebe4d51024c2f0773b79",
+        "size": 2080,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/99eb5d2a1f814336a6a4ebe4d51024c2f0773b79"
+      },
+      {
+        "path": "runs/e00/completed_baselines.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "99eb5d2a1f814336a6a4ebe4d51024c2f0773b79",
+        "size": 2080,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/99eb5d2a1f814336a6a4ebe4d51024c2f0773b79"
+      },
+      {
+        "path": "runs/e00/data_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2860c36e56142099540bd238a165c73056d497aa",
+        "size": 11570,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2860c36e56142099540bd238a165c73056d497aa"
+      },
+      {
+        "path": "runs/e00/debug67_b0",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "86b6101a9c03dbcf85bc1861ffb1a8b769461204",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/86b6101a9c03dbcf85bc1861ffb1a8b769461204"
+      },
+      {
+        "path": "runs/e00/debug67_b0/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "acc4ae57c2ae29f406640bd2ef66cc490388f6ec",
+        "size": 229,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/acc4ae57c2ae29f406640bd2ef66cc490388f6ec"
+      },
+      {
+        "path": "runs/e00/debug67_b0/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "20fe59b936c128c295fff257eadea8513b59cb49",
+        "size": 363,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/20fe59b936c128c295fff257eadea8513b59cb49"
+      },
+      {
+        "path": "runs/e00/debug67_b0/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5e91fc618196655fb11bd08220e2826a387502ba",
+        "size": 112296,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5e91fc618196655fb11bd08220e2826a387502ba"
+      },
+      {
+        "path": "runs/e00/debug67_b0/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ce22195f2fda9d417f987f751788a8ba4f634c1c",
+        "size": 1135,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ce22195f2fda9d417f987f751788a8ba4f634c1c"
+      },
+      {
+        "path": "runs/e00/debug67_b0/run_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0020f3a023922cf59ba8993739db619fa216c6a9",
+        "size": 1094,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/0020f3a023922cf59ba8993739db619fa216c6a9"
+      },
+      {
+        "path": "runs/e00/debug67_b1",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "260770fbbba44200d5fcb44ffd670aabedb86848",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/260770fbbba44200d5fcb44ffd670aabedb86848"
+      },
+      {
+        "path": "runs/e00/debug67_b1/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "32f5e479f804fdf948777e74fb2bad9f7db4202c",
+        "size": 230,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/32f5e479f804fdf948777e74fb2bad9f7db4202c"
+      },
+      {
+        "path": "runs/e00/debug67_b1/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "20fe59b936c128c295fff257eadea8513b59cb49",
+        "size": 363,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/20fe59b936c128c295fff257eadea8513b59cb49"
+      },
+      {
+        "path": "runs/e00/debug67_b1/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "10f3fd162a81c2f2d9342402fc62340edf6f7dc1",
+        "size": 111296,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/10f3fd162a81c2f2d9342402fc62340edf6f7dc1"
+      },
+      {
+        "path": "runs/e00/debug67_b1/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "bcdf9c50fac686b227939863d3ca6616df50a91a",
+        "size": 1135,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/bcdf9c50fac686b227939863d3ca6616df50a91a"
+      },
+      {
+        "path": "runs/e00/debug67_b1/run_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "58f70fe9b68a106bb25ee402d86b30cdacc15e09",
+        "size": 1099,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/58f70fe9b68a106bb25ee402d86b30cdacc15e09"
+      },
+      {
+        "path": "runs/e00/debug67_b2",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "a910eaac88224765f0da271bd5c10d1fb361299b",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/a910eaac88224765f0da271bd5c10d1fb361299b"
+      },
+      {
+        "path": "runs/e00/debug67_b2/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7b6183bf5ae6f33827efb729010b7da3b83bbbec",
+        "size": 229,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7b6183bf5ae6f33827efb729010b7da3b83bbbec"
+      },
+      {
+        "path": "runs/e00/debug67_b2/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "20fe59b936c128c295fff257eadea8513b59cb49",
+        "size": 363,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/20fe59b936c128c295fff257eadea8513b59cb49"
+      },
+      {
+        "path": "runs/e00/debug67_b2/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0c6e58ddc3929710e83cf20fe82d9b384ba44650",
+        "size": 111319,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/0c6e58ddc3929710e83cf20fe82d9b384ba44650"
+      },
+      {
+        "path": "runs/e00/debug67_b2/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a5471f1a668c49cefe0c03f2f6916756020e1918",
+        "size": 1136,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a5471f1a668c49cefe0c03f2f6916756020e1918"
+      },
+      {
+        "path": "runs/e00/debug67_b2/run_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6e791c7d7af96ad7dd918728d8feb4a214e50a76",
+        "size": 1099,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/6e791c7d7af96ad7dd918728d8feb4a214e50a76"
+      },
+      {
+        "path": "runs/e00/dense_b3",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "77efe46e67a9dd1bd2ae34ab79a08869fc5fc62b",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/77efe46e67a9dd1bd2ae34ab79a08869fc5fc62b"
+      },
+      {
+        "path": "runs/e00/dense_b3/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0e7baf49cf5ccebcd6c5b74090e230b63953dfd9",
+        "size": 230,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/0e7baf49cf5ccebcd6c5b74090e230b63953dfd9"
+      },
+      {
+        "path": "runs/e00/dense_b3/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "84cb019440446a868cbec9e6c026db3fb9fc239c",
+        "size": 363,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/84cb019440446a868cbec9e6c026db3fb9fc239c"
+      },
+      {
+        "path": "runs/e00/dense_b3/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ec3ef3c028e1eb49745a92760e3941bff039bee5",
+        "size": 111294,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ec3ef3c028e1eb49745a92760e3941bff039bee5"
+      },
+      {
+        "path": "runs/e00/dense_b3/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "79a71d4cb0d7aa66a956a3d47d459e4fed293461",
+        "size": 1003,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/79a71d4cb0d7aa66a956a3d47d459e4fed293461"
+      },
+      {
+        "path": "runs/e00/dense_b3/run_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d67e91f313f88ca34cb7bf6b3163b59ac745be1b",
+        "size": 1097,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d67e91f313f88ca34cb7bf6b3163b59ac745be1b"
+      },
+      {
+        "path": "runs/e00/dense_b4",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "25b04d9758a67022b4206b08735bfde1add7189b",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/25b04d9758a67022b4206b08735bfde1add7189b"
+      },
+      {
+        "path": "runs/e00/dense_b4/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d239aa640d9f38f4e30e8b703621624c6b3ef6b2",
+        "size": 229,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d239aa640d9f38f4e30e8b703621624c6b3ef6b2"
+      },
+      {
+        "path": "runs/e00/dense_b4/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1f5ebd3136f4c4b685ffac52aa13576daa366bb6",
+        "size": 364,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1f5ebd3136f4c4b685ffac52aa13576daa366bb6"
+      },
+      {
+        "path": "runs/e00/dense_b4/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f5a98af6b84419014cff639d3b6d8db9680d44f2",
+        "size": 111338,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f5a98af6b84419014cff639d3b6d8db9680d44f2"
+      },
+      {
+        "path": "runs/e00/dense_b4/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c875caf67b1f2626f6e25502cf9368b8687070e5",
+        "size": 1003,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c875caf67b1f2626f6e25502cf9368b8687070e5"
+      },
+      {
+        "path": "runs/e00/dense_b4/run_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "56dc6281afa76aa92a0381fe30ee8c7a8cb59977",
+        "size": 1103,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/56dc6281afa76aa92a0381fe30ee8c7a8cb59977"
+      },
+      {
+        "path": "runs/e00/dense_b5",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "dc7bc17de2a7d05128ae439f5d9206b3c78ff063",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/dc7bc17de2a7d05128ae439f5d9206b3c78ff063"
+      },
+      {
+        "path": "runs/e00/dense_b5/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0e86d612eb948928c69196dd537bd7bec0c54a31",
+        "size": 230,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/0e86d612eb948928c69196dd537bd7bec0c54a31"
+      },
+      {
+        "path": "runs/e00/dense_b5/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "20b52d8506e6a7d45764f8fbc470cc4acc45532e",
+        "size": 363,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/20b52d8506e6a7d45764f8fbc470cc4acc45532e"
+      },
+      {
+        "path": "runs/e00/dense_b5/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f35a3f8db1428bc0aeb995491068067d9fbb5e0a",
+        "size": 111327,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f35a3f8db1428bc0aeb995491068067d9fbb5e0a"
+      },
+      {
+        "path": "runs/e00/dense_b5/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "fd168ff8c2a22b252708320acc8998fe4f9287ac",
+        "size": 1032,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/fd168ff8c2a22b252708320acc8998fe4f9287ac"
+      },
+      {
+        "path": "runs/e00/dense_b5/run_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ac027deb5990153703207fb9715e8286127bf6e2",
+        "size": 1097,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ac027deb5990153703207fb9715e8286127bf6e2"
+      },
+      {
+        "path": "runs/e00/dense_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "76870756c1a5cdbb970efea1785595dade3d9a1b",
+        "size": 12898,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/76870756c1a5cdbb970efea1785595dade3d9a1b"
+      },
+      {
+        "path": "runs/e00/finished_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6cea981369118e1996cfaf9da8f2a5632e69bd5f",
+        "size": 24911,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/6cea981369118e1996cfaf9da8f2a5632e69bd5f"
+      },
+      {
+        "path": "runs/e00/m105_100m_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5b8d368bcf610487174449e7e3b2ac0075871528",
+        "size": 22573,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5b8d368bcf610487174449e7e3b2ac0075871528"
+      },
+      {
+        "path": "runs/e00/m105_b2",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "5849ee36f9d1167ba780a42e62b40d8292287fee",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/5849ee36f9d1167ba780a42e62b40d8292287fee"
+      },
+      {
+        "path": "runs/e00/m105_b2/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7d5ccf716683d8e33692a975030e136cda28d38d",
+        "size": 233,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7d5ccf716683d8e33692a975030e136cda28d38d"
+      },
+      {
+        "path": "runs/e00/m105_b2/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2b5b68b311cc1f671ee71973c6a7235f199a97cd",
+        "size": 364,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2b5b68b311cc1f671ee71973c6a7235f199a97cd"
+      },
+      {
+        "path": "runs/e00/m105_b2/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4dba385bfdd0ab05805bad93cfd716511c38e9e4",
+        "size": 2222249,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4dba385bfdd0ab05805bad93cfd716511c38e9e4"
+      },
+      {
+        "path": "runs/e00/m105_b2/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5ddb503c43becc88d7fe376455663376cbaa3ac0",
+        "size": 1130,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5ddb503c43becc88d7fe376455663376cbaa3ac0"
+      },
+      {
+        "path": "runs/e00/m105_b2/run_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "93ecc6f9e7982d6cb2c113abbc94a270b9d2b8fa",
+        "size": 1106,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/93ecc6f9e7982d6cb2c113abbc94a270b9d2b8fa"
+      },
+      {
+        "path": "runs/e00/m105_b2_100m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "93ecc6f9e7982d6cb2c113abbc94a270b9d2b8fa",
+        "size": 1106,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/93ecc6f9e7982d6cb2c113abbc94a270b9d2b8fa"
+      },
+      {
+        "path": "runs/e00/m105_b2_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a7770f3f3a728173da8173dc96e352f2378cddca",
+        "size": 1095,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a7770f3f3a728173da8173dc96e352f2378cddca"
+      },
+      {
+        "path": "runs/e00/m105_forward_resource.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b79c2c200e55a7e427f492037f4d67a1cacc95da",
+        "size": 172,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b79c2c200e55a7e427f492037f4d67a1cacc95da"
+      },
+      {
+        "path": "runs/e00/m105_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d9367fd466f240339e59d24d2c016a9e9a05aebc",
+        "size": 12121,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d9367fd466f240339e59d24d2c016a9e9a05aebc"
+      },
+      {
+        "path": "runs/e00a",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "8cbc8cc02767875f5771f2560d131b931ccf991e",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/8cbc8cc02767875f5771f2560d131b931ccf991e"
+      },
+      {
+        "path": "runs/e00a/p0_profile_shared.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d0c909a566137900087d0d2e1c28e71ea75d8de2",
+        "size": 337,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d0c909a566137900087d0d2e1c28e71ea75d8de2"
+      },
+      {
+        "path": "runs/e00a/registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "abcbb20a908f2341c5bde9b2d86145b3173e6382",
+        "size": 6409,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/abcbb20a908f2341c5bde9b2d86145b3173e6382"
+      },
+      {
+        "path": "runs/e00a/shared_load.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2b8da75a0e051d821f7f3fb08b19db4963c63358",
+        "size": 596,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2b8da75a0e051d821f7f3fb08b19db4963c63358"
+      },
+      {
+        "path": "runs/e01",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "4871dba032d10ea8a5ea5ffdb86313bf6042c18b",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/4871dba032d10ea8a5ea5ffdb86313bf6042c18b"
+      },
+      {
+        "path": "runs/e01/coverage_remediation",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "02e2f444a83f9c02e2aaaa9d65a5e927983b7f74",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/02e2f444a83f9c02e2aaaa9d65a5e927983b7f74"
+      },
+      {
+        "path": "runs/e01/coverage_remediation/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "505d28842cf03783864a04a3eda916b08f2927e0",
+        "size": 237,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/505d28842cf03783864a04a3eda916b08f2927e0"
+      },
+      {
+        "path": "runs/e01/coverage_remediation/e01_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8eb89f879fd1055048eebc998c78ab5dc323a318",
+        "size": 2216,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8eb89f879fd1055048eebc998c78ab5dc323a318"
+      },
+      {
+        "path": "runs/e01/coverage_remediation/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "dd136ec728d87c2c600736f73e8cb8e773a023fa",
+        "size": 252,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/dd136ec728d87c2c600736f73e8cb8e773a023fa"
+      },
+      {
+        "path": "runs/e01/coverage_remediation/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ca7be0d6169d4f32bee6b92788eb8f698ebe9ff7",
+        "size": 669,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ca7be0d6169d4f32bee6b92788eb8f698ebe9ff7"
+      },
+      {
+        "path": "runs/e01/coverage_remediation/records_test.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e249af4605c93dad0b68bb5103c5aa8d69a8ee12",
+        "size": 792616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e249af4605c93dad0b68bb5103c5aa8d69a8ee12"
+      },
+      {
+        "path": "runs/e01/coverage_remediation/records_train.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d12760325322f50f002284a9e834348e4f6ff7d8",
+        "size": 6339650,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d12760325322f50f002284a9e834348e4f6ff7d8"
+      },
+      {
+        "path": "runs/e01/coverage_remediation/records_validation.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7b921685b501134468feceacaa4b9da47579c6d3",
+        "size": 798266,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/7b921685b501134468feceacaa4b9da47579c6d3"
+      },
+      {
+        "path": "runs/e01/coverage_remediation/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1c451c56147ceaf16a3df496a2d49bb819d220b9",
+        "size": 1108,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1c451c56147ceaf16a3df496a2d49bb819d220b9"
+      },
+      {
+        "path": "runs/e01/coverage_remediation_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8eb89f879fd1055048eebc998c78ab5dc323a318",
+        "size": 2216,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8eb89f879fd1055048eebc998c78ab5dc323a318"
+      },
+      {
+        "path": "runs/e01/e02_blocked.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8e2d680177cb1c5db65dd90f1d966b624b3827e3",
+        "size": 14492,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8e2d680177cb1c5db65dd90f1d966b624b3827e3"
+      },
+      {
+        "path": "runs/e01/e04_blocked.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2eaa9739bcd8390acd4adf63d2cbba2642d7776e",
+        "size": 15276,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2eaa9739bcd8390acd4adf63d2cbba2642d7776e"
+      },
+      {
+        "path": "runs/e01/e05_service_blocked.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1d9fe372c270987e93111eede0691a787f8f867b",
+        "size": 15966,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1d9fe372c270987e93111eede0691a787f8f867b"
+      },
+      {
+        "path": "runs/e01/e06_service_blocked.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "10a03c4f19025a0bf65e20aa914527fe494b902d",
+        "size": 16235,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/10a03c4f19025a0bf65e20aa914527fe494b902d"
+      },
+      {
+        "path": "runs/e01/e09_neural_blocked.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4286ae82c20645b76c4a98e126ec9ac33a121723",
+        "size": 14755,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4286ae82c20645b76c4a98e126ec9ac33a121723"
+      },
+      {
+        "path": "runs/e01/e11_stopped.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f81477e9e65ba30cb3c03acb16ba84155a530049",
+        "size": 15690,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f81477e9e65ba30cb3c03acb16ba84155a530049"
+      },
+      {
+        "path": "runs/e01/m105_100m",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "a8e5ee90a95adc09ad628ef70ec61308f4e465e9",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/a8e5ee90a95adc09ad628ef70ec61308f4e465e9"
+      },
+      {
+        "path": "runs/e01/m105_100m/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "63a337c679e3f85d6c7d4b1769e5f8b81c4b03a6",
+        "size": 246,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/63a337c679e3f85d6c7d4b1769e5f8b81c4b03a6"
+      },
+      {
+        "path": "runs/e01/m105_100m/e01_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1b539020e86f68e61f3a1a9b11b30d9dfffc2ca1",
+        "size": 2217,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1b539020e86f68e61f3a1a9b11b30d9dfffc2ca1"
+      },
+      {
+        "path": "runs/e01/m105_100m/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d71a396145ace6d8841bee572e4fcfe6e1af68f0",
+        "size": 263,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d71a396145ace6d8841bee572e4fcfe6e1af68f0"
+      },
+      {
+        "path": "runs/e01/m105_100m/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b32715d6aeaed68a467c0b48c5e48811519418d6",
+        "size": 667,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b32715d6aeaed68a467c0b48c5e48811519418d6"
+      },
+      {
+        "path": "runs/e01/m105_100m/records_test.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3bb51c77490ccc3a41c58b36d42f9efcdf3672a2",
+        "size": 792449,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/3bb51c77490ccc3a41c58b36d42f9efcdf3672a2"
+      },
+      {
+        "path": "runs/e01/m105_100m/records_train.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "16affc79de72fa81f2907a69be550d5577cc9db8",
+        "size": 6334819,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/16affc79de72fa81f2907a69be550d5577cc9db8"
+      },
+      {
+        "path": "runs/e01/m105_100m/records_validation.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4186c356cf5cf2f82e43445aa55ee2f9ab51d311",
+        "size": 797587,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4186c356cf5cf2f82e43445aa55ee2f9ab51d311"
+      },
+      {
+        "path": "runs/e01/m105_100m/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "37ff974353aa3d771bfcd7a37f9d843a875d9c99",
+        "size": 1104,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/37ff974353aa3d771bfcd7a37f9d843a875d9c99"
+      },
+      {
+        "path": "runs/e01/m105_100m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1b539020e86f68e61f3a1a9b11b30d9dfffc2ca1",
+        "size": 2217,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1b539020e86f68e61f3a1a9b11b30d9dfffc2ca1"
+      },
+      {
+        "path": "runs/e01/m105_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8c15d3362e3094954f47721e581c1fc1487c8d9d",
+        "size": 23066,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8c15d3362e3094954f47721e581c1fc1487c8d9d"
+      },
+      {
+        "path": "runs/e01/pilot",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "6f2cdec20008f01556671bd1d8a8c235386cb651",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/6f2cdec20008f01556671bd1d8a8c235386cb651"
+      },
+      {
+        "path": "runs/e01/pilot/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "89f2df5ef3f88782de9025cc95a5ff92cc434fd7",
+        "size": 231,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/89f2df5ef3f88782de9025cc95a5ff92cc434fd7"
+      },
+      {
+        "path": "runs/e01/pilot/e01_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b7734c20ef1ba163d4b95b9ce1999300886196cc",
+        "size": 2200,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b7734c20ef1ba163d4b95b9ce1999300886196cc"
+      },
+      {
+        "path": "runs/e01/pilot/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "42f7732134940389f3441732cc5b4c8521a5141e",
+        "size": 252,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/42f7732134940389f3441732cc5b4c8521a5141e"
+      },
+      {
+        "path": "runs/e01/pilot/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "277897293f9e1560d1ad3d2edf3add16dc82c50f",
+        "size": 667,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/277897293f9e1560d1ad3d2edf3add16dc82c50f"
+      },
+      {
+        "path": "runs/e01/pilot/records_test.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5855406095f227f5ffbb2ecafb11763590d812f2",
+        "size": 197868,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5855406095f227f5ffbb2ecafb11763590d812f2"
+      },
+      {
+        "path": "runs/e01/pilot/records_train.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3d4a2293470a6b7d6df74d6ba74f40a4cf8d923d",
+        "size": 791228,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/3d4a2293470a6b7d6df74d6ba74f40a4cf8d923d"
+      },
+      {
+        "path": "runs/e01/pilot/records_validation.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "36a73684b2a0e6276f9ecb3619e94272eaa49244",
+        "size": 199668,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/36a73684b2a0e6276f9ecb3619e94272eaa49244"
+      },
+      {
+        "path": "runs/e01/pilot/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1c451c56147ceaf16a3df496a2d49bb819d220b9",
+        "size": 1108,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1c451c56147ceaf16a3df496a2d49bb819d220b9"
+      },
+      {
+        "path": "runs/e01/pilot_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b7734c20ef1ba163d4b95b9ce1999300886196cc",
+        "size": 2200,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b7734c20ef1ba163d4b95b9ce1999300886196cc"
+      },
+      {
+        "path": "runs/e01/registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e05d383246617518d060d36e0ead2ed5e5fe2338",
+        "size": 13516,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e05d383246617518d060d36e0ead2ed5e5fe2338"
+      },
+      {
+        "path": "runs/e01/stopped_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cd548d198aab42d80432c9b082d59818e627878b",
+        "size": 14222,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/cd548d198aab42d80432c9b082d59818e627878b"
+      },
+      {
+        "path": "runs/e03",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "9668a2ce4f9d2b7fc1f775b41211850eb272ab87",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/9668a2ce4f9d2b7fc1f775b41211850eb272ab87"
+      },
+      {
+        "path": "runs/e03/m105_100m",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "0808f458238ec9a1b22bc3b4d1ca58bf38a2fc0e",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/0808f458238ec9a1b22bc3b4d1ca58bf38a2fc0e"
+      },
+      {
+        "path": "runs/e03/m105_100m/e03_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3f64720f34e3e4480621a4d21017e125344a7e29",
+        "size": 98842,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/3f64720f34e3e4480621a4d21017e125344a7e29"
+      },
+      {
+        "path": "runs/e03/m105_100m_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3f64720f34e3e4480621a4d21017e125344a7e29",
+        "size": 98842,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/3f64720f34e3e4480621a4d21017e125344a7e29"
+      },
+      {
+        "path": "runs/e03/m105_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3e4c2aaca202fa0de3f91aa9f7c6d01ef24f2e06",
+        "size": 23689,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/3e4c2aaca202fa0de3f91aa9f7c6d01ef24f2e06"
+      },
+      {
+        "path": "runs/e03/pilot",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "2a182c8eb077e9461b31f5d386b76485aae6948b",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/2a182c8eb077e9461b31f5d386b76485aae6948b"
+      },
+      {
+        "path": "runs/e03/pilot/e03_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8a86ef0d92c1db4077ef383687bdef65178737f0",
+        "size": 99116,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8a86ef0d92c1db4077ef383687bdef65178737f0"
+      },
+      {
+        "path": "runs/e03/registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c298126c0262cb68237439fe9a04e46274284ef6",
+        "size": 18813,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c298126c0262cb68237439fe9a04e46274284ef6"
+      },
+      {
+        "path": "runs/e05_e06",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "ea2cb543cf37db9809ab519afefdca767c2cf414",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/ea2cb543cf37db9809ab519afefdca767c2cf414"
+      },
+      {
+        "path": "runs/e05_e06/e05_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5fa91959704f72e86d13eb21e31cb1c0865b1169",
+        "size": 7778,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5fa91959704f72e86d13eb21e31cb1c0865b1169"
+      },
+      {
+        "path": "runs/e05_e06/e06_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f3ecbdebb390436be149f1de4f0a7679fec2cd7e",
+        "size": 8304,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f3ecbdebb390436be149f1de4f0a7679fec2cd7e"
+      },
+      {
+        "path": "runs/e05_e06/seed0.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "60005074fba3a54228f3a5fe2a3ad5dad2dd03aa",
+        "size": 7141,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/60005074fba3a54228f3a5fe2a3ad5dad2dd03aa"
+      },
+      {
+        "path": "runs/e07",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "7efb676faa1fd484b737e1b77e3cd32a73e7440d",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/7efb676faa1fd484b737e1b77e3cd32a73e7440d"
+      },
+      {
+        "path": "runs/e07/m105_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "071987756a60466bd42163f6a3ea81de2aaff66c",
+        "size": 24292,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/071987756a60466bd42163f6a3ea81de2aaff66c"
+      },
+      {
+        "path": "runs/e07/m105_replay",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "4731667437111716898b1fe433acf7c6f8e00aab",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/4731667437111716898b1fe433acf7c6f8e00aab"
+      },
+      {
+        "path": "runs/e07/m105_replay/e07_replay.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a923816fa06aebef8984e0e36c9e6934f24ad6f2",
+        "size": 1139837,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a923816fa06aebef8984e0e36c9e6934f24ad6f2"
+      },
+      {
+        "path": "runs/e07/m105_replay_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1a78f357b6323e4bf2349023be560e110429fec3",
+        "size": 1230,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1a78f357b6323e4bf2349023be560e110429fec3"
+      },
+      {
+        "path": "runs/e07/replay",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "8136dc03f5c003d14d7d5249e01b09cf2408db39",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/8136dc03f5c003d14d7d5249e01b09cf2408db39"
+      },
+      {
+        "path": "runs/e07/replay/e07_replay.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "610243454462da0ffd85ff1893cc8c8411cacc29",
+        "size": 1140031,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/610243454462da0ffd85ff1893cc8c8411cacc29"
+      },
+      {
+        "path": "runs/e07/replay_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8aec654b8bf4e21c0c2a8917042739a7de9c22a3",
+        "size": 21282,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8aec654b8bf4e21c0c2a8917042739a7de9c22a3"
+      },
+      {
+        "path": "runs/e08_ab",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "f243829623409b9041bd348b7c9632ddb7620888",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/f243829623409b9041bd348b7c9632ddb7620888"
+      },
+      {
+        "path": "runs/e08_ab/e08_ab_results.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f2da8dcc30ed7a483f5bdddb1f4c0bac14602ff4",
+        "size": 66320,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f2da8dcc30ed7a483f5bdddb1f4c0bac14602ff4"
+      },
+      {
+        "path": "runs/e08_cde_cde.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "85114b544986ed61058624d4bce2dcc49b36155f",
+        "size": 493694,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/85114b544986ed61058624d4bce2dcc49b36155f"
+      },
+      {
+        "path": "runs/e09",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "1f08000a4b3ef76bae1a484e898cb2a0e3a1ce0b",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/1f08000a4b3ef76bae1a484e898cb2a0e3a1ce0b"
+      },
+      {
+        "path": "runs/e09/controlled.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "35f076b8ce9728301c4ccfefd493251e96a0c488",
+        "size": 104487,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/35f076b8ce9728301c4ccfefd493251e96a0c488"
+      },
+      {
+        "path": "runs/e09/final_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6c65a21381478e8057c2a83de85bf69e95273606",
+        "size": 25422,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/6c65a21381478e8057c2a83de85bf69e95273606"
+      },
+      {
+        "path": "runs/e09/registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "bd51b121bbb39ff17abb302c9247d290d5346a4b",
+        "size": 16976,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/bd51b121bbb39ff17abb302c9247d290d5346a4b"
+      },
+      {
+        "path": "runs/e10",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "e26559510fcb6dba5ed6ebf69b9097dfb075faa3",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/e26559510fcb6dba5ed6ebf69b9097dfb075faa3"
+      },
+      {
+        "path": "runs/e10/pilot",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "c0059032bcc83657329354c2e905f257c429d347",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/c0059032bcc83657329354c2e905f257c429d347"
+      },
+      {
+        "path": "runs/e10/pilot/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "43cb105ce24b25ba656a9c24756c67381f26810d",
+        "size": 233,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/43cb105ce24b25ba656a9c24756c67381f26810d"
+      },
+      {
+        "path": "runs/e10/pilot/e10_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5b5dd3c5dc5aa228a9f0b574fbb4fbb0e72e32d3",
+        "size": 6820,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5b5dd3c5dc5aa228a9f0b574fbb4fbb0e72e32d3"
+      },
+      {
+        "path": "runs/e10/pilot/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4956b0cacc78f52101fceb4847ea56bc7319bbca",
+        "size": 252,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4956b0cacc78f52101fceb4847ea56bc7319bbca"
+      },
+      {
+        "path": "runs/e10/pilot/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3c1dac238654183088451f81d2539a72019bc0ac",
+        "size": 865,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/3c1dac238654183088451f81d2539a72019bc0ac"
+      },
+      {
+        "path": "runs/e10/pilot/records_test.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "945f5cbedb7cb7f14660122bae0b427efa9e8742",
+        "size": 134686,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/945f5cbedb7cb7f14660122bae0b427efa9e8742"
+      },
+      {
+        "path": "runs/e10/pilot/records_train.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f446ff047b01fb281cd2f3431a3ebfe67f9b4e90",
+        "size": 271145,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f446ff047b01fb281cd2f3431a3ebfe67f9b4e90"
+      },
+      {
+        "path": "runs/e10/pilot/records_validation.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4eb57407b42c53371a8d6c81242897a87aceb3d0",
+        "size": 135663,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4eb57407b42c53371a8d6c81242897a87aceb3d0"
+      },
+      {
+        "path": "runs/e10/pilot/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1c451c56147ceaf16a3df496a2d49bb819d220b9",
+        "size": 1108,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1c451c56147ceaf16a3df496a2d49bb819d220b9"
+      },
+      {
+        "path": "runs/e10/registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "049c596469ffc53821f56ee9ff5ccdaf94c49e52",
+        "size": 19583,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/049c596469ffc53821f56ee9ff5ccdaf94c49e52"
+      },
+      {
+        "path": "runs/e10_pilot_stdout.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5b5dd3c5dc5aa228a9f0b574fbb4fbb0e72e32d3",
+        "size": 6820,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5b5dd3c5dc5aa228a9f0b574fbb4fbb0e72e32d3"
+      },
+      {
+        "path": "runs/e11",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "9b862d7f6cf5e45426225c910ba9db8cb6c9a6a8",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/9b862d7f6cf5e45426225c910ba9db8cb6c9a6a8"
+      },
+      {
+        "path": "runs/e11/m105_s0_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8c85b4c721069bf7f4b8f8c0799fcb64f57df73b",
+        "size": 1184,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8c85b4c721069bf7f4b8f8c0799fcb64f57df73b"
+      },
+      {
+        "path": "runs/e11/m105_s0_dynamic_profile.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8c85b4c721069bf7f4b8f8c0799fcb64f57df73b",
+        "size": 1184,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8c85b4c721069bf7f4b8f8c0799fcb64f57df73b"
+      },
+      {
+        "path": "runs/e11/s0_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4b23d2c26022e421b3264ce8dbe79b44e8de1952",
+        "size": 26203,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4b23d2c26022e421b3264ce8dbe79b44e8de1952"
+      },
+      {
+        "path": "runs/e12",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "eec4887a4dc9f025851c0611ae52806fa706e4b9",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/eec4887a4dc9f025851c0611ae52806fa706e4b9"
+      },
+      {
+        "path": "runs/e12/bidding",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "237ed659edf19df24ee2d52fcc46b057dcfdfd2f",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/237ed659edf19df24ee2d52fcc46b057dcfdfd2f"
+      },
+      {
+        "path": "runs/e12/bidding/e12_bidding_summary.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "643679ee91298b1223b83764d1876f0821b08204",
+        "size": 7770,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/643679ee91298b1223b83764d1876f0821b08204"
+      },
+      {
+        "path": "runs/e12/bidding_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e060641f158e2f5a71b29269747512974a092c0a",
+        "size": 20494,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e060641f158e2f5a71b29269747512974a092c0a"
+      },
+      {
+        "path": "runs/e12/bidding_stdout.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "643679ee91298b1223b83764d1876f0821b08204",
+        "size": 7770,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/643679ee91298b1223b83764d1876f0821b08204"
+      },
+      {
+        "path": "runs/e12/equivalence.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f67ba6ebc0d8fac0c7ab29fc3a78872dce94e07e",
+        "size": 342,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f67ba6ebc0d8fac0c7ab29fc3a78872dce94e07e"
+      },
+      {
+        "path": "runs/full_tests.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "62695afe44c41b2afe87392ba959ceaddccb1c6e",
+        "size": 38306,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/62695afe44c41b2afe87392ba959ceaddccb1c6e"
+      },
+      {
+        "path": "runs/full_tests_final.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2f9e74af6d6cce7a941b49ebc38036ac2e378045",
+        "size": 763676,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2f9e74af6d6cce7a941b49ebc38036ac2e378045"
+      },
+      {
+        "path": "runs/full_tests_goal.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5f669073f4fed69b6b67fcde7f70fa7b3f44061f",
+        "size": 42152,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5f669073f4fed69b6b67fcde7f70fa7b3f44061f"
+      },
+      {
+        "path": "runs/goal_status.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2519c895c6f5d2d5043fd8534ae4bbcd81c35a7d",
+        "size": 27535,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/2519c895c6f5d2d5043fd8534ae4bbcd81c35a7d"
+      },
+      {
+        "path": "runs/recovery",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "02cae9b7935fc6a8d55bea024bacecc090fac163",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/02cae9b7935fc6a8d55bea024bacecc090fac163"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e5cb48de4c3e246402d968a84cc5aa14542dd5f8",
+        "size": 987,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e5cb48de4c3e246402d968a84cc5aa14542dd5f8"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_dense",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "9837e297c14898eccb3308e016078f235ab238a8",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/9837e297c14898eccb3308e016078f235ab238a8"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_dense/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ae346608cd1cac5e7cb13b40ba20bc814f351702",
+        "size": 283,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ae346608cd1cac5e7cb13b40ba20bc814f351702"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_dense/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "134c37d6fd1ea6ee6f13652452767354204e0b5d",
+        "size": 226,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/134c37d6fd1ea6ee6f13652452767354204e0b5d"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_dense/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "030ce2cdb4bb0e7b20349f7aebb340e20837f6bc",
+        "size": 359,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/030ce2cdb4bb0e7b20349f7aebb340e20837f6bc"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_dense/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "96656cb07fbac7ca5f010625cce0486772594e80",
+        "size": 177,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/96656cb07fbac7ca5f010625cce0486772594e80"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_dense/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "64015b8916c75e1eeab020a4729c175c4477555b",
+        "size": 12941,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/64015b8916c75e1eeab020a4729c175c4477555b"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_dense/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "631a0945a485c9f1a10ebca5444677ec76466409",
+        "size": 1051,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/631a0945a485c9f1a10ebca5444677ec76466409"
+      },
+      {
+        "path": "runs/recovery/c0_fixed_dense/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e5cb48de4c3e246402d968a84cc5aa14542dd5f8",
+        "size": 987,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e5cb48de4c3e246402d968a84cc5aa14542dd5f8"
+      },
+      {
+        "path": "runs/recovery/c0_identity_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1797e89fc7ad2999af4b587bead1a28588b0b75c",
+        "size": 989,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1797e89fc7ad2999af4b587bead1a28588b0b75c"
+      },
+      {
+        "path": "runs/recovery/c0_identity_dense",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "4cc21356538cff6a6675135122bed85fb946b705",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/4cc21356538cff6a6675135122bed85fb946b705"
+      },
+      {
+        "path": "runs/recovery/c0_identity_dense/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "df93e4ac1984c80230815de745c35c76a37edc67",
+        "size": 282,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/df93e4ac1984c80230815de745c35c76a37edc67"
+      },
+      {
+        "path": "runs/recovery/c0_identity_dense/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "134c37d6fd1ea6ee6f13652452767354204e0b5d",
+        "size": 226,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/134c37d6fd1ea6ee6f13652452767354204e0b5d"
+      },
+      {
+        "path": "runs/recovery/c0_identity_dense/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b5bca9e02f9ce5b53ec7638c420e05ce3ec60694",
+        "size": 362,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b5bca9e02f9ce5b53ec7638c420e05ce3ec60694"
+      },
+      {
+        "path": "runs/recovery/c0_identity_dense/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "96656cb07fbac7ca5f010625cce0486772594e80",
+        "size": 177,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/96656cb07fbac7ca5f010625cce0486772594e80"
+      },
+      {
+        "path": "runs/recovery/c0_identity_dense/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c9081a703f48ae84a0465d096ca7d091340c1e1d",
+        "size": 12961,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c9081a703f48ae84a0465d096ca7d091340c1e1d"
+      },
+      {
+        "path": "runs/recovery/c0_identity_dense/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a342866f84c5b69c46155bbb5b367b532e006733",
+        "size": 1057,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a342866f84c5b69c46155bbb5b367b532e006733"
+      },
+      {
+        "path": "runs/recovery/c0_identity_dense/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1797e89fc7ad2999af4b587bead1a28588b0b75c",
+        "size": 989,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1797e89fc7ad2999af4b587bead1a28588b0b75c"
+      },
+      {
+        "path": "runs/recovery/c0_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "64146b12ffbdd3b9b7738f72c27077519e55b1c8",
+        "size": 5536,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/64146b12ffbdd3b9b7738f72c27077519e55b1c8"
+      },
+      {
+        "path": "runs/recovery/c1_all_comparison.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ea37d2259d5b0f9835a04b65f824dbfcca96a290",
+        "size": 17830,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ea37d2259d5b0f9835a04b65f824dbfcca96a290"
+      },
+      {
+        "path": "runs/recovery/c1_all_comparison.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ea37d2259d5b0f9835a04b65f824dbfcca96a290",
+        "size": 17830,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ea37d2259d5b0f9835a04b65f824dbfcca96a290"
+      },
+      {
+        "path": "runs/recovery/c1_dense",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "ff442c5a41b5ac269c61899574b9eba7e64150d5",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/ff442c5a41b5ac269c61899574b9eba7e64150d5"
+      },
+      {
+        "path": "runs/recovery/c1_dense/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "98656f4d0a5bbb181a52c9c4b6b7fd82d7a1039f",
+        "size": 284,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/98656f4d0a5bbb181a52c9c4b6b7fd82d7a1039f"
+      },
+      {
+        "path": "runs/recovery/c1_dense/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29",
+        "size": 613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29"
+      },
+      {
+        "path": "runs/recovery/c1_dense/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b350659b2697bf2533c70afc0df6d12bb018677a",
+        "size": 616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b350659b2697bf2533c70afc0df6d12bb018677a"
+      },
+      {
+        "path": "runs/recovery/c1_dense/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "96656cb07fbac7ca5f010625cce0486772594e80",
+        "size": 177,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/96656cb07fbac7ca5f010625cce0486772594e80"
+      },
+      {
+        "path": "runs/recovery/c1_dense/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cc0b87e870d14a37326a8f41e8c010a797d02f24",
+        "size": 54443,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/cc0b87e870d14a37326a8f41e8c010a797d02f24"
+      },
+      {
+        "path": "runs/recovery/c1_dense/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "be8862802177cadcb77a24b48ab463c58a436162",
+        "size": 1042,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/be8862802177cadcb77a24b48ab463c58a436162"
+      },
+      {
+        "path": "runs/recovery/c1_dense/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "27cdf93b4c33b7c1af496a8f25b1868692eba5a6",
+        "size": 1489,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/27cdf93b4c33b7c1af496a8f25b1868692eba5a6"
+      },
+      {
+        "path": "runs/recovery/c1_dense_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "27cdf93b4c33b7c1af496a8f25b1868692eba5a6",
+        "size": 1489,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/27cdf93b4c33b7c1af496a8f25b1868692eba5a6"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "c0b4ee0b4f9ad999e3598099506de60bee5c2c30",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/c0b4ee0b4f9ad999e3598099506de60bee5c2c30"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0424f0bc0e0a234c2daecb816759707c833546c6",
+        "size": 287,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/0424f0bc0e0a234c2daecb816759707c833546c6"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29",
+        "size": 613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b350659b2697bf2533c70afc0df6d12bb018677a",
+        "size": 616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b350659b2697bf2533c70afc0df6d12bb018677a"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "96656cb07fbac7ca5f010625cce0486772594e80",
+        "size": 177,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/96656cb07fbac7ca5f010625cce0486772594e80"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d8dcb2d51c4ff92634ff10f9c6a39deda6446d6c",
+        "size": 62434,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d8dcb2d51c4ff92634ff10f9c6a39deda6446d6c"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1828002f4964a9973c2aa505f8fdbee6e9d11ceb",
+        "size": 1058,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1828002f4964a9973c2aa505f8fdbee6e9d11ceb"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "aff9f9dd9169e06a59b67896ea07b867cc441e4c",
+        "size": 1618,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/aff9f9dd9169e06a59b67896ea07b867cc441e4c"
+      },
+      {
+        "path": "runs/recovery/c1_dense_generalization_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "aff9f9dd9169e06a59b67896ea07b867cc441e4c",
+        "size": 1618,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/aff9f9dd9169e06a59b67896ea07b867cc441e4c"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "91ebf87f8c9012120fd6d1c6dd69b2349018bd12",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/91ebf87f8c9012120fd6d1c6dd69b2349018bd12"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5cfcb95fe001ecf112df6ef9d847bc26ea0f2c78",
+        "size": 284,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/5cfcb95fe001ecf112df6ef9d847bc26ea0f2c78"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29",
+        "size": 613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b350659b2697bf2533c70afc0df6d12bb018677a",
+        "size": 616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b350659b2697bf2533c70afc0df6d12bb018677a"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "96656cb07fbac7ca5f010625cce0486772594e80",
+        "size": 177,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/96656cb07fbac7ca5f010625cce0486772594e80"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "24478ea80c280404c53abcddcaab3f4a1cb7cbe8",
+        "size": 54914,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/24478ea80c280404c53abcddcaab3f4a1cb7cbe8"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f95f53a6b7430f9959a89e9018e09f7e9186e4bf",
+        "size": 1046,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/f95f53a6b7430f9959a89e9018e09f7e9186e4bf"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "74ae34897e5e3ccf4fafbb773c75475c53baea2b",
+        "size": 1610,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/74ae34897e5e3ccf4fafbb773c75475c53baea2b"
+      },
+      {
+        "path": "runs/recovery/c1_dense_wd_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "74ae34897e5e3ccf4fafbb773c75475c53baea2b",
+        "size": 1610,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/74ae34897e5e3ccf4fafbb773c75475c53baea2b"
+      },
+      {
+        "path": "runs/recovery/c1_initial_comparison.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b78e30bad707a3d900fc7b020e20b872108b57b5",
+        "size": 7527,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b78e30bad707a3d900fc7b020e20b872108b57b5"
+      },
+      {
+        "path": "runs/recovery/c1_initial_comparison.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b78e30bad707a3d900fc7b020e20b872108b57b5",
+        "size": 7527,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b78e30bad707a3d900fc7b020e20b872108b57b5"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "11cb30fc5c2394c31deee0dd96bc0f007e7551a6",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/11cb30fc5c2394c31deee0dd96bc0f007e7551a6"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "76d0e5f91c47ce807e2fca06f9f244dc8a0ff4d2",
+        "size": 287,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/76d0e5f91c47ce807e2fca06f9f244dc8a0ff4d2"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29",
+        "size": 613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b350659b2697bf2533c70afc0df6d12bb018677a",
+        "size": 616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b350659b2697bf2533c70afc0df6d12bb018677a"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b3b8aad52c48a21fc59ada45ddacafcc064699fe",
+        "size": 157,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b3b8aad52c48a21fc59ada45ddacafcc064699fe"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c3d4dfa84ac04f906a0f011ae1aff11500e915d9",
+        "size": 55101,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c3d4dfa84ac04f906a0f011ae1aff11500e915d9"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "24232ca79d2c70dc76e2d2d40b150df261677154",
+        "size": 1019,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/24232ca79d2c70dc76e2d2d40b150df261677154"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "14ee96fb48d09c5fe34671fd2449263e44ec2ecc",
+        "size": 1479,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/14ee96fb48d09c5fe34671fd2449263e44ec2ecc"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "14ee96fb48d09c5fe34671fd2449263e44ec2ecc",
+        "size": 1479,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/14ee96fb48d09c5fe34671fd2449263e44ec2ecc"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "e06f3081917e4a0d646c49861c85ecab6f842070",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/e06f3081917e4a0d646c49861c85ecab6f842070"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "96ac7694a3be3f306183337130281b7a0a3de1f8",
+        "size": 287,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/96ac7694a3be3f306183337130281b7a0a3de1f8"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29",
+        "size": 613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b350659b2697bf2533c70afc0df6d12bb018677a",
+        "size": 616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b350659b2697bf2533c70afc0df6d12bb018677a"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b3b8aad52c48a21fc59ada45ddacafcc064699fe",
+        "size": 157,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b3b8aad52c48a21fc59ada45ddacafcc064699fe"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1c354fce168b8cd4d3699c2ca0761d1f1c172095",
+        "size": 55232,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1c354fce168b8cd4d3699c2ca0761d1f1c172095"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "dc6fafa5405a2278c7d73935bc35e74c263bf728",
+        "size": 1023,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/dc6fafa5405a2278c7d73935bc35e74c263bf728"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "801c5552b9bdf4c8989e8bff9888f8b6cbd776a4",
+        "size": 1585,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/801c5552b9bdf4c8989e8bff9888f8b6cbd776a4"
+      },
+      {
+        "path": "runs/recovery/c1_moe_final_wd_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "801c5552b9bdf4c8989e8bff9888f8b6cbd776a4",
+        "size": 1585,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/801c5552b9bdf4c8989e8bff9888f8b6cbd776a4"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "dd1cff250ea549b7d76fd94690beee9efef487b8",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/dd1cff250ea549b7d76fd94690beee9efef487b8"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "afec579a0d12d0422ddd7e152b4956f59df9afda",
+        "size": 284,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/afec579a0d12d0422ddd7e152b4956f59df9afda"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29",
+        "size": 613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b350659b2697bf2533c70afc0df6d12bb018677a",
+        "size": 616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b350659b2697bf2533c70afc0df6d12bb018677a"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8c02d4aa4e98994dc57ba63a81935a56b3f50183",
+        "size": 178,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8c02d4aa4e98994dc57ba63a81935a56b3f50183"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "af5c20016e09be8be797cf5ca1c04da04ed10b1f",
+        "size": 55824,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/af5c20016e09be8be797cf5ca1c04da04ed10b1f"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "20056f0eafc6f647538bb017c66e532ed97244a1",
+        "size": 1045,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/20056f0eafc6f647538bb017c66e532ed97244a1"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "79011459f0e388df97c069326370bebb90156c11",
+        "size": 1539,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/79011459f0e388df97c069326370bebb90156c11"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "79011459f0e388df97c069326370bebb90156c11",
+        "size": 1539,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/79011459f0e388df97c069326370bebb90156c11"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "94631e53147315a2acf451243c0cf571ed1012bf",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/94631e53147315a2acf451243c0cf571ed1012bf"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd/cost_ledger.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cfee4e38acf0cfe5b3f1f2b2a4112fde4fcdff6a",
+        "size": 287,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/cfee4e38acf0cfe5b3f1f2b2a4112fde4fcdff6a"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29",
+        "size": 613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b350659b2697bf2533c70afc0df6d12bb018677a",
+        "size": 616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b350659b2697bf2533c70afc0df6d12bb018677a"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd/environment.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8c02d4aa4e98994dc57ba63a81935a56b3f50183",
+        "size": 178,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8c02d4aa4e98994dc57ba63a81935a56b3f50183"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd/metrics.jsonl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "47ea250501e5f9182041db0c551480f3fe18d975",
+        "size": 55786,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/47ea250501e5f9182041db0c551480f3fe18d975"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a1dda8656c48040fc39f98ceb824e7b96d5911db",
+        "size": 1049,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a1dda8656c48040fc39f98ceb824e7b96d5911db"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d8922b1c4cad28ee2c9e66c7aa5d020fa20d2f0f",
+        "size": 1613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d8922b1c4cad28ee2c9e66c7aa5d020fa20d2f0f"
+      },
+      {
+        "path": "runs/recovery/c1_moe_full_wd_console.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d8922b1c4cad28ee2c9e66c7aa5d020fa20d2f0f",
+        "size": 1613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d8922b1c4cad28ee2c9e66c7aa5d020fa20d2f0f"
+      },
+      {
+        "path": "runs/recovery/c1_registry.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ded1cf69acc9f64cf306315cba57cb3ff7039ac6",
+        "size": 9077,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ded1cf69acc9f64cf306315cba57cb3ff7039ac6"
+      },
+      {
+        "path": "runs/recovery/d0_c1",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "367b90b61c7446cacd891559f1d5aee7971c68bd",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/367b90b61c7446cacd891559f1d5aee7971c68bd"
+      },
+      {
+        "path": "runs/recovery/d0_c1/d0_audit.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29",
+        "size": 613,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e759aba045bd6f7d8ac4e7fc0da8b2e268f9de29"
+      },
+      {
+        "path": "runs/recovery/d0_c1/data_manifest.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b350659b2697bf2533c70afc0df6d12bb018677a",
+        "size": 616,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b350659b2697bf2533c70afc0df6d12bb018677a"
+      },
+      {
+        "path": "runs/recovery/d0_c1/resolved_config.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "bdc67ee3c807041a79e563b24f93a081e1fa037e",
+        "size": 1039,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/bdc67ee3c807041a79e563b24f93a081e1fa037e"
+      },
+      {
+        "path": "runs/recovery/d0_c1/stage_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ef501eb0ec4724a461c91a74f4b1d28ca29d6ddc",
+        "size": 204,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ef501eb0ec4724a461c91a74f4b1d28ca29d6ddc"
+      },
+      {
+        "path": "runs/recovery/smoke_resume_verified.log",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a18abbf176e314818188026faa04a09ae164539b",
+        "size": 979,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a18abbf176e314818188026faa04a09ae164539b"
+      },
+      {
+        "path": "runs/registry.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "24c13e4b6698b5fc49c469712f1d39f0f32b2fb8",
+        "size": 26692,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/24c13e4b6698b5fc49c469712f1d39f0f32b2fb8"
+      },
+      {
+        "path": "tests",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "34dd2fcd939f84968df4273b3a468136054a2129",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/34dd2fcd939f84968df4273b3a468136054a2129"
+      },
+      {
+        "path": "tests/test_affine.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c080ff0e8b8ffa453e1c45aabc55ee0b593b4ed8",
+        "size": 11418,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/c080ff0e8b8ffa453e1c45aabc55ee0b593b4ed8"
+      },
+      {
+        "path": "tests/test_controlled.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9f9d8e0f54cc2c0640d5bc85eb6408bd69f1898f",
+        "size": 16041,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/9f9d8e0f54cc2c0640d5bc85eb6408bd69f1898f"
+      },
+      {
+        "path": "tests/test_counterfactual.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8c104710967d789d627068a489fae82acfdba54b",
+        "size": 13012,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/8c104710967d789d627068a489fae82acfdba54b"
+      },
+      {
+        "path": "tests/test_dynamic_halting.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "34c163be5e1617793dc923838854c92a6f44608d",
+        "size": 1727,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/34c163be5e1617793dc923838854c92a6f44608d"
+      },
+      {
+        "path": "tests/test_e03_halting.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "371eadd7091c6678f941d27a26d2daa15cd3dc43",
+        "size": 14433,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/371eadd7091c6678f941d27a26d2daa15cd3dc43"
+      },
+      {
+        "path": "tests/test_e05_e06.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b78890f6a2cd103850d356bdce3ff84a111e496b",
+        "size": 12688,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b78890f6a2cd103850d356bdce3ff84a111e496b"
+      },
+      {
+        "path": "tests/test_e07.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a3bd9a2854e81a07b8890c10a59b763b98ff8b6a",
+        "size": 7266,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/a3bd9a2854e81a07b8890c10a59b763b98ff8b6a"
+      },
+      {
+        "path": "tests/test_e07_replay.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6f9f51af656aba1c9e0f217682cc427cd88fcd2f",
+        "size": 17112,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/6f9f51af656aba1c9e0f217682cc427cd88fcd2f"
+      },
+      {
+        "path": "tests/test_e08_ab.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1f9a117d2a59d4b7c231c2dd7ae929226f2759f1",
+        "size": 8385,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1f9a117d2a59d4b7c231c2dd7ae929226f2759f1"
+      },
+      {
+        "path": "tests/test_e08_cde.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d1f2e3f8719a9d6986cbe911869847ff39e30bc2",
+        "size": 10930,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/d1f2e3f8719a9d6986cbe911869847ff39e30bc2"
+      },
+      {
+        "path": "tests/test_e09_controlled.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "16693dc9030be0de6aae228d3854d4f7795421d8",
+        "size": 10093,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/16693dc9030be0de6aae228d3854d4f7795421d8"
+      },
+      {
+        "path": "tests/test_e10_ordered.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e2c47a1b5ac335b8079d0d356c409243ba79b63c",
+        "size": 15285,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e2c47a1b5ac335b8079d0d356c409243ba79b63c"
+      },
+      {
+        "path": "tests/test_e12.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0d9e0ffc955edfff1e8371fe44c97a0ccd032d37",
+        "size": 380,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/0d9e0ffc955edfff1e8371fe44c97a0ccd032d37"
+      },
+      {
+        "path": "tests/test_e12_bidding.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4e9956adebc9a477cd1e45e1fe3294e7cec3177c",
+        "size": 8187,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4e9956adebc9a477cd1e45e1fe3294e7cec3177c"
+      },
+      {
+        "path": "tests/test_fineweb.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ea4ad97dcfd77d67477d19a937af5bef8c3d42b6",
+        "size": 20166,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/ea4ad97dcfd77d67477d19a937af5bef8c3d42b6"
+      },
+      {
+        "path": "tests/test_math_resources.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4cffbf6c512ff50f51c0e3fd0bc25a0f1cac7e49",
+        "size": 6227,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4cffbf6c512ff50f51c0e3fd0bc25a0f1cac7e49"
+      },
+      {
+        "path": "tests/test_model_policy.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4f5491be9f4d10d0e1b279730a6b2cc8905b9bb8",
+        "size": 11424,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/4f5491be9f4d10d0e1b279730a6b2cc8905b9bb8"
+      },
+      {
+        "path": "tests/test_packed_lm.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cec96f5aa4185b97f7564c968fca6d425caec3ba",
+        "size": 13684,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/cec96f5aa4185b97f7564c968fca6d425caec3ba"
+      },
+      {
+        "path": "tests/test_recovery_data.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "bbbe74d3338040021bd25667d50bdbe4acf1ad2c",
+        "size": 23008,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/bbbe74d3338040021bd25667d50bdbe4acf1ad2c"
+      },
+      {
+        "path": "tests/test_recovery_model.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "aa8c825d0dd03fbdfc918bc1f3bfbbec7577bf54",
+        "size": 3085,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/aa8c825d0dd03fbdfc918bc1f3bfbbec7577bf54"
+      },
+      {
+        "path": "tests/test_top2.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "71b7a16fe7ec4a9208d1bda56d94c61394e5bcde",
+        "size": 11596,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/71b7a16fe7ec4a9208d1bda56d94c61394e5bcde"
+      },
+      {
+        "path": "tests/test_training.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b37f9e97529e1d4f342e4a25633dbb57f4cb2514",
+        "size": 2344,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/b37f9e97529e1d4f342e4a25633dbb57f4cb2514"
+      },
+      {
+        "path": "train",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "efe671eb6d9257c1e180eb59decd23ff68d23454",
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/trees/efe671eb6d9257c1e180eb59decd23ff68d23454"
+      },
+      {
+        "path": "train/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cb3f6a99c9c5da4e954132628e17ccf74302d7f0",
+        "size": 127,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/cb3f6a99c9c5da4e954132628e17ccf74302d7f0"
+      },
+      {
+        "path": "train/common.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "858d57e0672f19360e716263be09c06d4de033cc",
+        "size": 2858,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/858d57e0672f19360e716263be09c06d4de033cc"
+      },
+      {
+        "path": "train/exact.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1e087c726cfe4ea3786e3a0bf853ca5c58c3b714",
+        "size": 2850,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/1e087c726cfe4ea3786e3a0bf853ca5c58c3b714"
+      },
+      {
+        "path": "train/halt.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "137a0a786b574f5159fe785a3d1d42e5a16072ad",
+        "size": 4561,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/137a0a786b574f5159fe785a3d1d42e5a16072ad"
+      },
+      {
+        "path": "train/imitation.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "67a5736bc598a144a0f683aef0bda28a005ee46d",
+        "size": 3296,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/67a5736bc598a144a0f683aef0bda28a005ee46d"
+      },
+      {
+        "path": "train/lm.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "648af1128b51ea3cfeeae2fccf5d83f6780d2ba0",
+        "size": 6420,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/648af1128b51ea3cfeeae2fccf5d83f6780d2ba0"
+      },
+      {
+        "path": "train/pretrain.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "80b9114f6273eea8ac2d46665315c1e9ed4df71e",
+        "size": 2528,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/80b9114f6273eea8ac2d46665315c1e9ed4df71e"
+      },
+      {
+        "path": "train/recovery.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "71d17b901ce8e22d33d86542bae460d27607894e",
+        "size": 7968,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/71d17b901ce8e22d33d86542bae460d27607894e"
+      },
+      {
+        "path": "train/recovery_common.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e1063e5d9d95f9504199131bedb416744f717bef",
+        "size": 2363,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/e1063e5d9d95f9504199131bedb416744f717bef"
+      },
+      {
+        "path": "train/router_rloo.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "fed0a2c4fa2ab3e4f16ea7c5325d2906dc59c678",
+        "size": 6879,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/fed0a2c4fa2ab3e4f16ea7c5325d2906dc59c678"
+      },
+      {
+        "path": "train/value_student.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "632a4fb2decce0e285245a478bf8b6cee897db90",
+        "size": 4464,
+        "url": "https://api.github.com/repos/kkc25/GB_RL_MoE_Loop/git/blobs/632a4fb2decce0e285245a478bf8b6cee897db90"
+      }
+    ],
+    "truncated": false
+  },
+  "mode": "read-only connector snapshot"
+}

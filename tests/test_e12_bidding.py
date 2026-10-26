@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 import torch
+from torch.nn import functional as F
 
 from experiments.e12_bidding import (
     ExpertBidAdapters,
@@ -113,6 +114,85 @@ class BiddingSelectionTests(unittest.TestCase):
         self.assertEqual(tuple(bids.shape), (6, 4, 4))
 
 
+class AuditCounterexampleTests(unittest.TestCase):
+    """Counterexamples from the 2026-10-25 code audit (finding F12).
+
+    Both tests fail on the pre-repair implementation: the first because the
+    first-layer einsum summed the expert axis, the second because the
+    ``_apply`` method overrode ``nn.Module._apply`` and broke ``.to()``.
+    """
+
+    def test_each_expert_reads_only_its_own_summary(self):
+        adapters = ExpertBidAdapters(
+            1, 2, 1, summary_mode="checkpoint", checkpoint_summary=torch.tensor([[2.0], [7.0]])
+        )
+        with torch.no_grad():
+            adapters.w1.zero_()
+            adapters.w1[:, -1, 0] = torch.tensor([3.0, 5.0])
+            adapters.w2.fill_(1.0)
+            adapters.w3.fill_(1.0)
+        h = torch.zeros(1, 1)
+        anchors = torch.zeros(1, dtype=torch.long)
+        with torch.no_grad():
+            before = adapters.bids_for_anchor(h, anchors)
+        expected = F.gelu(F.gelu(torch.tensor([[6.0, 35.0]])))
+        torch.testing.assert_close(before, expected)
+        with torch.no_grad():
+            adapters.summary[1, 0] += 1.0
+            after = adapters.bids_for_anchor(h, anchors)
+        torch.testing.assert_close(before[:, 0], after[:, 0])
+        self.assertNotEqual(float(before[0, 1]), float(after[0, 1]))
+
+    def test_module_to_and_dtype_conversion_remain_available(self):
+        adapters = ExpertBidAdapters(2, 3, 4)
+        moved = adapters.to(device="cpu", dtype=torch.float64)
+        self.assertIs(moved, adapters)
+        self.assertTrue(all(p.dtype == torch.float64 for p in adapters.parameters()))
+        output = adapters.bids_for_anchor(torch.zeros(2, 2, dtype=torch.float64), torch.tensor([0, 1]))
+        self.assertEqual(output.dtype, torch.float64)
+        self.assertEqual(tuple(output.shape), (2, 3))
+
+
+class CentralRestrictedAlignmentTests(unittest.TestCase):
+    """The restricted central deployment must face the exact bidding contract."""
+
+    def test_restricted_selection_matches_anchor_candidates_and_argmin(self):
+        from experiments.e12_bidding import central_restricted_actions
+
+        torch.manual_seed(0)
+        experts = 4
+        pa = pair_action_matrix(experts)
+        n_actions = experts * (experts - 1) // 2
+        predictions = torch.randn(16, n_actions)
+        anchors = torch.randint(experts, (16,))
+        selected, seconds = central_restricted_actions(predictions, anchors, pa)
+        self.assertFalse((seconds == anchors).any())
+        pairs = torch.stack([torch.minimum(anchors, seconds), torch.maximum(anchors, seconds)], dim=-1)
+        self.assertTrue((selected == pair_to_action(pairs, experts=experts)).all())
+        for i in range(16):
+            cells = pa[anchors[i]]
+            valid = cells >= 0
+            self.assertEqual(int(valid.sum()), experts - 1)
+            expected = valid.nonzero().flatten()[predictions[i][cells[valid]].argmin()]
+            self.assertEqual(seconds[i].item(), expected.item())
+
+    def test_restricted_differs_from_unrestricted_only_in_candidate_space(self):
+        from experiments.e12_bidding import central_restricted_actions
+
+        experts = 4
+        pa = pair_action_matrix(experts)
+        n_actions = experts * (experts - 1) // 2
+        predictions = torch.zeros(1, n_actions)
+        anchors = torch.tensor([2])
+        # put the global minimum on a pair not containing the anchor
+        outside = pair_to_action(torch.tensor([[0, 1]]), experts=experts).item()
+        predictions[0, outside] = -1.0
+        selected, seconds = central_restricted_actions(predictions, anchors, pa)
+        self.assertNotEqual(selected.item(), outside)
+        self.assertNotEqual(seconds.item(), anchors.item())
+        self.assertEqual(predictions.argmin(dim=-1).item(), outside)
+
+
 class LoadStatesTests(unittest.TestCase):
     def test_hash_mismatch_raises(self):
         with tempfile.TemporaryDirectory() as root:
@@ -148,6 +228,18 @@ class EndToEndTests(unittest.TestCase):
             for policy in ("baseline", "random", "central_argmin", "bidding_learned_anchor",
                            "bidding_baseline_pair_first_anchor", "bidding_summary_learned_anchor"):
                 self.assertIn(policy, loaded["policies"])
+            for policy in ("central_restricted_learned_anchor", "central_restricted_baseline_pair_first_anchor",
+                           "bidding_summary_baseline_pair_first_anchor"):
+                self.assertIn(policy, loaded["policies"])
+            self.assertIn("unrestricted", loaded["deployment_alignment"]["unrestricted_central"])
+            self.assertEqual(loaded["training_budget"]["weight_decay"], 0.0)
+            for arm in ("bidding", "bidding_summary"):
+                adapter_file = Path(root) / "case" / "output" / f"adapters_{arm}.pt"
+                self.assertTrue(adapter_file.exists())
+                saved = torch.load(adapter_file, map_location="cpu", weights_only=False)
+                self.assertIn("state_dict", saved)
+                self.assertEqual(saved["config"]["backbone_hash"], BACKBONE_HASH)
+                self.assertEqual(saved["config"]["training_budget"]["weight_decay"], 0.0)
             self.assertLess(loaded["policies"]["central_argmin"]["mean_cost"], loaded["policies"]["random"]["mean_cost"])
             matching = loaded["parameter_matching"]["bidding"]
             self.assertLess(abs(matching["relative_difference"]), 0.2)
