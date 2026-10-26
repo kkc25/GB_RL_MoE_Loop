@@ -1,0 +1,64 @@
+{
+  "protocol": "fixed-depth-natural-token-confirmation-v1",
+  "evaluation_plan_sha256": "19406353e87243e0f0efb5e1cb8c32e32dec1cfcf3de4e6af38181e5c022d7dd",
+  "sequences": 1075,
+  "documents": 990,
+  "supervised_tokens": 1097936.0,
+  "packed_real_tokens": 1100000,
+  "max_document_token_weight": 0.02180090642806138,
+  "effective_documents": 264.53682091740734,
+  "nll": {
+    "1": 4.985806867991397,
+    "2": 4.984138989522581,
+    "4": 4.984202174664738
+  },
+  "primary_r1_minus_r2": {
+    "estimate": 0.0016678784688157883,
+    "upper_95": 0.0017566059123453536,
+    "ci_95": [
+      0.001566648650061594,
+      0.0017732464562323382
+    ],
+    "replicates": 10000,
+    "seed": 0
+  },
+  "tolerance_nat_per_token": 0.005,
+  "non_inferiority_pass": true,
+  "secondary": {
+    "r1_minus_r4": {
+      "estimate": 0.0016046933266599963,
+      "upper_95": 0.0018039023599187012,
+      "ci_95": [
+        0.001368453094480404,
+        0.0018437425336661644
+      ],
+      "replicates": 10000,
+      "seed": 0
+    },
+    "r2_minus_r4": {
+      "estimate": -6.318514215579203e-05,
+      "upper_95": 6.832737567153399e-05,
+      "ci_95": [
+        -0.00022613220661683956,
+        9.112753068847684e-05
+      ],
+      "replicates": 10000,
+      "seed": 0
+    }
+  },
+  "production_consistency": {
+    "states": 32,
+    "max_abs_diff_by_depth": {
+      "1": 0.05964469909667969,
+      "2": 0.031236648559570312,
+      "4": 0.06451845169067383
+    },
+    "full_forward_is_primary": true
+  },
+  "elapsed_seconds_by_depth": {
+    "1": 181.74315199488774,
+    "2": 197.7045527434675,
+    "4": 229.68874259933364
+  },
+  "peak_memory_bytes": 2169760256
+}

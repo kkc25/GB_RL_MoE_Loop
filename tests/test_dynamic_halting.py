@@ -84,9 +84,16 @@ class DynamicHaltingTests(unittest.TestCase):
         tau = float((delta[index] + wrong_delta[index]) / 2)
         continue_mask = delta > tau
         expected_rounds = 1 + (config.max_calls - 1) * continue_mask.long()
+        trace = {}
         with torch.no_grad():
-            logits, rounds = DynamicHaltingPolicy(students, tau).forward(model, input_ids, segment_ids)
+            logits, rounds = DynamicHaltingPolicy(students, tau).forward(model, input_ids, segment_ids, trace=trace)
         torch.testing.assert_close(rounds.reshape(-1), expected_rounds)
+        torch.testing.assert_close(trace["h"], h)
+        self.assertTrue(torch.equal(trace["baseline_action"].reshape(-1), actions))
+        torch.testing.assert_close(trace["delta"].reshape(-1), delta)
+        self.assertTrue(torch.equal(trace["continue_mask"].reshape(-1), continue_mask))
+        self.assertTrue(torch.equal(trace["rounds"], rounds))
+        self.assertEqual(trace["hidden"].shape, h.shape)
         with torch.no_grad():
             expected_h, _ = model.fixed_depth(h, block, expected_rounds, None, model.gammas[config.adaptive_layers[-1]])
             expected_logits = F.linear(model.final_norm(expected_h), model.embedding.weight)

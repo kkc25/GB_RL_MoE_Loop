@@ -1,0 +1,21 @@
+{
+  "updates": 4,
+  "input_tokens": 64,
+  "supervised_tokens": 60,
+  "ffn_rounds": 128,
+  "expert_token_pairs": 256,
+  "elapsed_seconds": 1.3995550570543855,
+  "allocated_gpu_hours": 0.0003887652936262182,
+  "peak_memory_bytes": 17777664,
+  "schedule_phases": [
+    {
+      "schedule": {
+        "updates": 2,
+        "learning_rate": 0.0001,
+        "warmup_fraction": 0.02
+      },
+      "ended_at_update": 2
+    }
+  ],
+  "data_migrations": []
+}

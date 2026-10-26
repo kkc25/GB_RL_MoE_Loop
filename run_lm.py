@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 import platform
 import torch
 
-from data.packed_lm import PackedLMDataset
+from data.packed_lm import PackedLMDataset, legacy_data_fingerprint, packed_data_fingerprint
 from lm_config import LMExperimentConfig
 from model import LoopMoE
 from train.common import MetricWriter, seed_everything
@@ -48,13 +47,15 @@ def main() -> None:
         "device": torch.cuda.get_device_name(device) if device.type == "cuda" else "cpu",
         "parameters": parameters,
         "data_revision": manifest["revision"],
-        "data_hash": manifest["document_list_sha256"],
+        "document_list_hash": manifest["document_list_sha256"],
         "tokenizer_hash": manifest["tokenizer"]["sha256"],
     }
-    data_hash = hashlib.sha256(f'{manifest["document_list_sha256"]}:{manifest["tokenizer"]["sha256"]}'.encode()).hexdigest()
+    data_hash = packed_data_fingerprint(manifest)
+    legacy_data_hash = legacy_data_fingerprint(manifest)
+    environment["data_hash"] = data_hash
     (output_dir / "environment.json").write_text(json.dumps(environment, indent=2) + "\n")
     writer = MetricWriter(output_dir / "metrics.jsonl")
-    ledger = train_lm(model, train_dataset, validation_dataset, config, device, writer, data_hash=data_hash)
+    ledger = train_lm(model, train_dataset, validation_dataset, config, device, writer, data_hash=data_hash, legacy_data_hash=legacy_data_hash)
     final = {}
     for depth in (1, 2, 4):
         final[f"depth_{depth}"] = evaluate_lm(model, validation_dataset, config, device, depth, run.validation_batches)

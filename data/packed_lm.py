@@ -47,6 +47,26 @@ _SEG_SUFFIX = ".segment_ids.i32.bin"
 _MAP_SUFFIX = ".doc_map.jsonl"
 
 
+def legacy_data_fingerprint(manifest: Dict) -> str:
+    return hashlib.sha256(f'{manifest["document_list_sha256"]}:{manifest["tokenizer"]["sha256"]}'.encode()).hexdigest()
+
+
+def packed_data_fingerprint(manifest: Dict) -> str:
+    splits = {
+        split: {
+            key: manifest["splits"][split][key]
+            for key in ("input_ids_sha256", "segment_ids_sha256", "doc_map_sha256", "seq_len")
+        }
+        for split in ("train", "validation")
+    }
+    payload = {
+        "document_list_sha256": manifest["document_list_sha256"],
+        "tokenizer_sha256": manifest["tokenizer"]["sha256"],
+        "splits": splits,
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
 def split_paths(root: Union[str, Path], split: str) -> Dict[str, Path]:
     """On-disk paths of the three files that make up one packed split."""
     root = Path(root)

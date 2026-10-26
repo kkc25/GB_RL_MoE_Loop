@@ -27,6 +27,7 @@ def evaluate(model, controller, config: ExperimentConfig, device: torch.device, 
                 depth=config.model.max_calls,
                 controller=controller if routed else None,
                 budget=train.budget if routed else None,
+                price=train.lambda_cost,
                 sample=False,
                 collect_rollout=routed,
             )

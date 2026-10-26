@@ -44,13 +44,15 @@ def restore_ledger_fields(raw: dict, top_k: int) -> dict:
 
 
 def restore_rng_state(checkpoint: dict) -> None:
-    """Restore torch/cuda RNG state saved in a checkpoint (no-op if absent)."""
+    """Restore CPU-typed RNG states, including after a CUDA map_location load."""
     torch_rng = checkpoint.get("torch_rng")
     if torch_rng is not None:
-        torch.set_rng_state(torch_rng)
+        torch.set_rng_state(torch_rng.cpu())
     cuda_rng = checkpoint.get("cuda_rng")
     if cuda_rng is not None and torch.cuda.is_available():
-        torch.cuda.set_rng_state_all(cuda_rng)
+        if len(cuda_rng) != torch.cuda.device_count():
+            raise ValueError("checkpoint CUDA RNG count does not match visible GPU count")
+        torch.cuda.set_rng_state_all([state.cpu() for state in cuda_rng])
 
 
 def sha256_file(path: str | Path) -> str:
@@ -77,10 +79,12 @@ def atomic_torch_save(path: str | Path, payload: dict) -> None:
     os.replace(temporary, destination)
 
 
-def recovery_checkpoint(path, config, model, optimizer, update, ledger, data_hash, best_validation_loss=None, schedule=None):
+def recovery_checkpoint(path, config, model, optimizer, update, ledger, data_hash, best_validation_loss=None, schedule=None, stream_metadata=None):
     atomic_torch_save(
         path,
         {
+            "checkpoint_version": 2,
+            "stream_metadata": stream_metadata,
             "config": asdict(config),
             "model": model.state_dict(),
             "optimizer": optimizer.state_dict(),

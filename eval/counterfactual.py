@@ -233,16 +233,13 @@ def counterfactual_path_costs(
                 raise ValueError("candidate actions must contain every state's baseline action")
             baseline_action[start : start + size] = baseline_local
             expanded = hc.unsqueeze(1).expand(size, n_actions, hc.shape[-1]).reshape(-1, hc.shape[-1])
-            forced = torch.arange(n_actions, device=device).repeat(size)
             current = expanded
             for round_index in range(rounds):
                 normalized = block.ffn_norm(current)
                 if round_index == 0:
-                    if actions.ndim == 2:
-                        update, _, _, _ = block.executor(normalized, forced)
-                    else:
-                        expanded_actions = actions[start : start + size].reshape(-1, 2)
-                        update, _, _, _ = block.executor(normalized, pairs=expanded_actions)
+                    chunk_actions = actions if actions.ndim == 2 else actions[start : start + size]
+                    expanded_actions = chunk_actions.unsqueeze(0).expand(size, -1, -1).reshape(-1, 2) if actions.ndim == 2 else chunk_actions.reshape(-1, 2)
+                    update, _, _, _ = block.executor(normalized, pairs=expanded_actions)
                 else:
                     update, _, _, _ = block.executor(normalized)
                 current = current + gamma * update
@@ -307,6 +304,9 @@ def evaluate_policies(costs: PathCosts, selections: dict[str, torch.Tensor]) -> 
     for name, selection in selections.items():
         if selection.shape != costs.baseline_action.shape:
             raise ValueError(f"selection {name!r} has shape {tuple(selection.shape)}")
+        selection = selection.to(device=costs.q_pi0.device, dtype=torch.long)
+        if bool(((selection < 0) | (selection >= costs.q_pi0.shape[1])).any()):
+            raise ValueError(f"selection {name!r} contains an out-of-range candidate index")
         executed = costs.q_pi0[rows, selection]
         immediate = costs.immediate[rows, selection]
         improvement = baseline - executed

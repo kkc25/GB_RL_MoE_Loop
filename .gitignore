@@ -33,3 +33,5 @@ runs/repair_*/r1_fp32/
 runs/repair_*/r1_test/
 runs/repair_*/r2_smoke*
 runs/repair_*/r4_smoke*
+runs/followup_*/plan_c/exclusions/
+runs/followup_*/full_tests.log

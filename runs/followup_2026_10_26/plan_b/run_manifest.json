@@ -1,0 +1,15 @@
+{
+  "source": {
+    "commit": "661eb57dd0234d4d2b2ea635845e2592ed82546d",
+    "tree": "2f2b71d27bfa239e37d937c481c826111dcdbbdb",
+    "uncommitted_diff_sha256": "1a1dceee0e0fa24c8609dbd8c0065f1e367cd26496f4f1c38fa2a6246e4594c9",
+    "has_uncommitted_diff": true
+  },
+  "argv": [
+    "/nvme-1/zhoukegu/GB_RL_MoE_Loop/experiments/followup_b_recompute.py",
+    "--device",
+    "cuda"
+  ],
+  "r2_summary_sha256": "d2e7a8e06d8bed17df1eea73c3f2e4c62caa030d340a2d6bdff1f5c4cc8239bf",
+  "r4_summary_sha256": "7b26a88eaaac2ccd242263dd4e1549f7c6d43379ebfb793545eec9deed146865"
+}

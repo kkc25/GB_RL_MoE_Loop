@@ -26,22 +26,57 @@ def linear_predict(features, weights):
     return (x @ weights).float()
 
 
-def group_rules(train_costs, train_baseline, test_baseline, actions):
-    means = train_costs.q_pi0.mean(dim=0)
-    constant_global = int(train_costs.global_action_ids[0, means.argmin()])
-    group_means = {}
-    for global_id in actions.unique():
-        mask = train_baseline == global_id
-        if bool(mask.any()):
-            group_means[int(global_id)] = int(train_costs.global_action_ids[mask][0, train_costs.q_pi0[mask].mean(dim=0).argmin()])
-    constant = test_baseline.clone()
-    group = test_baseline.clone()
-    lookup = torch.full((int(actions.max()) + 1,), -1, dtype=torch.long)
-    lookup[actions] = torch.arange(actions.shape[1]).repeat(actions.shape[0]).reshape(actions.shape)
-    for row, baseline in enumerate(test_baseline):
-        constant[row] = lookup[constant_global]
-        group[row] = lookup[group_means.get(int(baseline), int(baseline))]
-    return constant, group
+def baseline_global_ids(costs):
+    rows = torch.arange(costs.baseline_action.shape[0], device=costs.baseline_action.device)
+    return costs.global_action_ids[rows, costs.baseline_action]
+
+
+def local_action_or_baseline(global_action_ids, global_action, baseline_local):
+    if isinstance(global_action, int):
+        matches = global_action_ids == global_action
+    else:
+        matches = global_action_ids == global_action.reshape(-1, 1)
+    local = matches.long().argmax(dim=1)
+    return torch.where(matches.any(dim=1), local, baseline_local)
+
+
+def policy_cost_for_global(costs, global_action, rows=None):
+    baseline = costs.baseline_action if rows is None else costs.baseline_action[rows]
+    selection = local_action_or_baseline(costs.global_action_ids if rows is None else costs.global_action_ids[rows], global_action, baseline)
+    index = torch.arange(selection.shape[0], device=selection.device)
+    costs_q = costs.q_pi0 if rows is None else costs.q_pi0[rows]
+    return costs_q[index, selection]
+
+
+def candidate_rank_rule(train_costs, test_costs):
+    rank = int(train_costs.q_pi0.mean(dim=0).argmin())
+    return torch.full_like(test_costs.baseline_action, rank), {"rank": rank}
+
+
+def group_rules(train_costs, test_costs, min_group_states=32):
+    train_baseline_global = baseline_global_ids(train_costs)
+    test_baseline_global = baseline_global_ids(test_costs)
+    global_actions = train_costs.global_action_ids.unique()
+    constant_costs = [policy_cost_for_global(train_costs, int(action)).mean() for action in global_actions]
+    constant_global = int(global_actions[torch.stack(constant_costs).argmin()])
+    constant = local_action_or_baseline(test_costs.global_action_ids, constant_global, test_costs.baseline_action)
+    group_global = torch.full_like(test_baseline_global, constant_global)
+    group_support = {}
+    for baseline_global in test_baseline_global.unique().tolist():
+        rows = torch.nonzero(train_baseline_global == baseline_global, as_tuple=False).squeeze(-1)
+        group_support[str(baseline_global)] = int(rows.numel())
+        if rows.numel() < min_group_states:
+            continue
+        costs = [policy_cost_for_global(train_costs, int(action), rows).mean() for action in global_actions]
+        group_global[test_baseline_global == baseline_global] = int(global_actions[torch.stack(costs).argmin()])
+    group = local_action_or_baseline(test_costs.global_action_ids, group_global, test_costs.baseline_action)
+    metadata = {
+        "constant_global_action": constant_global,
+        "group_global_actions": group_global.tolist(),
+        "group_train_support": group_support,
+        "min_group_states": min_group_states,
+    }
+    return constant, group, metadata
 
 
 def run(config_path, checkpoint_path, corpus_dir, output_dir, device_name, train_states, selection_states, calibration_states, test_states, epochs, seed):
@@ -93,11 +128,13 @@ def run(config_path, checkpoint_path, corpus_dir, output_dir, device_name, train
     linear_raw = linear_fit(train_features, q_train)
     linear_centered = linear_fit(train_features, centered_train)
     torch.save({"raw": raw_student, "centered": centered_student, "linear_raw": linear_raw, "linear_centered": linear_centered}, output_dir / "students.pt")
-    test_baseline = test.baseline_action.cpu()
-    constant, group = group_rules(train, train.baseline_action.cpu(), test_baseline, test.global_action_ids.cpu())
+    test_baseline = test.baseline_action
+    constant, group, rule_metadata = group_rules(train, test)
+    candidate_rank, rank_metadata = candidate_rank_rule(train, test)
     selections = {
         "baseline": test_baseline,
         "random": random_selection(test_baseline.shape[0], test.q_pi0.shape[1], seed, test.q_pi0.device),
+        "candidate_rank": candidate_rank,
         "constant": constant,
         "group": group,
         "raw_mlp": predict(raw_student.student, test_features, raw_student.mean, raw_student.std).argmin(dim=-1),
@@ -108,11 +145,12 @@ def run(config_path, checkpoint_path, corpus_dir, output_dir, device_name, train
     policies = evaluate_policies(test, selections)
     oracle = oracle_metrics(test)
     doc_ids = torch.load(output_dir / "states_newtest.pt", map_location="cpu", weights_only=False)["doc_ids"]
-    rows = torch.arange(test_baseline.shape[0])
+    rows_cpu = torch.arange(test_baseline.shape[0])
+    rows = rows_cpu.to(test.q_pi0.device)
     baseline_cost = test.q_pi0[rows, test_baseline].cpu()
     intervals = {}
     for name, selection in selections.items():
-        executed = test.q_pi0[rows, selection].cpu()
+        executed = test.q_pi0[rows, selection.to(test.q_pi0.device)].cpu()
         intervals[name] = document_paired_bootstrap(baseline_cost, executed, doc_ids, n_bootstrap=500, seed=seed)
     ledger.student_train_samples = 2 * epochs * train_features.shape[0]
     ledger.student_optimizer_updates = raw_student.optimizer_updates + centered_student.optimizer_updates
@@ -125,6 +163,7 @@ def run(config_path, checkpoint_path, corpus_dir, output_dir, device_name, train
         "requested_states": roles,
         "epochs": epochs,
         "seed": seed,
+        "cheap_rule_metadata": {**rule_metadata, **rank_metadata},
         "policies": policies,
         "oracle": oracle,
         "paired_document_intervals": intervals,

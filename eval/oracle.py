@@ -18,8 +18,16 @@ def legal_paths(experts: int, budget: int, max_calls: int) -> list[tuple[int, ..
     return all_paths(experts, min(budget, max_calls))
 
 
+def validate_exact_contract(model, labels: torch.Tensor) -> None:
+    if len(model.config.adaptive_layers) != 1 or not model.config.target_only:
+        raise NotImplementedError("exact enumeration currently requires one adaptive layer and target_only=True")
+    if bool(((labels != -100).sum(dim=1) != 1).any()):
+        raise NotImplementedError("exact enumeration currently requires exactly one supervised position per sequence")
+
+
 @torch.no_grad()
 def oracle_path_metrics(model, controller, input_ids, labels, budget: int, price: float, device: torch.device, dtype: str) -> dict[str, float]:
+    validate_exact_contract(model, labels)
     paths = legal_paths(model.config.experts_per_layer, budget, model.config.max_calls)
     losses, costs = [], []
     with autocast_context(device, dtype):
@@ -40,6 +48,7 @@ def oracle_path_metrics(model, controller, input_ids, labels, budget: int, price
 
 
 def exact_path_batch(model, controller, input_ids, labels, budget: int, price: float, device: torch.device, dtype: str):
+    validate_exact_contract(model, labels)
     paths = legal_paths(model.config.experts_per_layer, budget, model.config.max_calls)
     for path in paths:
         with torch.no_grad(), autocast_context(device, dtype):

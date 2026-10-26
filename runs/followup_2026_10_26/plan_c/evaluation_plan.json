@@ -1,0 +1,39 @@
+{
+  "protocol": "fixed-depth-natural-token-confirmation-v1",
+  "created_before_evaluation": true,
+  "source": {
+    "commit": "661eb57dd0234d4d2b2ea635845e2592ed82546d",
+    "tree": "2f2b71d27bfa239e37d937c481c826111dcdbbdb",
+    "uncommitted_diff_sha256": "6db8688c8a66b1093e77c9ba734c2a6b9fe1fe2bc2a384e2cd8d73483fe58265",
+    "has_uncommitted_diff": true
+  },
+  "config_path": "configs/e00_m105_b2.json",
+  "config_sha256": "37cde2d6eab26e2d29f759b3ca44d5e78c2c314027b77c41dc5e307802c0cd23",
+  "checkpoint_path": "runs/e00/m105_b2/latest.pt",
+  "checkpoint_sha256": "47f6ec019b4d72a3229076e4f60d3dd7e41c26e6a14c12dc964536e65de33324",
+  "corpus_manifest_sha256": "7fca0563f4db360790ef848fc446680ccbce2ad7a1927b41b2562803759685ca",
+  "frozen_document_ids_sha256": "6528ca163ff8e548c537cb928148b4cc7a84eb97b783d117244715bb11c0c9f1",
+  "depths": [
+    1,
+    2,
+    4
+  ],
+  "primary_comparison": "D = sum(L_R1 - L_R2) / N_valid_tokens",
+  "secondary_comparison": "R1 - R4 and R2 - R4, descriptive",
+  "tolerance_nat_per_token": 0.005,
+  "decision_rule": "one-sided 95% document-bootstrap upper bound of D < 0.005",
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 0,
+  "cluster": "document",
+  "weighting": "natural valid-token counts; all packed sequences; no per-document cap",
+  "minimum_supervised_tokens": 1000000,
+  "packed_real_tokens": 1100000,
+  "evaluation_batch_size": 1,
+  "dtype": "bfloat16",
+  "controller_training": "none; fixed depths only",
+  "controller_exclusion_counts": {
+    "heldout_roles": 3066,
+    "controller_train_states": 873
+  },
+  "sample_size_changes_after_results": "forbidden"
+}

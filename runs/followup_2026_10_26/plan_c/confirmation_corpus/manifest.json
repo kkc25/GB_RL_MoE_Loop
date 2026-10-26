@@ -1,0 +1,62 @@
+{
+  "pipeline_version": "fixed-depth-confirmation-v1",
+  "created_utc": "2026-10-26T09:34:53.426708+00:00",
+  "source": "HuggingFaceFW/fineweb-edu:sample-10BT",
+  "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+  "config": {
+    "confirmation_tokens": 1100000,
+    "pool_bytes": 13200000,
+    "seq_len": 1024
+  },
+  "environment": {
+    "python": "3.12.15"
+  },
+  "n_source_documents": 726000,
+  "n_excluded_documents": 109491,
+  "n_eligible_documents": 616509,
+  "n_selected_documents": 2615,
+  "n_frozen_documents": 990,
+  "selected_bytes": 13202049,
+  "confirmation_documents_sha256": "f13f19959850296bfc0da9581437878c19db23afdc1bc9d7977022739b610e09",
+  "frozen_document_ids_sha256": "6528ca163ff8e548c537cb928148b4cc7a84eb97b783d117244715bb11c0c9f1",
+  "exclusion": {
+    "documents_files": [
+      "runs/followup_2026_10_26/plan_c/exclusions/original_0.jsonl",
+      "runs/followup_2026_10_26/plan_c/exclusions/original_1.jsonl",
+      "runs/followup_2026_10_26/plan_c/exclusions/controller_used.jsonl"
+    ],
+    "documents_sha256": [
+      "9f5cc5685bccfc16f250cc8c9e520380dcdea7a67442ff323a08c4b2ee7a0560",
+      "0ba1211a4f6d778cc8d2940575ca0fc56b842a9f1cfd66a757985971691f701b",
+      "e1d3f6deee24ae6ff63aa987012c7021029f5ee2e522767bfada12508cd312af"
+    ],
+    "n_doc_hashes": 109083,
+    "n_text_hashes": 109065
+  },
+  "tokenizer": {
+    "source_shards": [
+      "sample/10BT/000_00000.parquet"
+    ],
+    "path": "runs/data/fineweb_edu_100m/tokenizer.json",
+    "sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+    "vocab_size": 32768,
+    "trained_by": "caller"
+  },
+  "splits": {
+    "confirmation": {
+      "n_sequences": 1075,
+      "seq_len": 1024,
+      "n_tokens": 1100000,
+      "n_padding": 800,
+      "n_documents": 990,
+      "input_ids_file": "confirmation.input_ids.u16.bin",
+      "segment_ids_file": "confirmation.segment_ids.i32.bin",
+      "doc_map_file": "confirmation.doc_map.jsonl",
+      "input_ids_dtype": "uint16",
+      "segment_ids_dtype": "int32",
+      "input_ids_sha256": "69184b4c3ed1fb326cbb612aed3b692adfb0f355b4f090eb78908a22de8a905c",
+      "segment_ids_sha256": "0a6cf386df34ee6e16e9faaf2734eeb5065ba1c5bee2118894c53f78dae8c261",
+      "doc_map_sha256": "1bc1bff032b5ed59f98fc075fe5fd11a419a1b12ac7eeee1537f388bd8d04799"
+    }
+  }
+}

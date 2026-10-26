@@ -1,0 +1,32 @@
+{
+  "scope": "Representative largest-error BF16 test states; production full-batch forward versus independent cached-state baseline replay",
+  "records": [
+    {
+      "diagnostic": "max_online_ce_vs_offline_selected_cost_diff",
+      "sequence": 2086,
+      "position": 111,
+      "offline_rounds": 4,
+      "offline_selected_cost": 10.594389915466309,
+      "online_ce": 10.446795463562012,
+      "online_fp32_readout_ce": 11.311321258544922,
+      "replayed_r1": 10.63718032836914,
+      "replayed_r4": 10.594416618347168,
+      "cached_r1": 10.637190818786621,
+      "cached_r4": 10.594389915466309
+    },
+    {
+      "diagnostic": "max_fp32_readout_vs_offline_selected_cost_diff",
+      "sequence": 2086,
+      "position": 266,
+      "offline_rounds": 4,
+      "offline_selected_cost": 13.783960342407227,
+      "online_ce": 13.849989891052246,
+      "online_fp32_readout_ce": 16.786540985107422,
+      "replayed_r1": 13.825681686401367,
+      "replayed_r4": 13.78395938873291,
+      "cached_r1": 13.825684547424316,
+      "cached_r4": 13.783960342407227
+    }
+  ],
+  "interpretation": "Independent baseline replay from the original cached h reproduces cached R1/R4 costs to BF16 rounding. The remaining production CE difference arises after the common h, when the full-batch BF16 policy continuation uses different kernel shapes from per-state counterfactual replay. It is not evidence of another cached-h, baseline-action or student-input mismatch. Full-batch production CE and cached counterfactual CE must remain separate metrics."
+}

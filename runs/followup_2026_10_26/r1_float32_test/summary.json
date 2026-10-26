@@ -1,0 +1,22 @@
+{
+  "split": "test",
+  "states": 1024,
+  "sequences": 2,
+  "tau": -0.004153502614874598,
+  "online_dtype": "float32",
+  "offline_reference": "original cached h, baseline, student predictions and selected costs",
+  "online_entry": "eval.dynamic_halting.DynamicHaltingPolicy.forward",
+  "baseline_global_mismatches": 11,
+  "decision_mismatches": 5,
+  "round_mismatches": 5,
+  "max_cached_online_h_diff": 6.774511337280273,
+  "max_offline_online_delta_diff": 0.03451800346374512,
+  "max_online_ce_vs_offline_selected_cost_diff": 0.7122728824615479,
+  "max_fp32_readout_vs_offline_selected_cost_diff": 2.9669246673583984,
+  "near_threshold_states": 1,
+  "near_threshold_decision_mismatches": 0,
+  "offline_mean_rounds": 2.376953125,
+  "online_mean_rounds": 2.3740234375,
+  "offline_mean_selected_cost": 5.036005964235557,
+  "online_mean_ce": 5.037499475490094
+}

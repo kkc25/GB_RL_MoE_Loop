@@ -1,0 +1,22 @@
+{
+  "created_utc": "2026-10-26T09:59:22.833427+00:00",
+  "source": {
+    "commit": "661eb57dd0234d4d2b2ea635845e2592ed82546d",
+    "tree": "2f2b71d27bfa239e37d937c481c826111dcdbbdb",
+    "uncommitted_diff_sha256": "6db8688c8a66b1093e77c9ba734c2a6b9fe1fe2bc2a384e2cd8d73483fe58265",
+    "has_uncommitted_diff": true
+  },
+  "argv": [
+    "/nvme-1/zhoukegu/GB_RL_MoE_Loop/experiments/evaluate_plan_c.py",
+    "--device",
+    "cuda"
+  ],
+  "evaluation_plan_sha256": "19406353e87243e0f0efb5e1cb8c32e32dec1cfcf3de4e6af38181e5c022d7dd",
+  "summary_sha256": "e2ea3678542aa3c7ad2eb67fdb772fb7cdc656ead1cd5fcbc18bd6ab26bb5510",
+  "per_document_sha256": "b897b1a0738d92acc2489c5183784a884e2fb10dbf24de2d7644baa92a0683f6",
+  "production_consistency_sha256": "1f259b904156941483d939269bbc901fe67931ed61cc4ee7c4ccc2d4b2bc991b",
+  "checkpoint_sha256": "47f6ec019b4d72a3229076e4f60d3dd7e41c26e6a14c12dc964536e65de33324",
+  "corpus_manifest_sha256": "7fca0563f4db360790ef848fc446680ccbce2ad7a1927b41b2562803759685ca",
+  "torch_version": "2.12.1+cu130",
+  "device": "cuda"
+}

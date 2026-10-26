@@ -48,8 +48,10 @@ def evaluate_lm(model, dataset, config, device, depth, max_batches):
     return {"nll": nll, "ppl": float(torch.tensor(nll).exp()), "supervised_tokens": count, "depth": depth}
 
 
-def save_lm_checkpoint(path, config, model, optimizer, update, ledger, best_nll, schedule, data_hash):
+def save_lm_checkpoint(path, config, model, optimizer, update, ledger, best_nll, schedule, data_hash, stream_metadata=None):
     atomic_torch_save(path, {
+        "checkpoint_version": 2,
+        "stream_metadata": stream_metadata,
         "config": asdict(config),
         "model": model.state_dict(),
         "optimizer": optimizer.state_dict(),
@@ -63,7 +65,7 @@ def save_lm_checkpoint(path, config, model, optimizer, update, ledger, best_nll,
     })
 
 
-def train_lm(model, train_dataset, validation_dataset, config, device, writer, data_hash=None):
+def train_lm(model, train_dataset, validation_dataset, config, device, writer, data_hash=None, legacy_data_hash=None):
     run = config.train
     decay, no_decay = [], []
     for parameter in model.parameters():
@@ -74,33 +76,54 @@ def train_lm(model, train_dataset, validation_dataset, config, device, writer, d
         betas=(0.9, 0.95),
         eps=1e-8,
     )
-    ledger = {"updates": 0, "input_tokens": 0, "supervised_tokens": 0, "ffn_rounds": 0, "expert_token_pairs": 0, "elapsed_seconds": 0.0, "allocated_gpu_hours": 0.0, "peak_memory_bytes": 0, "schedule_phases": []}
+    ledger = {"updates": 0, "input_tokens": 0, "supervised_tokens": 0, "ffn_rounds": 0, "expert_token_pairs": 0, "elapsed_seconds": 0.0, "allocated_gpu_hours": 0.0, "peak_memory_bytes": 0, "schedule_phases": [], "data_migrations": []}
     schedule = {"updates": run.updates, "learning_rate": run.learning_rate, "warmup_fraction": run.warmup_fraction}
     start_update = 0
     best_nll = float("inf")
+    batches_per_epoch = len(train_dataset) // run.batch_size
+    if batches_per_epoch < 1:
+        raise ValueError("training dataset is smaller than one full batch")
+    stream_metadata = {"n_sequences": len(train_dataset), "batch_size": run.batch_size, "sampler_seed": run.seed, "batches_per_epoch": batches_per_epoch}
     if run.resume:
         checkpoint = torch.load(run.resume, map_location=device, weights_only=False)
+        checkpoint_version = checkpoint.get("checkpoint_version", 1)
+        previous_run = checkpoint.get("config", {}).get("train", {})
+        for key, current in (("batch_size", run.batch_size), ("seed", run.seed), ("data_dir", run.data_dir)):
+            if key in previous_run and previous_run[key] != current:
+                raise ValueError(f"checkpoint {key} does not match the current training stream")
+        previous_stream = checkpoint.get("stream_metadata")
+        if checkpoint_version >= 2 and previous_stream is None:
+            raise ValueError("version 2 checkpoint is missing stream metadata")
+        if previous_stream is not None:
+            for key in ("n_sequences", "batch_size", "sampler_seed"):
+                if previous_stream[key] != stream_metadata[key]:
+                    raise ValueError(f"checkpoint stream {key} does not match the current training stream")
         checkpoint_hash = checkpoint.get("data_hash")
-        if checkpoint_hash is not None and data_hash is not None and checkpoint_hash != data_hash:
-            raise ValueError(f"checkpoint data hash {checkpoint_hash} does not match current data hash {data_hash}")
+        legacy_migration = False
+        if data_hash is not None and checkpoint_hash != data_hash:
+            legacy_migration = checkpoint_version == 1 and legacy_data_hash is not None and checkpoint_hash == legacy_data_hash
+            if not legacy_migration:
+                raise ValueError(f"checkpoint data hash {checkpoint_hash} does not match current packed data hash {data_hash}")
         model.load_state_dict(checkpoint["model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         start_update = checkpoint["update"]
         ledger = checkpoint["ledger"]
         if "ffn_rounds" not in ledger:
-            # Legacy checkpoints stored per-token FFN rounds as "expert_calls".
             ledger["ffn_rounds"] = ledger.pop("expert_calls", 0)
         else:
             ledger.pop("expert_calls", None)
         ledger.setdefault("expert_token_pairs", ledger["ffn_rounds"] * config.model.top_k)
         ledger.setdefault("schedule_phases", [])
+        ledger.setdefault("data_migrations", [])
+        if legacy_migration:
+            ledger["data_migrations"].append({"from": "document_pool_v1", "to": "packed_stream_v2", "at_update": start_update})
+            writer.write(phase="data_migration", update=start_update, previous_data_hash=checkpoint_hash, current_data_hash=data_hash)
         best_nll = checkpoint.get("best_nll", float("inf"))
         previous_schedule = checkpoint.get("schedule")
         if previous_schedule is not None and previous_schedule != schedule:
             ledger["schedule_phases"].append({"schedule": previous_schedule, "ended_at_update": start_update})
             writer.write(phase="schedule", update=start_update, previous_schedule=previous_schedule, current_schedule=schedule)
         restore_rng_state(checkpoint)
-    batches_per_epoch = len(train_dataset) // run.batch_size
     started = time.monotonic()
     last_accounted = started
 
@@ -153,8 +176,8 @@ def train_lm(model, train_dataset, validation_dataset, config, device, writer, d
                 ledger["peak_memory_bytes"] = max(ledger["peak_memory_bytes"], torch.cuda.max_memory_allocated(device))
             if metrics["nll"] < best_nll:
                 best_nll = metrics["nll"]
-                save_lm_checkpoint(f"{run.output_dir}/best_validation.pt", config, model, optimizer, update + 1, ledger, best_nll, schedule, data_hash)
-            save_lm_checkpoint(f"{run.output_dir}/latest.pt", config, model, optimizer, update + 1, ledger, best_nll, schedule, data_hash)
+                save_lm_checkpoint(f"{run.output_dir}/best_validation.pt", config, model, optimizer, update + 1, ledger, best_nll, schedule, data_hash, stream_metadata)
+            save_lm_checkpoint(f"{run.output_dir}/latest.pt", config, model, optimizer, update + 1, ledger, best_nll, schedule, data_hash, stream_metadata)
             model.train()
     accumulate_elapsed()
     if device.type == "cuda":

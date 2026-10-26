@@ -1,0 +1,39 @@
+{
+  "revision": "followup-synthetic-v1",
+  "document_list_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "tokenizer": {
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "splits": {
+    "train": {
+      "n_sequences": 16,
+      "seq_len": 16,
+      "n_tokens": 256,
+      "n_padding": 0,
+      "n_documents": 8,
+      "input_ids_file": "train.input_ids.u16.bin",
+      "segment_ids_file": "train.segment_ids.i32.bin",
+      "doc_map_file": "train.doc_map.jsonl",
+      "input_ids_dtype": "uint16",
+      "segment_ids_dtype": "int32",
+      "input_ids_sha256": "cc62b915eb5f114fc1d0d5267c8cc388c85269a7c60a8d073505e9a4b1fa4539",
+      "segment_ids_sha256": "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+      "doc_map_sha256": "fbf928aa8a80532cb5e69af50ca45dbee92eca6e7628f8bbf70e04e16107074c"
+    },
+    "validation": {
+      "n_sequences": 16,
+      "seq_len": 16,
+      "n_tokens": 256,
+      "n_padding": 0,
+      "n_documents": 8,
+      "input_ids_file": "validation.input_ids.u16.bin",
+      "segment_ids_file": "validation.segment_ids.i32.bin",
+      "doc_map_file": "validation.doc_map.jsonl",
+      "input_ids_dtype": "uint16",
+      "segment_ids_dtype": "int32",
+      "input_ids_sha256": "cc62b915eb5f114fc1d0d5267c8cc388c85269a7c60a8d073505e9a4b1fa4539",
+      "segment_ids_sha256": "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+      "doc_map_sha256": "fbf928aa8a80532cb5e69af50ca45dbee92eca6e7628f8bbf70e04e16107074c"
+    }
+  }
+}

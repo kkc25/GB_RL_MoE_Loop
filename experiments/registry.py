@@ -110,13 +110,15 @@ class Registry:
 
     def update(self, experiment: str, component: str, status: str, evidence: list[str] | None = None, metrics: dict | None = None, gpu_hours: float | None = None, stop_reason: str | None = None, next_trigger: str | None = None) -> None:
         record = self.data["experiments"][experiment]
-        record["components"][component] = {"status": status, "evidence": evidence or [], "metrics": metrics or {}, "gpu_hours": gpu_hours, "updated_at": now()}
+        record["components"][component] = {"status": status, "evidence": evidence or [], "metrics": metrics or {}, "gpu_hours": gpu_hours, "stop_reason": stop_reason, "next_trigger": next_trigger, "updated_at": now()}
         record["status"] = aggregate_status(record["components"])
         record["evidence"] = sorted(set(record["evidence"] + (evidence or [])))
         record["metrics"].update(metrics or {})
         record["gpu_hours"] = aggregate_gpu_hours(record["components"])
-        record["stop_reason"] = stop_reason
-        record["next_trigger"] = next_trigger
+        matching = [item for item in record["components"].values() if item["status"] == record["status"]]
+        for field in ("stop_reason", "next_trigger"):
+            values = [item for item in matching if item.get(field) is not None]
+            record[field] = max(values, key=lambda item: item["updated_at"])[field] if values else None
         self.save()
 
 

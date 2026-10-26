@@ -1,0 +1,32 @@
+test_controller_exclusions_cover_heldout_and_sampled_train_documents (tests.test_plan_c.ConfirmationCorpusTests.test_controller_exclusions_cover_heldout_and_sampled_train_documents) ... ok
+test_pipeline_excludes_prior_documents_and_packs_natural_stream (tests.test_plan_c.ConfirmationCorpusTests.test_pipeline_excludes_prior_documents_and_packs_natural_stream) ... ok
+test_bootstrap_uses_document_ratio_of_sums_and_one_sided_upper (tests.test_plan_c.ConfirmationStatisticsTests.test_bootstrap_uses_document_ratio_of_sums_and_one_sided_upper) ... ok
+test_document_accumulation_preserves_natural_token_weights (tests.test_plan_c.ConfirmationStatisticsTests.test_document_accumulation_preserves_natural_token_weights) ... ok
+test_analytic_mix_is_exact_per_state_expectation (tests.test_followup_b.FollowupBTests.test_analytic_mix_is_exact_per_state_expectation) ... ok
+test_selection_diagnostics_uses_actual_global_ids_and_fallback (tests.test_followup_b.FollowupBTests.test_selection_diagnostics_uses_actual_global_ids_and_fallback) ... ok
+test_candidate_column_permutation_preserves_executed_global_action (tests.test_r2_value.ActionMappingTests.test_candidate_column_permutation_preserves_executed_global_action) ... ok
+test_candidate_rank_is_selected_on_train_only (tests.test_r2_value.ActionMappingTests.test_candidate_rank_is_selected_on_train_only) ... ok
+test_evaluation_rejects_invalid_selection_indices (tests.test_r2_value.ActionMappingTests.test_evaluation_rejects_invalid_selection_indices) ... ok
+test_global_action_uses_each_rows_own_candidate_columns (tests.test_r2_value.ActionMappingTests.test_global_action_uses_each_rows_own_candidate_columns) ... ok
+test_rules_are_row_permutation_and_split_batch_invariant (tests.test_r2_value.ActionMappingTests.test_rules_are_row_permutation_and_split_batch_invariant) ... ok
+test_sparse_group_falls_back_to_global_rule (tests.test_r2_value.ActionMappingTests.test_sparse_group_falls_back_to_global_rule) ... ok
+test_cached_h_matches_normal_baseline_forward (tests.test_counterfactual.CounterfactualTests.test_cached_h_matches_normal_baseline_forward) ... ok
+test_candidate_actions_include_baseline_and_exploration (tests.test_counterfactual.CounterfactualTests.test_candidate_actions_include_baseline_and_exploration) ... ok
+test_chunking_does_not_change_costs (tests.test_counterfactual.CounterfactualTests.test_chunking_does_not_change_costs) ... ok
+test_custom_action_subset_preserves_pairs_and_global_mapping (tests.test_counterfactual.CounterfactualTests.test_custom_action_subset_preserves_pairs_and_global_mapping) ... ok
+test_forced_baseline_then_baseline_continuation_equals_baseline (tests.test_counterfactual.CounterfactualTests.test_forced_baseline_then_baseline_continuation_equals_baseline) ... ok
+test_no_attention_after_cached_h (tests.test_counterfactual.CounterfactualTests.test_no_attention_after_cached_h) ... ok
+test_path_cost_shapes_and_candidate_set (tests.test_counterfactual.CounterfactualTests.test_path_cost_shapes_and_candidate_set) ... ok
+test_per_state_actions_use_state_specific_mapping (tests.test_counterfactual.CounterfactualTests.test_per_state_actions_use_state_specific_mapping) ... ok
+test_shared_and_broadcast_nonprefix_actions_are_equivalent (tests.test_counterfactual.CounterfactualTests.test_shared_and_broadcast_nonprefix_actions_are_equivalent) ... ok
+test_states_only_at_supervised_positions (tests.test_counterfactual.CounterfactualTests.test_states_only_at_supervised_positions) ... ok
+test_gathered_states_stay_inside_their_split_file_and_docs (tests.test_counterfactual.SplitIsolationTests.test_gathered_states_stay_inside_their_split_file_and_docs) ... ok
+test_ledger_counts_real_work (tests.test_counterfactual.StudentTests.test_ledger_counts_real_work) ... ok
+test_oracle_is_not_a_deploy_policy (tests.test_counterfactual.StudentTests.test_oracle_is_not_a_deploy_policy) ... ok
+test_student_input_is_only_the_legal_state (tests.test_counterfactual.StudentTests.test_student_input_is_only_the_legal_state) ... ok
+test_students_fit_and_select_legal_actions (tests.test_counterfactual.StudentTests.test_students_fit_and_select_legal_actions) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 1.805s
+
+OK

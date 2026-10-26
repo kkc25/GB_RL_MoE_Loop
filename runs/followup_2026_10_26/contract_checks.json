@@ -1,0 +1,75 @@
+{
+  "schema": "followup-plan-a-contract-checks-v1",
+  "status": "plan_A_complete_with_documented_CE_numerical_boundary",
+  "source_baseline_commit": "661eb57dd0234d4d2b2ea635845e2592ed82546d",
+  "tests": {
+    "command": ".venv/bin/python -m unittest discover -s tests -v",
+    "log": "runs/followup_2026_10_26/full_tests_final.log",
+    "total": 539,
+    "passed": 538,
+    "skipped": 1,
+    "failed": 0
+  },
+  "r2_and_counterfactual": {
+    "targeted_tests": 21,
+    "row_permutation_invariant": true,
+    "split_batch_invariant": true,
+    "candidate_column_permutation_invariant": true,
+    "missing_global_action_falls_back_to_baseline": true,
+    "invalid_selection_rejected": true,
+    "shared_2d_equals_broadcast_3d": true,
+    "formal_r2_numeric_recompute": "not_run_plan_B"
+  },
+  "r1": {
+    "online_entry": "eval.dynamic_halting.DynamicHaltingPolicy.forward",
+    "offline_reference": "original cached h, baseline, predictions and selected costs",
+    "student_precision": "float32",
+    "bf16": {
+      "test": {
+        "states": 1024,
+        "baseline_global_mismatches": 0,
+        "decision_mismatches": 0,
+        "round_mismatches": 0,
+        "max_cached_online_h_diff": 0.0,
+        "max_offline_online_delta_diff": 0.0000095367431640625,
+        "near_threshold_decision_mismatches": 0
+      },
+      "validation": {
+        "states": 1024,
+        "baseline_global_mismatches": 0,
+        "decision_mismatches": 0,
+        "round_mismatches": 0,
+        "max_cached_online_h_diff": 0.0,
+        "max_offline_online_delta_diff": 0.00001049041748046875,
+        "near_threshold_decision_mismatches": 0
+      }
+    },
+    "fp32_sensitivity": "cached BF16 states do not match FP32 replay; reported separately, not used as BF16 acceptance",
+    "ce_boundary": "full-batch BF16 production CE is not bitwise identical to per-state cached counterfactual CE; representative cached-state baseline replay reproduces cached costs, localizing the difference to post-cache execution shape and numerical drift",
+    "diagnostics": "runs/followup_2026_10_26/r1_ce_diagnostics.json",
+    "manifests_present_for_all_four_runs": true
+  },
+  "auxiliary_contracts": {
+    "exact_unsupported_joint_configuration_rejected": true,
+    "evaluation_price_forwarded": true,
+    "registry_stop_reason_aggregated_from_components": true,
+    "nested_registry_missing_evidence": 0
+  },
+  "training_recovery": {
+    "packed_hash_distinguishes_truncated_streams": true,
+    "batch_size_change_rejected": true,
+    "sequence_count_change_rejected": true,
+    "real_gpu_two_process_resume": "passed_2_to_4_updates",
+    "checkpoint_version": 2,
+    "cuda_mapped_rng_restore": "passed",
+    "visible_gpu_rng_count_validated": true,
+    "initial_log": "runs/followup_2026_10_26/gpu_lm_initial.log",
+    "resume_log": "runs/followup_2026_10_26/gpu_lm_resumed.log"
+  },
+  "not_executed": {
+    "plan_B": "correct R2 baselines and R4 actual-cost-matched analytic mixtures",
+    "plan_C": "independent natural-token fixed-depth confirmation",
+    "plan_D": "bounded candidate-aware advantage experiment",
+    "plan_E": "new backbone or real LM RL"
+  }
+}

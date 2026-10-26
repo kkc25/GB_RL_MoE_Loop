@@ -1,0 +1,17 @@
+{
+  "source": {
+    "commit": "661eb57dd0234d4d2b2ea635845e2592ed82546d",
+    "tree": "2f2b71d27bfa239e37d937c481c826111dcdbbdb",
+    "uncommitted_diff_sha256": "6db8688c8a66b1093e77c9ba734c2a6b9fe1fe2bc2a384e2cd8d73483fe58265",
+    "has_uncommitted_diff": true
+  },
+  "argv": [
+    "/nvme-1/zhoukegu/GB_RL_MoE_Loop/experiments/followup_d_learnability.py",
+    "--device",
+    "cuda"
+  ],
+  "d_plan_sha256": "d7b6c09f7b3ff19a3c1e6b63c2a8c5e89b3a89e2df84120e827f98de3b253107",
+  "d_summary_sha256": "1474fc581711accb44974c460cc3c4e8af515fe887d39514988b454c61e99e27",
+  "checkpoint_sha256": "47f6ec019b4d72a3229076e4f60d3dd7e41c26e6a14c12dc964536e65de33324",
+  "router_features_sha256": "f3bf8a258b0fbf908e0a4fbba86d08395c65d452b34c9ea7af7ac9a35eafdb80"
+}

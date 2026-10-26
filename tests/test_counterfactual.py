@@ -152,6 +152,17 @@ class CounterfactualTests(unittest.TestCase):
         torch.testing.assert_close(custom.immediate, self.costs.immediate[:, expected])
         torch.testing.assert_close(custom.q_pi0, self.costs.q_pi0[:, expected])
 
+    def test_shared_and_broadcast_nonprefix_actions_are_equivalent(self):
+        order = torch.tensor([5, 0, 4, 1, 3, 2])
+        shared_actions = self.costs.actions[order]
+        shared = counterfactual_path_costs(self.model, self.states["h"], self.states["targets"], rounds=4, actions=shared_actions)
+        broadcast_actions = shared_actions.unsqueeze(0).expand(self.states["h"].shape[0], -1, -1)
+        broadcast = counterfactual_path_costs(self.model, self.states["h"], self.states["targets"], rounds=4, actions=broadcast_actions)
+        torch.testing.assert_close(shared.immediate, broadcast.immediate)
+        torch.testing.assert_close(shared.q_pi0, broadcast.q_pi0)
+        self.assertTrue(torch.equal(shared.baseline_action, broadcast.baseline_action))
+        self.assertTrue(torch.equal(shared.global_action_ids.unsqueeze(0).expand_as(broadcast.global_action_ids), broadcast.global_action_ids))
+
     def test_per_state_actions_use_state_specific_mapping(self):
         pairs = self.costs.actions[self.costs.baseline_action].unsqueeze(1)
         custom = counterfactual_path_costs(self.model, self.states["h"], self.states["targets"], rounds=4, actions=pairs)

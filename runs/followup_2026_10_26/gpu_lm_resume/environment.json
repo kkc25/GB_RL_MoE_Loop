@@ -1,0 +1,11 @@
+{
+  "python": "3.12.15",
+  "torch": "2.12.1+cu130",
+  "cuda": "13.0",
+  "device": "NVIDIA RTX A6000",
+  "parameters": 28960,
+  "data_revision": "followup-synthetic-v1",
+  "document_list_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "tokenizer_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "data_hash": "f228660f1e3025f9ab1585bddc91355481a462f7aa09d13f724f5f2c668cb04e"
+}

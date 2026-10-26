@@ -95,9 +95,20 @@ def train_recovery(model, datasets: dict, collate, config, device: torch.device,
     start_update = 0
     best_validation_loss = float("inf")
     schedule = {"updates": run.updates, "learning_rate": run.learning_rate, "warmup_updates": run.warmup_updates}
+    stream_metadata = {"n_examples": len(train_set), "batch_size": run.batch_size, "sampler_seed": run.seed, "shuffle_each_epoch": run.shuffle_each_epoch}
     if run.resume:
         checkpoint = torch.load(run.resume, map_location=device, weights_only=False)
-        if checkpoint["data_hash"] != data_hash:
+        checkpoint_version = checkpoint.get("checkpoint_version", 1)
+        previous_run = checkpoint.get("config", {}).get("run", {})
+        for key in ("batch_size", "seed"):
+            if key in previous_run and previous_run[key] != stream_metadata["sampler_seed" if key == "seed" else key]:
+                raise ValueError(f"checkpoint {key} does not match the current training stream")
+        previous_stream = checkpoint.get("stream_metadata")
+        if checkpoint_version >= 2 and previous_stream is None:
+            raise ValueError("version 2 checkpoint is missing stream metadata")
+        if previous_stream is not None and previous_stream != stream_metadata:
+            raise ValueError("checkpoint stream metadata does not match the current training stream")
+        if checkpoint.get("data_hash") != data_hash:
             raise ValueError("checkpoint data hash does not match current task")
         model.load_state_dict(checkpoint["model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
@@ -170,9 +181,9 @@ def train_recovery(model, datasets: dict, collate, config, device: torch.device,
                 ledger.peak_memory_bytes = max(ledger.peak_memory_bytes, torch.cuda.max_memory_allocated(device))
             if selection_loss < best_validation_loss:
                 best_validation_loss = selection_loss
-                recovery_checkpoint(f"{run.output_dir}/best_validation.pt", config, model, optimizer, update + 1, ledger, data_hash, best_validation_loss, schedule)
+                recovery_checkpoint(f"{run.output_dir}/best_validation.pt", config, model, optimizer, update + 1, ledger, data_hash, best_validation_loss, schedule, stream_metadata)
             model.train()
-            recovery_checkpoint(f"{run.output_dir}/latest.pt", config, model, optimizer, update + 1, ledger, data_hash, best_validation_loss, schedule)
+            recovery_checkpoint(f"{run.output_dir}/latest.pt", config, model, optimizer, update + 1, ledger, data_hash, best_validation_loss, schedule, stream_metadata)
     accumulate_elapsed()
     if device.type == "cuda":
         ledger.peak_memory_bytes = max(ledger.peak_memory_bytes, torch.cuda.max_memory_allocated(device))

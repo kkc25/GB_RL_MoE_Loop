@@ -1,0 +1,31 @@
+{
+  "protocol": "candidate-aware-advantage-bounded-v1",
+  "created_before_training": true,
+  "source": {
+    "commit": "661eb57dd0234d4d2b2ea635845e2592ed82546d",
+    "tree": "2f2b71d27bfa239e37d937c481c826111dcdbbdb",
+    "uncommitted_diff_sha256": "6db8688c8a66b1093e77c9ba734c2a6b9fe1fe2bc2a384e2cd8d73483fe58265",
+    "has_uncommitted_diff": true
+  },
+  "training_sizes": [
+    2000,
+    8000
+  ],
+  "student_seeds": [
+    0,
+    1,
+    2
+  ],
+  "epochs": 10,
+  "optimizer": "AdamW lr=0.001 weight_decay=0 batch_size=256 fixed final weights",
+  "target": "Q(s,a) - Q(s,a0)",
+  "h_only": "512-d raw h -> four candidate advantage outputs, hidden=128",
+  "candidate_aware": "raw h + actual action-ID embedding + router logits + pair score/margin -> shared scalar advantage, hidden=120",
+  "development_gate": {
+    "at_8k_all_three_candidate_seeds": "selection improvement > 0, > paired h-only seed, and > best cheap-rule mean",
+    "learning_curve": "mean candidate-aware selection improvement at 8k > 2k",
+    "uses_test": false
+  },
+  "on_pass": "eligible for new-document expansion and a separately frozen confirmation; not automatic confirmation",
+  "on_fail": "stop current backbone/interface learnability expansion; no 32k and no RL"
+}

@@ -1,0 +1,562 @@
+{
+  "scope": "development diagnostic only; newtest previously viewed and never used for expansion gate",
+  "results": {
+    "2000": {
+      "cheap": {
+        "constant_global": {
+          "mean_cost": 5.116297245025635,
+          "mean_immediate_cost": 5.1632513999938965,
+          "deploy_improvement": -0.00033735125907696784,
+          "deploy_improvement_se": 0.0002505288284737617,
+          "document_interval": {
+            "estimate": -0.00033735125581733883,
+            "ci_lo": -0.0008674186820279851,
+            "ci_hi": 0.00016835249679733708,
+            "se": 0.00026764631394821033,
+            "n_documents": 412,
+            "n_rows": 2000
+          }
+        },
+        "baseline_group": {
+          "mean_cost": 5.116217136383057,
+          "mean_immediate_cost": 5.156084060668945,
+          "deploy_improvement": -0.000256747764069587,
+          "deploy_improvement_se": 0.00030751503072679043,
+          "document_interval": {
+            "estimate": -0.00025674776697997,
+            "ci_lo": -0.0008622365215347166,
+            "ci_hi": 0.0004202413660991055,
+            "se": 0.0003362656516996322,
+            "n_documents": 412,
+            "n_rows": 2000
+          }
+        },
+        "candidate_rank": {
+          "mean_cost": 5.116165637969971,
+          "mean_immediate_cost": 5.297735214233398,
+          "deploy_improvement": -0.00020496339129749686,
+          "deploy_improvement_se": 0.000666653155349195,
+          "document_interval": {
+            "estimate": -0.00020496342700243985,
+            "ci_lo": -0.00145527789605973,
+            "ci_hi": 0.0011427794412530593,
+            "se": 0.000674684077395712,
+            "n_documents": 412,
+            "n_rows": 2000
+          }
+        }
+      },
+      "best_cheap_name": "candidate_rank",
+      "best_cheap_mean": -0.00020496339129749686,
+      "seeds": {
+        "0": {
+          "selection": {
+            "h_only": {
+              "mean_cost": 5.116856098175049,
+              "mean_immediate_cost": 5.166196346282959,
+              "deploy_improvement": -0.0008955184021033347,
+              "deploy_improvement_se": 0.0017579048871994019,
+              "document_interval": {
+                "estimate": -0.0008955184579299384,
+                "ci_lo": -0.0041654670415722395,
+                "ci_hi": 0.0023463679388289974,
+                "se": 0.0017380057386457727,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 5.115808010101318,
+              "mean_immediate_cost": 5.18992280960083,
+              "deploy_improvement": 0.0001524157851235941,
+              "deploy_improvement_se": 0.000971142842900008,
+              "document_interval": {
+                "estimate": 0.00015241576156040538,
+                "ci_lo": -0.0017479573789813557,
+                "ci_hi": 0.002035012236433813,
+                "se": 0.0009655461300778504,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "h_only_mse": 0.008055398240685463,
+            "candidate_aware_mse": 0.006552908103913069
+          },
+          "newtest": {
+            "h_only": {
+              "mean_cost": 4.973498821258545,
+              "mean_immediate_cost": 5.010124206542969,
+              "deploy_improvement": -0.005655321292579174,
+              "deploy_improvement_se": 0.0013446654193103313,
+              "document_interval": {
+                "estimate": -0.005655320561294502,
+                "ci_lo": -0.008500427110658324,
+                "ci_hi": -0.002924093315121351,
+                "se": 0.0013945975827636772,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 4.9672064781188965,
+              "mean_immediate_cost": 5.0156474113464355,
+              "deploy_improvement": 0.0006371563649736345,
+              "deploy_improvement_se": 0.0005364682292565703,
+              "document_interval": {
+                "estimate": 0.0006371564072942419,
+                "ci_lo": -0.00031053238049295927,
+                "ci_hi": 0.0017272245941958328,
+                "se": 0.0005316717804536073,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "h_only_mse": 0.008148818276822567,
+            "candidate_aware_mse": 0.006372631993144751
+          },
+          "parameters": {
+            "h_only": 82692,
+            "candidate_aware": 79769
+          },
+          "optimizer_updates": {
+            "h_only": 80,
+            "candidate_aware": 80
+          }
+        },
+        "1": {
+          "selection": {
+            "h_only": {
+              "mean_cost": 5.117740154266357,
+              "mean_immediate_cost": 5.180652618408203,
+              "deploy_improvement": -0.0017793847946450114,
+              "deploy_improvement_se": 0.0017948906170204282,
+              "document_interval": {
+                "estimate": -0.0017793848723358678,
+                "ci_lo": -0.005089472862454837,
+                "ci_hi": 0.0013153183015655533,
+                "se": 0.0017060034674096446,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 5.1157307624816895,
+              "mean_immediate_cost": 5.181309223175049,
+              "deploy_improvement": 0.00022945010277908295,
+              "deploy_improvement_se": 0.0011372639564797282,
+              "document_interval": {
+                "estimate": 0.00022945005578912968,
+                "ci_lo": -0.0020328008248879214,
+                "ci_hi": 0.002366947060794408,
+                "se": 0.0011566459689379993,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "h_only_mse": 0.00818588212132454,
+            "candidate_aware_mse": 0.006585679482668638
+          },
+          "newtest": {
+            "h_only": {
+              "mean_cost": 4.970274925231934,
+              "mean_immediate_cost": 5.008641719818115,
+              "deploy_improvement": -0.0024310690350830555,
+              "deploy_improvement_se": 0.0012918481370434165,
+              "document_interval": {
+                "estimate": -0.002431069456244586,
+                "ci_lo": -0.004671854593373247,
+                "ci_hi": 0.0002337893649637386,
+                "se": 0.00130609436897651,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 4.968731880187988,
+              "mean_immediate_cost": 5.012182235717773,
+              "deploy_improvement": -0.0008883308037184179,
+              "deploy_improvement_se": 0.0007528087589889765,
+              "document_interval": {
+                "estimate": -0.0008883307666910696,
+                "ci_lo": -0.002353639792766885,
+                "ci_hi": 0.0006060304847506984,
+                "se": 0.0007624729289774755,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "h_only_mse": 0.008059581741690636,
+            "candidate_aware_mse": 0.006368553265929222
+          },
+          "parameters": {
+            "h_only": 82692,
+            "candidate_aware": 79769
+          },
+          "optimizer_updates": {
+            "h_only": 80,
+            "candidate_aware": 80
+          }
+        },
+        "2": {
+          "selection": {
+            "h_only": {
+              "mean_cost": 5.117584705352783,
+              "mean_immediate_cost": 5.162100315093994,
+              "deploy_improvement": -0.0016239929245784879,
+              "deploy_improvement_se": 0.0019335716497153044,
+              "document_interval": {
+                "estimate": -0.0016239930204301346,
+                "ci_lo": -0.005096698262059333,
+                "ci_hi": 0.0018220664287953304,
+                "se": 0.0018380249264796512,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 5.11586856842041,
+              "mean_immediate_cost": 5.160805702209473,
+              "deploy_improvement": 9.207004040945321e-05,
+              "deploy_improvement_se": 0.0014315734151750803,
+              "document_interval": {
+                "estimate": 9.20699160451477e-05,
+                "ci_lo": -0.0028143635385080258,
+                "ci_hi": 0.0024456303747587404,
+                "se": 0.0013780478403831557,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "h_only_mse": 0.008074379526078701,
+            "candidate_aware_mse": 0.0068593453615903854
+          },
+          "newtest": {
+            "h_only": {
+              "mean_cost": 4.972513675689697,
+              "mean_immediate_cost": 5.000034809112549,
+              "deploy_improvement": -0.004669948481023312,
+              "deploy_improvement_se": 0.0014219045406207442,
+              "document_interval": {
+                "estimate": -0.004669948894174013,
+                "ci_lo": -0.007684016387441844,
+                "ci_hi": -0.0017731034663069627,
+                "se": 0.0015041119320297195,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 4.96904182434082,
+              "mean_immediate_cost": 5.002074241638184,
+              "deploy_improvement": -0.0011982577852904797,
+              "deploy_improvement_se": 0.0010225997539237142,
+              "document_interval": {
+                "estimate": -0.001198257733034552,
+                "ci_lo": -0.003067675071874893,
+                "ci_hi": 0.0009339083107795983,
+                "se": 0.0010391305888615388,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "h_only_mse": 0.008191769942641258,
+            "candidate_aware_mse": 0.006524657364934683
+          },
+          "parameters": {
+            "h_only": 82692,
+            "candidate_aware": 79769
+          },
+          "optimizer_updates": {
+            "h_only": 80,
+            "candidate_aware": 80
+          }
+        }
+      }
+    },
+    "8000": {
+      "cheap": {
+        "constant_global": {
+          "mean_cost": 5.1155500411987305,
+          "mean_immediate_cost": 5.164472579956055,
+          "deploy_improvement": 0.00041079949005506933,
+          "deploy_improvement_se": 0.00034346396569162607,
+          "document_interval": {
+            "estimate": 0.0004107994840160245,
+            "ci_lo": -0.00020631023821175948,
+            "ci_hi": 0.001139852157462785,
+            "se": 0.00033226840829249637,
+            "n_documents": 412,
+            "n_rows": 2000
+          }
+        },
+        "baseline_group": {
+          "mean_cost": 5.115816116333008,
+          "mean_immediate_cost": 5.163410186767578,
+          "deploy_improvement": 0.00014460481179412454,
+          "deploy_improvement_se": 0.0003702167887240648,
+          "document_interval": {
+            "estimate": 0.00014460482138383668,
+            "ci_lo": -0.0005746949446621443,
+            "ci_hi": 0.0009471592614195607,
+            "se": 0.00038021397334336653,
+            "n_documents": 412,
+            "n_rows": 2000
+          }
+        },
+        "candidate_rank": {
+          "mean_cost": 5.116165637969971,
+          "mean_immediate_cost": 5.297735214233398,
+          "deploy_improvement": -0.00020496339129749686,
+          "deploy_improvement_se": 0.000666653155349195,
+          "document_interval": {
+            "estimate": -0.00020496342700243985,
+            "ci_lo": -0.00145527789605973,
+            "ci_hi": 0.0011427794412530593,
+            "se": 0.000674684077395712,
+            "n_documents": 412,
+            "n_rows": 2000
+          }
+        }
+      },
+      "best_cheap_name": "constant_global",
+      "best_cheap_mean": 0.00041079949005506933,
+      "seeds": {
+        "0": {
+          "selection": {
+            "h_only": {
+              "mean_cost": 5.116693496704102,
+              "mean_immediate_cost": 5.156948089599609,
+              "deploy_improvement": -0.0007330554071813822,
+              "deploy_improvement_se": 0.0019516042666509748,
+              "document_interval": {
+                "estimate": -0.0007330553651172522,
+                "ci_lo": -0.0043433028692904385,
+                "ci_hi": 0.00287601265513004,
+                "se": 0.0018753730377924157,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 5.115034103393555,
+              "mean_immediate_cost": 5.172752380371094,
+              "deploy_improvement": 0.0009256636840291321,
+              "deploy_improvement_se": 0.0014820530777797103,
+              "document_interval": {
+                "estimate": 0.0009256638857696089,
+                "ci_lo": -0.0016122733722493926,
+                "ci_hi": 0.003690044350775039,
+                "se": 0.0014086548677988658,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "h_only_mse": 0.007858644239604473,
+            "candidate_aware_mse": 0.006966128945350647
+          },
+          "newtest": {
+            "h_only": {
+              "mean_cost": 4.971424579620361,
+              "mean_immediate_cost": 5.00950288772583,
+              "deploy_improvement": -0.003580841002985835,
+              "deploy_improvement_se": 0.0013082628138363361,
+              "document_interval": {
+                "estimate": -0.00358084080710978,
+                "ci_lo": -0.0063626103500319135,
+                "ci_hi": -0.001109362850061444,
+                "se": 0.0013342595690374226,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 4.970088958740234,
+              "mean_immediate_cost": 5.017471790313721,
+              "deploy_improvement": -0.002245374722406268,
+              "deploy_improvement_se": 0.0011642660247161984,
+              "document_interval": {
+                "estimate": -0.0022453745510356386,
+                "ci_lo": -0.004726362147161473,
+                "ci_hi": -5.654505736297059e-06,
+                "se": 0.0012161180206914696,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "h_only_mse": 0.008062649518251419,
+            "candidate_aware_mse": 0.007025890052318573
+          },
+          "parameters": {
+            "h_only": 82692,
+            "candidate_aware": 79769
+          },
+          "optimizer_updates": {
+            "h_only": 320,
+            "candidate_aware": 320
+          }
+        },
+        "1": {
+          "selection": {
+            "h_only": {
+              "mean_cost": 5.116594314575195,
+              "mean_immediate_cost": 5.1675262451171875,
+              "deploy_improvement": -0.0006339313113130629,
+              "deploy_improvement_se": 0.0018682109657675028,
+              "document_interval": {
+                "estimate": -0.0006339313646076335,
+                "ci_lo": -0.004079082054885608,
+                "ci_hi": 0.0027727857348736045,
+                "se": 0.0017434920470322717,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 5.116147041320801,
+              "mean_immediate_cost": 5.178637981414795,
+              "deploy_improvement": -0.00018671713769435883,
+              "deploy_improvement_se": 0.0015984337078407407,
+              "document_interval": {
+                "estimate": -0.00018671709888258193,
+                "ci_lo": -0.003384699113756024,
+                "ci_hi": 0.0029262804711057567,
+                "se": 0.001606622380170637,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "h_only_mse": 0.007908003404736519,
+            "candidate_aware_mse": 0.007158814929425716
+          },
+          "newtest": {
+            "h_only": {
+              "mean_cost": 4.970401763916016,
+              "mean_immediate_cost": 5.0069451332092285,
+              "deploy_improvement": -0.0025580411311239004,
+              "deploy_improvement_se": 0.0013381860917434096,
+              "document_interval": {
+                "estimate": -0.002558041187032359,
+                "ci_lo": -0.005365753375698912,
+                "ci_hi": 0.0001912340000737211,
+                "se": 0.0013723191417848615,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 4.970188617706299,
+              "mean_immediate_cost": 5.014345645904541,
+              "deploy_improvement": -0.002345180604606867,
+              "deploy_improvement_se": 0.0011820885119959712,
+              "document_interval": {
+                "estimate": -0.0023451805234944913,
+                "ci_lo": -0.004573555600203757,
+                "ci_hi": 0.00017024325841966952,
+                "se": 0.0012338569495030905,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "h_only_mse": 0.00810530036687851,
+            "candidate_aware_mse": 0.007217221427708864
+          },
+          "parameters": {
+            "h_only": 82692,
+            "candidate_aware": 79769
+          },
+          "optimizer_updates": {
+            "h_only": 320,
+            "candidate_aware": 320
+          }
+        },
+        "2": {
+          "selection": {
+            "h_only": {
+              "mean_cost": 5.11720085144043,
+              "mean_immediate_cost": 5.164005756378174,
+              "deploy_improvement": -0.001240260316990316,
+              "deploy_improvement_se": 0.001873029163107276,
+              "document_interval": {
+                "estimate": -0.001240260306856726,
+                "ci_lo": -0.0046307308154409635,
+                "ci_hi": 0.0022980401430448927,
+                "se": 0.0017427967113379551,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 5.11754846572876,
+              "mean_immediate_cost": 5.154385566711426,
+              "deploy_improvement": -0.0015878973063081503,
+              "deploy_improvement_se": 0.00176969263702631,
+              "document_interval": {
+                "estimate": -0.0015878971947222453,
+                "ci_lo": -0.004668893203774022,
+                "ci_hi": 0.001555413295205978,
+                "se": 0.0017000288460734686,
+                "n_documents": 412,
+                "n_rows": 2000
+              }
+            },
+            "h_only_mse": 0.00785055011510849,
+            "candidate_aware_mse": 0.007348309736698866
+          },
+          "newtest": {
+            "h_only": {
+              "mean_cost": 4.9696245193481445,
+              "mean_immediate_cost": 5.008562088012695,
+              "deploy_improvement": -0.0017809944692999125,
+              "deploy_improvement_se": 0.0012957858853042126,
+              "document_interval": {
+                "estimate": -0.0017809943757420114,
+                "ci_lo": -0.004296509821209678,
+                "ci_hi": 0.0007176886764738249,
+                "se": 0.0013883446563805121,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "candidate_aware": {
+              "mean_cost": 4.9693922996521,
+              "mean_immediate_cost": 4.996871471405029,
+              "deploy_improvement": -0.0015482524177059531,
+              "deploy_improvement_se": 0.0011450893944129348,
+              "document_interval": {
+                "estimate": -0.0015482527386120636,
+                "ci_lo": -0.003747019843647946,
+                "ci_hi": 0.0006922433615022314,
+                "se": 0.001155231581167527,
+                "n_documents": 385,
+                "n_rows": 4000
+              }
+            },
+            "h_only_mse": 0.007960897870361805,
+            "candidate_aware_mse": 0.00722333462908864
+          },
+          "parameters": {
+            "h_only": 82692,
+            "candidate_aware": 79769
+          },
+          "optimizer_updates": {
+            "h_only": 320,
+            "candidate_aware": 320
+          }
+        }
+      }
+    }
+  },
+  "development_gate": {
+    "per_seed_pass": {
+      "0": true,
+      "1": false,
+      "2": false
+    },
+    "candidate_aware_mean_improvement_2k": 0.00015797864277071008,
+    "candidate_aware_mean_improvement_8k": -0.00028298358665779233,
+    "learning_curve_pass": false,
+    "pass": false
+  },
+  "next_step": "stop_no_32k_no_RL",
+  "d_plan_sha256": "d7b6c09f7b3ff19a3c1e6b63c2a8c5e89b3a89e2df84120e827f98de3b253107"
+}

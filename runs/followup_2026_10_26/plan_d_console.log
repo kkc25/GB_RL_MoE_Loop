@@ -1,0 +1,14 @@
+/nvme-1/zhoukegu/GB_RL_MoE_Loop/experiments/followup_d_learnability.py:94: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  total += float(loss) * len(indices)
+{
+  "per_seed_pass": {
+    "0": true,
+    "1": false,
+    "2": false
+  },
+  "candidate_aware_mean_improvement_2k": 0.00015797864277071008,
+  "candidate_aware_mean_improvement_8k": -0.00028298358665779233,
+  "learning_curve_pass": false,
+  "pass": false
+}

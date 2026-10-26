@@ -19,7 +19,7 @@ class DynamicHaltingPolicy:
             entry["std"] = entry["std"].to(device)
 
     @torch.no_grad()
-    def forward(self, model, input_ids: torch.Tensor, segment_ids: torch.Tensor | None = None) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, model, input_ids: torch.Tensor, segment_ids: torch.Tensor | None = None, trace: dict | None = None) -> tuple[torch.Tensor, torch.Tensor]:
         self.to(input_ids.device)
         layer = last_adaptive_layer(model)
         block = model.blocks[layer]
@@ -28,8 +28,9 @@ class DynamicHaltingPolicy:
         flat_normalized = normalized.reshape(-1, normalized.shape[-1])
         actions = block.executor.baseline_actions(flat_normalized)
         flat_h = h.reshape(-1, h.shape[-1])
-        stop_cost = predict(self.students["immediate"]["student"], flat_h, self.students["immediate"]["mean"], self.students["immediate"]["std"])
-        continue_cost = predict(self.students["q_pi0"]["student"], flat_h, self.students["q_pi0"]["mean"], self.students["q_pi0"]["std"])
+        with torch.autocast(device_type=input_ids.device.type, enabled=False):
+            stop_cost = predict(self.students["immediate"]["student"], flat_h, self.students["immediate"]["mean"], self.students["immediate"]["std"])
+            continue_cost = predict(self.students["q_pi0"]["student"], flat_h, self.students["q_pi0"]["mean"], self.students["q_pi0"]["std"])
         rows = torch.arange(actions.shape[0], device=actions.device)
         delta = stop_cost[rows, actions] - continue_cost[rows, actions]
         continue_mask = delta > self.tau
@@ -47,4 +48,14 @@ class DynamicHaltingPolicy:
             rounds[continue_mask] += 1
         current = current_flat.reshape(h.shape)
         logits = F.linear(model.final_norm(current), model.embedding.weight)
-        return logits, rounds.reshape(input_ids.shape)
+        rounds = rounds.reshape(input_ids.shape)
+        if trace is not None:
+            trace.update({
+                "h": h,
+                "baseline_action": actions.reshape(input_ids.shape),
+                "delta": delta.reshape(input_ids.shape),
+                "continue_mask": continue_mask.reshape(input_ids.shape),
+                "rounds": rounds,
+                "hidden": current,
+            })
+        return logits, rounds

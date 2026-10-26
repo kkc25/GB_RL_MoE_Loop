@@ -1,0 +1,708 @@
+{
+  "records": [
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 0,
+      "depths": {
+        "1": {
+          "full_ce": 8.830277442932129,
+          "cached_replay_ce": 8.8125,
+          "abs_diff": 0.017777442932128906
+        },
+        "2": {
+          "full_ce": 8.825273513793945,
+          "cached_replay_ce": 8.8125,
+          "abs_diff": 0.012773513793945312
+        },
+        "4": {
+          "full_ce": 8.823803901672363,
+          "cached_replay_ce": 8.8125,
+          "abs_diff": 0.011303901672363281
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 1,
+      "depths": {
+        "1": {
+          "full_ce": 0.4699037969112396,
+          "cached_replay_ce": 0.46875,
+          "abs_diff": 0.001153796911239624
+        },
+        "2": {
+          "full_ce": 0.4745241105556488,
+          "cached_replay_ce": 0.474609375,
+          "abs_diff": 8.526444435119629e-05
+        },
+        "4": {
+          "full_ce": 0.4928668141365051,
+          "cached_replay_ce": 0.4921875,
+          "abs_diff": 0.000679314136505127
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 2,
+      "depths": {
+        "1": {
+          "full_ce": 10.99714469909668,
+          "cached_replay_ce": 10.9375,
+          "abs_diff": 0.05964469909667969
+        },
+        "2": {
+          "full_ce": 10.981965065002441,
+          "cached_replay_ce": 11.0,
+          "abs_diff": 0.018034934997558594
+        },
+        "4": {
+          "full_ce": 10.965152740478516,
+          "cached_replay_ce": 10.9375,
+          "abs_diff": 0.027652740478515625
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 3,
+      "depths": {
+        "1": {
+          "full_ce": 1.1186857223510742,
+          "cached_replay_ce": 1.1171875,
+          "abs_diff": 0.0014982223510742188
+        },
+        "2": {
+          "full_ce": 1.1580159664154053,
+          "cached_replay_ce": 1.15625,
+          "abs_diff": 0.0017659664154052734
+        },
+        "4": {
+          "full_ce": 1.2124427556991577,
+          "cached_replay_ce": 1.2109375,
+          "abs_diff": 0.0015052556991577148
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 4,
+      "depths": {
+        "1": {
+          "full_ce": 2.2197794914245605,
+          "cached_replay_ce": 2.21875,
+          "abs_diff": 0.0010294914245605469
+        },
+        "2": {
+          "full_ce": 2.2044904232025146,
+          "cached_replay_ce": 2.203125,
+          "abs_diff": 0.0013654232025146484
+        },
+        "4": {
+          "full_ce": 2.1902403831481934,
+          "cached_replay_ce": 2.1875,
+          "abs_diff": 0.0027403831481933594
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 5,
+      "depths": {
+        "1": {
+          "full_ce": 7.595424652099609,
+          "cached_replay_ce": 7.59375,
+          "abs_diff": 0.001674652099609375
+        },
+        "2": {
+          "full_ce": 7.612334728240967,
+          "cached_replay_ce": 7.59375,
+          "abs_diff": 0.018584728240966797
+        },
+        "4": {
+          "full_ce": 7.624786376953125,
+          "cached_replay_ce": 7.625,
+          "abs_diff": 0.000213623046875
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 6,
+      "depths": {
+        "1": {
+          "full_ce": 0.6571961045265198,
+          "cached_replay_ce": 0.65625,
+          "abs_diff": 0.0009461045265197754
+        },
+        "2": {
+          "full_ce": 0.6793022155761719,
+          "cached_replay_ce": 0.6796875,
+          "abs_diff": 0.000385284423828125
+        },
+        "4": {
+          "full_ce": 0.6807152032852173,
+          "cached_replay_ce": 0.6875,
+          "abs_diff": 0.006784796714782715
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 7,
+      "depths": {
+        "1": {
+          "full_ce": 8.09949779510498,
+          "cached_replay_ce": 8.125,
+          "abs_diff": 0.02550220489501953
+        },
+        "2": {
+          "full_ce": 8.094537734985352,
+          "cached_replay_ce": 8.125,
+          "abs_diff": 0.030462265014648438
+        },
+        "4": {
+          "full_ce": 8.111026763916016,
+          "cached_replay_ce": 8.125,
+          "abs_diff": 0.013973236083984375
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 8,
+      "depths": {
+        "1": {
+          "full_ce": 0.6701262593269348,
+          "cached_replay_ce": 0.671875,
+          "abs_diff": 0.0017487406730651855
+        },
+        "2": {
+          "full_ce": 0.6987918615341187,
+          "cached_replay_ce": 0.6953125,
+          "abs_diff": 0.0034793615341186523
+        },
+        "4": {
+          "full_ce": 0.7660961151123047,
+          "cached_replay_ce": 0.7734375,
+          "abs_diff": 0.0073413848876953125
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 9,
+      "depths": {
+        "1": {
+          "full_ce": 0.043648768216371536,
+          "cached_replay_ce": 0.043701171875,
+          "abs_diff": 5.2403658628463745e-05
+        },
+        "2": {
+          "full_ce": 0.04489279165863991,
+          "cached_replay_ce": 0.044921875,
+          "abs_diff": 2.9083341360092163e-05
+        },
+        "4": {
+          "full_ce": 0.04589277133345604,
+          "cached_replay_ce": 0.0458984375,
+          "abs_diff": 5.666166543960571e-06
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 10,
+      "depths": {
+        "1": {
+          "full_ce": 10.317342758178711,
+          "cached_replay_ce": 10.3125,
+          "abs_diff": 0.0048427581787109375
+        },
+        "2": {
+          "full_ce": 10.311840057373047,
+          "cached_replay_ce": 10.3125,
+          "abs_diff": 0.000659942626953125
+        },
+        "4": {
+          "full_ce": 10.35272216796875,
+          "cached_replay_ce": 10.375,
+          "abs_diff": 0.02227783203125
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 11,
+      "depths": {
+        "1": {
+          "full_ce": 8.995917320251465,
+          "cached_replay_ce": 9.0,
+          "abs_diff": 0.004082679748535156
+        },
+        "2": {
+          "full_ce": 8.981860160827637,
+          "cached_replay_ce": 9.0,
+          "abs_diff": 0.01813983917236328
+        },
+        "4": {
+          "full_ce": 8.97712516784668,
+          "cached_replay_ce": 9.0,
+          "abs_diff": 0.022874832153320312
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 12,
+      "depths": {
+        "1": {
+          "full_ce": 9.887605667114258,
+          "cached_replay_ce": 9.875,
+          "abs_diff": 0.012605667114257812
+        },
+        "2": {
+          "full_ce": 9.90823745727539,
+          "cached_replay_ce": 9.9375,
+          "abs_diff": 0.029262542724609375
+        },
+        "4": {
+          "full_ce": 9.957101821899414,
+          "cached_replay_ce": 9.9375,
+          "abs_diff": 0.019601821899414062
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 13,
+      "depths": {
+        "1": {
+          "full_ce": 0.15035299956798553,
+          "cached_replay_ce": 0.1494140625,
+          "abs_diff": 0.0009389370679855347
+        },
+        "2": {
+          "full_ce": 0.16057859361171722,
+          "cached_replay_ce": 0.1611328125,
+          "abs_diff": 0.0005542188882827759
+        },
+        "4": {
+          "full_ce": 0.18276724219322205,
+          "cached_replay_ce": 0.1826171875,
+          "abs_diff": 0.0001500546932220459
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 14,
+      "depths": {
+        "1": {
+          "full_ce": 12.464890480041504,
+          "cached_replay_ce": 12.4375,
+          "abs_diff": 0.027390480041503906
+        },
+        "2": {
+          "full_ce": 12.462820053100586,
+          "cached_replay_ce": 12.4375,
+          "abs_diff": 0.025320053100585938
+        },
+        "4": {
+          "full_ce": 12.504252433776855,
+          "cached_replay_ce": 12.5,
+          "abs_diff": 0.004252433776855469
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 15,
+      "depths": {
+        "1": {
+          "full_ce": 9.87415599822998,
+          "cached_replay_ce": 9.875,
+          "abs_diff": 0.0008440017700195312
+        },
+        "2": {
+          "full_ce": 9.871684074401855,
+          "cached_replay_ce": 9.875,
+          "abs_diff": 0.0033159255981445312
+        },
+        "4": {
+          "full_ce": 9.87760066986084,
+          "cached_replay_ce": 9.875,
+          "abs_diff": 0.0026006698608398438
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 16,
+      "depths": {
+        "1": {
+          "full_ce": 4.210422515869141,
+          "cached_replay_ce": 4.21875,
+          "abs_diff": 0.008327484130859375
+        },
+        "2": {
+          "full_ce": 4.20543098449707,
+          "cached_replay_ce": 4.21875,
+          "abs_diff": 0.013319015502929688
+        },
+        "4": {
+          "full_ce": 4.2594451904296875,
+          "cached_replay_ce": 4.25,
+          "abs_diff": 0.0094451904296875
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 17,
+      "depths": {
+        "1": {
+          "full_ce": 10.126012802124023,
+          "cached_replay_ce": 10.125,
+          "abs_diff": 0.0010128021240234375
+        },
+        "2": {
+          "full_ce": 10.11709976196289,
+          "cached_replay_ce": 10.125,
+          "abs_diff": 0.007900238037109375
+        },
+        "4": {
+          "full_ce": 10.127267837524414,
+          "cached_replay_ce": 10.125,
+          "abs_diff": 0.0022678375244140625
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 18,
+      "depths": {
+        "1": {
+          "full_ce": 1.2716188430786133,
+          "cached_replay_ce": 1.25,
+          "abs_diff": 0.02161884307861328
+        },
+        "2": {
+          "full_ce": 1.3492636680603027,
+          "cached_replay_ce": 1.3515625,
+          "abs_diff": 0.0022988319396972656
+        },
+        "4": {
+          "full_ce": 1.3251571655273438,
+          "cached_replay_ce": 1.3046875,
+          "abs_diff": 0.02046966552734375
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 19,
+      "depths": {
+        "1": {
+          "full_ce": 2.943141460418701,
+          "cached_replay_ce": 2.9375,
+          "abs_diff": 0.005641460418701172
+        },
+        "2": {
+          "full_ce": 2.9031195640563965,
+          "cached_replay_ce": 2.890625,
+          "abs_diff": 0.012494564056396484
+        },
+        "4": {
+          "full_ce": 2.8853323459625244,
+          "cached_replay_ce": 2.875,
+          "abs_diff": 0.010332345962524414
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 20,
+      "depths": {
+        "1": {
+          "full_ce": 3.978182315826416,
+          "cached_replay_ce": 3.984375,
+          "abs_diff": 0.006192684173583984
+        },
+        "2": {
+          "full_ce": 3.97257399559021,
+          "cached_replay_ce": 3.96875,
+          "abs_diff": 0.003823995590209961
+        },
+        "4": {
+          "full_ce": 3.993732452392578,
+          "cached_replay_ce": 3.984375,
+          "abs_diff": 0.009357452392578125
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 21,
+      "depths": {
+        "1": {
+          "full_ce": 5.9871931076049805,
+          "cached_replay_ce": 6.0,
+          "abs_diff": 0.012806892395019531
+        },
+        "2": {
+          "full_ce": 6.000148773193359,
+          "cached_replay_ce": 6.0,
+          "abs_diff": 0.000148773193359375
+        },
+        "4": {
+          "full_ce": 5.9887518882751465,
+          "cached_replay_ce": 6.0,
+          "abs_diff": 0.011248111724853516
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 22,
+      "depths": {
+        "1": {
+          "full_ce": 0.7780798673629761,
+          "cached_replay_ce": 0.77734375,
+          "abs_diff": 0.0007361173629760742
+        },
+        "2": {
+          "full_ce": 0.8144162893295288,
+          "cached_replay_ce": 0.81640625,
+          "abs_diff": 0.0019899606704711914
+        },
+        "4": {
+          "full_ce": 0.8588148355484009,
+          "cached_replay_ce": 0.859375,
+          "abs_diff": 0.0005601644515991211
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 23,
+      "depths": {
+        "1": {
+          "full_ce": 3.8968493938446045,
+          "cached_replay_ce": 3.890625,
+          "abs_diff": 0.006224393844604492
+        },
+        "2": {
+          "full_ce": 3.905250072479248,
+          "cached_replay_ce": 3.90625,
+          "abs_diff": 0.0009999275207519531
+        },
+        "4": {
+          "full_ce": 3.885361671447754,
+          "cached_replay_ce": 3.890625,
+          "abs_diff": 0.005263328552246094
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 24,
+      "depths": {
+        "1": {
+          "full_ce": 11.18470287322998,
+          "cached_replay_ce": 11.1875,
+          "abs_diff": 0.0027971267700195312
+        },
+        "2": {
+          "full_ce": 11.187796592712402,
+          "cached_replay_ce": 11.1875,
+          "abs_diff": 0.00029659271240234375
+        },
+        "4": {
+          "full_ce": 11.208394050598145,
+          "cached_replay_ce": 11.1875,
+          "abs_diff": 0.02089405059814453
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 25,
+      "depths": {
+        "1": {
+          "full_ce": 3.597625255584717,
+          "cached_replay_ce": 3.59375,
+          "abs_diff": 0.003875255584716797
+        },
+        "2": {
+          "full_ce": 3.610663414001465,
+          "cached_replay_ce": 3.609375,
+          "abs_diff": 0.0012884140014648438
+        },
+        "4": {
+          "full_ce": 3.5881898403167725,
+          "cached_replay_ce": 3.59375,
+          "abs_diff": 0.005560159683227539
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 26,
+      "depths": {
+        "1": {
+          "full_ce": 7.4408159255981445,
+          "cached_replay_ce": 7.4375,
+          "abs_diff": 0.0033159255981445312
+        },
+        "2": {
+          "full_ce": 7.443586349487305,
+          "cached_replay_ce": 7.4375,
+          "abs_diff": 0.0060863494873046875
+        },
+        "4": {
+          "full_ce": 7.537729263305664,
+          "cached_replay_ce": 7.53125,
+          "abs_diff": 0.0064792633056640625
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 27,
+      "depths": {
+        "1": {
+          "full_ce": 10.741399765014648,
+          "cached_replay_ce": 10.75,
+          "abs_diff": 0.008600234985351562
+        },
+        "2": {
+          "full_ce": 10.78123664855957,
+          "cached_replay_ce": 10.75,
+          "abs_diff": 0.031236648559570312
+        },
+        "4": {
+          "full_ce": 10.805317878723145,
+          "cached_replay_ce": 10.8125,
+          "abs_diff": 0.007182121276855469
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 28,
+      "depths": {
+        "1": {
+          "full_ce": 1.3365319967269897,
+          "cached_replay_ce": 1.3359375,
+          "abs_diff": 0.0005944967269897461
+        },
+        "2": {
+          "full_ce": 1.3530714511871338,
+          "cached_replay_ce": 1.3515625,
+          "abs_diff": 0.001508951187133789
+        },
+        "4": {
+          "full_ce": 1.3784953355789185,
+          "cached_replay_ce": 1.3828125,
+          "abs_diff": 0.004317164421081543
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 29,
+      "depths": {
+        "1": {
+          "full_ce": 11.26354694366455,
+          "cached_replay_ce": 11.25,
+          "abs_diff": 0.013546943664550781
+        },
+        "2": {
+          "full_ce": 11.267382621765137,
+          "cached_replay_ce": 11.25,
+          "abs_diff": 0.01738262176513672
+        },
+        "4": {
+          "full_ce": 11.271392822265625,
+          "cached_replay_ce": 11.25,
+          "abs_diff": 0.021392822265625
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 30,
+      "depths": {
+        "1": {
+          "full_ce": 5.4353413581848145,
+          "cached_replay_ce": 5.4375,
+          "abs_diff": 0.002158641815185547
+        },
+        "2": {
+          "full_ce": 5.413930416107178,
+          "cached_replay_ce": 5.40625,
+          "abs_diff": 0.007680416107177734
+        },
+        "4": {
+          "full_ce": 5.409296989440918,
+          "cached_replay_ce": 5.40625,
+          "abs_diff": 0.0030469894409179688
+        }
+      }
+    },
+    {
+      "sequence_id": 0,
+      "doc_id": 101536,
+      "position": 31,
+      "depths": {
+        "1": {
+          "full_ce": 3.0518109798431396,
+          "cached_replay_ce": 3.046875,
+          "abs_diff": 0.0049359798431396484
+        },
+        "2": {
+          "full_ce": 3.029320240020752,
+          "cached_replay_ce": 3.03125,
+          "abs_diff": 0.0019297599792480469
+        },
+        "4": {
+          "full_ce": 3.029231548309326,
+          "cached_replay_ce": 3.09375,
+          "abs_diff": 0.06451845169067383
+        }
+      }
+    }
+  ]
+}
