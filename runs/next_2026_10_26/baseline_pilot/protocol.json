@@ -1,0 +1,79 @@
+{
+  "protocol": "matched-strong-baseline-5m-pilot-v1",
+  "created_before_training": true,
+  "source": {
+    "commit": "571f9f66618e4167709339d304a95423187c5a5a",
+    "tree": "ead4a9cc4a2b1faa4f2603d73e1945ecdbaeda9f",
+    "uncommitted_diff_sha256": "cf8f5d62e52d810ff56f8fbfd732d13296392eed33e90ccc912a5359b38f2504",
+    "has_uncommitted_diff": true,
+    "untracked_python_sha256": {
+      "experiments/mechanism_depth_interaction.py": "ab2d18807c950cb1213cbafa97dab5e1c3d60cec037adb3a6ff6e32a3dccf4b1",
+      "experiments/plan_c_group_sensitivity.py": "1e8327dff28a959efd81617fa677e00a46c2b1d69c3c5dc39809f70320d98122",
+      "experiments/profile_fixed_depth.py": "3259c1c85ac043b367c889555b755ca0821a6434bc10cde9e4da1615c81de3d5",
+      "tests/test_mechanism_depth_interaction.py": "e0f8a68d0f1f53512c59ec17606fd03c53889350ca24318aedf7e61b8ce956f6",
+      "tests/test_profile_fixed_depth.py": "b968d217251d69a80e33116eccd8f4ee4125ab67aef7d088f85d2120846910ef"
+    },
+    "entrypoint": "experiments/r1_closed_loop.py",
+    "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+  },
+  "scope": "protocol validation only; not a SOTA claim",
+  "data_dir": "runs/data/fineweb_edu_100m",
+  "tokenizer_sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+  "updates": 611,
+  "batch_size": 8,
+  "sequence_length": 1024,
+  "input_tokens_per_update": 8192,
+  "total_input_tokens": 5005312,
+  "learning_rate": 0.0003,
+  "weight_decay": 0.1,
+  "warmup_fraction": 0.02,
+  "seed": 17,
+  "dtype": "bfloat16",
+  "evaluation": "fixed R1, same validation stream and full production forward",
+  "arms": {
+    "loop_r1": {
+      "config": "runs/next_2026_10_26/baseline_pilot/loop_r1.json",
+      "config_sha256": "792545f9f1ad9891a18a4e10acb9a0369da1051e0d44b5154d0159776c1c9f3c",
+      "parameters": 104919552,
+      "active_intermediate_size": 512,
+      "adaptive_layers": [
+        11
+      ],
+      "moe_layers": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    "dense_compute_r1": {
+      "config": "runs/next_2026_10_26/baseline_pilot/dense_compute_r1.json",
+      "config_sha256": "38a35767f05ad7557a9135716e1ad829130290f0959f297d70c96bddcd47b967",
+      "parameters": 48247296,
+      "active_intermediate_size": 1024,
+      "adaptive_layers": [],
+      "moe_layers": []
+    },
+    "dense_parameter": {
+      "config": "runs/next_2026_10_26/baseline_pilot/dense_parameter.json",
+      "config_sha256": "a2296a7c3c80791b4239abef0ca4cd566fc98b9e235683a97d4fbd69d506079f",
+      "parameters": 104870400,
+      "active_intermediate_size": 4096,
+      "adaptive_layers": [],
+      "moe_layers": []
+    }
+  },
+  "matching": {
+    "loop_vs_dense_compute": "same active FFN intermediate width per token (2x512 vs 1024), different parameter count",
+    "loop_vs_dense_parameter": "near-equal total parameters (104919552 vs 104870400), different active FFN compute",
+    "not_matched": "training FLOPs, wall time and parameter count are separate axes; no claim all are simultaneously matched"
+  }
+}

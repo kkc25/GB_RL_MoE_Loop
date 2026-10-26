@@ -1,0 +1,48 @@
+{
+  "protocol": "matched-strong-baseline-100m-v1",
+  "created_before_training": true,
+  "source": {
+    "commit": "571f9f66618e4167709339d304a95423187c5a5a",
+    "tree": "ead4a9cc4a2b1faa4f2603d73e1945ecdbaeda9f",
+    "uncommitted_diff_sha256": "cf8f5d62e52d810ff56f8fbfd732d13296392eed33e90ccc912a5359b38f2504",
+    "has_uncommitted_diff": true,
+    "untracked_python_sha256": {
+      "experiments/mechanism_depth_interaction.py": "ab2d18807c950cb1213cbafa97dab5e1c3d60cec037adb3a6ff6e32a3dccf4b1",
+      "experiments/plan_c_group_sensitivity.py": "1e8327dff28a959efd81617fa677e00a46c2b1d69c3c5dc39809f70320d98122",
+      "experiments/profile_fixed_depth.py": "3259c1c85ac043b367c889555b755ca0821a6434bc10cde9e4da1615c81de3d5",
+      "tests/test_mechanism_depth_interaction.py": "e0f8a68d0f1f53512c59ec17606fd03c53889350ca24318aedf7e61b8ce956f6",
+      "tests/test_profile_fixed_depth.py": "b968d217251d69a80e33116eccd8f4ee4125ab67aef7d088f85d2120846910ef"
+    },
+    "entrypoint": "experiments/r1_closed_loop.py",
+    "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+  },
+  "parent_pilot": "runs/next_2026_10_26/baseline_pilot/protocol.json",
+  "parent_pilot_sha256": "12178f5f576a74f1fe219489e35c0740dc9fea93fb79fe77cf2f74d54f5e8837",
+  "scope": "controlled 100M pilot, not external SOTA certification",
+  "arms": {
+    "loop_r1": {
+      "config": "runs/next_2026_10_26/baseline_100m/loop_r1.json",
+      "config_sha256": "1aca88ecb1d20f838e8e40c5f4a65134ad5e616fb4e95f416d853d4e51d73f98",
+      "parameters": 104919552
+    },
+    "dense_parameter": {
+      "config": "runs/next_2026_10_26/baseline_100m/dense_parameter.json",
+      "config_sha256": "94f973e5aef0e07bd3d4145fc7d23f52738ea62923561c55fc767dcc700de464",
+      "parameters": 104870400
+    }
+  },
+  "shared": {
+    "updates": 12207,
+    "batch_size": 8,
+    "input_tokens_per_update": 8192,
+    "total_input_tokens": 99999744,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.1,
+    "warmup_fraction": 0.02,
+    "seed": 17,
+    "dtype": "bfloat16",
+    "validation_interval": 1000,
+    "validation_batches": 16
+  },
+  "selection": "only loop_r1 and strongest 5M parameter-matched dense; dense_compute arm not scaled because it was not the strongest baseline"
+}

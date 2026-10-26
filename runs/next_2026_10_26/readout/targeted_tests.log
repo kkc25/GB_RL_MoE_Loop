@@ -1,0 +1,30 @@
+test_position_ce_preserves_explicit_batch_dimensions (tests.test_r1_closed_loop.ClosedLoopHelperTests.test_position_ce_preserves_explicit_batch_dimensions) ... ok
+test_position_ce_rejects_ambiguous_shapes (tests.test_r1_closed_loop.ClosedLoopHelperTests.test_position_ce_rejects_ambiguous_shapes) ... ok
+test_tensor_hash_is_content_sensitive (tests.test_r1_closed_loop.ClosedLoopHelperTests.test_tensor_hash_is_content_sensitive) ... ok
+test_fp32_readout_ignores_outer_autocast_on_same_final_hidden (tests.test_r1_closed_loop.FinalHiddenReadoutTests.test_fp32_readout_ignores_outer_autocast_on_same_final_hidden) ... ok
+test_fp32_readout_matches_depth1_forward_only_with_final_hidden (tests.test_r1_closed_loop.FinalHiddenReadoutTests.test_fp32_readout_matches_depth1_forward_only_with_final_hidden) ... ok
+test_fp32_readout_matches_depth4_forward_only_with_final_hidden (tests.test_r1_closed_loop.FinalHiddenReadoutTests.test_fp32_readout_matches_depth4_forward_only_with_final_hidden) ... ok
+test_replay_baseline_continuation_reproduces_production_hidden_and_actions (tests.test_r1_closed_loop.FinalHiddenReadoutTests.test_replay_baseline_continuation_reproduces_production_hidden_and_actions) ... ok
+test_source_identity_binds_entrypoint_and_untracked_python (tests.test_r1_closed_loop.SourceIdentityTests.test_source_identity_binds_entrypoint_and_untracked_python) ... ok
+test_cached_h_matches_normal_baseline_forward (tests.test_counterfactual.CounterfactualTests.test_cached_h_matches_normal_baseline_forward) ... ok
+test_candidate_actions_include_baseline_and_exploration (tests.test_counterfactual.CounterfactualTests.test_candidate_actions_include_baseline_and_exploration) ... ok
+test_chunking_does_not_change_costs (tests.test_counterfactual.CounterfactualTests.test_chunking_does_not_change_costs) ... ok
+test_custom_action_subset_preserves_pairs_and_global_mapping (tests.test_counterfactual.CounterfactualTests.test_custom_action_subset_preserves_pairs_and_global_mapping) ... ok
+test_forced_baseline_then_baseline_continuation_equals_baseline (tests.test_counterfactual.CounterfactualTests.test_forced_baseline_then_baseline_continuation_equals_baseline) ... ok
+test_no_attention_after_cached_h (tests.test_counterfactual.CounterfactualTests.test_no_attention_after_cached_h) ... ok
+test_path_cost_shapes_and_candidate_set (tests.test_counterfactual.CounterfactualTests.test_path_cost_shapes_and_candidate_set) ... ok
+test_per_state_actions_use_state_specific_mapping (tests.test_counterfactual.CounterfactualTests.test_per_state_actions_use_state_specific_mapping) ... ok
+test_shared_and_broadcast_nonprefix_actions_are_equivalent (tests.test_counterfactual.CounterfactualTests.test_shared_and_broadcast_nonprefix_actions_are_equivalent) ... ok
+test_states_only_at_supervised_positions (tests.test_counterfactual.CounterfactualTests.test_states_only_at_supervised_positions) ... ok
+test_readout_ce_chunking_unchanged_under_autocast (tests.test_counterfactual.ReadoutPrecisionTests.test_readout_ce_chunking_unchanged_under_autocast) ... ok
+test_readout_ce_is_invariant_to_outer_autocast (tests.test_counterfactual.ReadoutPrecisionTests.test_readout_ce_is_invariant_to_outer_autocast) ... ok
+test_gathered_states_stay_inside_their_split_file_and_docs (tests.test_counterfactual.SplitIsolationTests.test_gathered_states_stay_inside_their_split_file_and_docs) ... ok
+test_ledger_counts_real_work (tests.test_counterfactual.StudentTests.test_ledger_counts_real_work) ... ok
+test_oracle_is_not_a_deploy_policy (tests.test_counterfactual.StudentTests.test_oracle_is_not_a_deploy_policy) ... ok
+test_student_input_is_only_the_legal_state (tests.test_counterfactual.StudentTests.test_student_input_is_only_the_legal_state) ... ok
+test_students_fit_and_select_legal_actions (tests.test_counterfactual.StudentTests.test_students_fit_and_select_legal_actions) ... ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 1.967s
+
+OK

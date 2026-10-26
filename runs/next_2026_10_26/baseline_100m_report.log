@@ -1,0 +1,6 @@
+{
+  "report": "Loop_MoE_Baseline_100M_Report_2026-10-26.md",
+  "status": "Loop_MoE_Current_Status_2026-10-26.md",
+  "decision": "stop_or_fundamental_redesign",
+  "validation_sha256": "dcb7ff35c75f4a6765ebd46bd8f86e0e4ee51a33d9aa968e2e6a4901b630bad8"
+}

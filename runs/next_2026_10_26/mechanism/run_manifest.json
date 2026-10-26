@@ -1,0 +1,24 @@
+{
+  "source": {
+    "commit": "571f9f66618e4167709339d304a95423187c5a5a",
+    "tree": "ead4a9cc4a2b1faa4f2603d73e1945ecdbaeda9f",
+    "uncommitted_diff_sha256": "4b693ad1a35192ac9ca5a58b69b0105868781e8f1e2d37ad112555bd544056b3",
+    "has_uncommitted_diff": true,
+    "untracked_python_sha256": {
+      "experiments/mechanism_depth_interaction.py": "ab2d18807c950cb1213cbafa97dab5e1c3d60cec037adb3a6ff6e32a3dccf4b1",
+      "experiments/plan_c_group_sensitivity.py": "1e8327dff28a959efd81617fa677e00a46c2b1d69c3c5dc39809f70320d98122",
+      "experiments/profile_fixed_depth.py": "3259c1c85ac043b367c889555b755ca0821a6434bc10cde9e4da1615c81de3d5",
+      "tests/test_mechanism_depth_interaction.py": "e0f8a68d0f1f53512c59ec17606fd03c53889350ca24318aedf7e61b8ce956f6",
+      "tests/test_profile_fixed_depth.py": "b968d217251d69a80e33116eccd8f4ee4125ab67aef7d088f85d2120846910ef"
+    },
+    "entrypoint": "experiments/r1_closed_loop.py",
+    "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+  },
+  "argv": [
+    "/nvme-1/zhoukegu/GB_RL_MoE_Loop/experiments/mechanism_depth_interaction.py"
+  ],
+  "n_bootstrap": 2000,
+  "seed": 0,
+  "summary_sha256": "391c93ae8afd5516238cd42b992b5f2c5d62f110f6d8d1bc535e3ca84328ba04",
+  "per_state_csv_sha256": "0fc498c6c99a937d83b151a1c90e6904b106346484b4d7d88d7fa5342652a1ab"
+}

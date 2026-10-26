@@ -1,0 +1,24 @@
+{
+  "states": 32,
+  "sequences": 32,
+  "documents": 32,
+  "max_abs_diff_by_depth": {
+    "1": 0.04886817932128906,
+    "2": 0.057396888732910156,
+    "4": 0.051573753356933594
+  },
+  "sampling": "prefixed_cross_document_v2 seed=0",
+  "full_forward_is_primary": true,
+  "verified_inputs": {
+    "corpus_manifest_sha256": "7fca0563f4db360790ef848fc446680ccbce2ad7a1927b41b2562803759685ca",
+    "checkpoint_sha256": "47f6ec019b4d72a3229076e4f60d3dd7e41c26e6a14c12dc964536e65de33324",
+    "config_sha256": "37cde2d6eab26e2d29f759b3ca44d5e78c2c314027b77c41dc5e307802c0cd23",
+    "frozen_document_ids_sha256": "6528ca163ff8e548c537cb928148b4cc7a84eb97b783d117244715bb11c0c9f1",
+    "packed_confirmation_sha256": {
+      "input_ids_sha256": "69184b4c3ed1fb326cbb612aed3b692adfb0f355b4f090eb78908a22de8a905c",
+      "segment_ids_sha256": "0a6cf386df34ee6e16e9faaf2734eeb5065ba1c5bee2118894c53f78dae8c261",
+      "doc_map_sha256": "1bc1bff032b5ed59f98fc075fe5fd11a419a1b12ac7eeee1537f388bd8d04799"
+    },
+    "tokenizer_sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628"
+  }
+}

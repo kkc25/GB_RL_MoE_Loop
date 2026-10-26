@@ -1,0 +1,124 @@
+{
+  "protocol_sha256": "aee142ae7da47a725b9765ee2ccc571655ec2d01e64488725cbc4528b503a70b",
+  "measurements_sha256": "2e182dbe48bf1481c2ebf2b42c3a0a73f39ecaed8004332757096036e8e57340",
+  "sequences": 32,
+  "valid_tokens_per_pass": 32702,
+  "data_prepare_seconds": 0.005836524069309235,
+  "latency": {
+    "1": {
+      "calls": 1000,
+      "event_ms": {
+        "p50": 48.12236785888672,
+        "p95": 55.00718250274658,
+        "mean": 49.018928131103515
+      },
+      "wall_ms": {
+        "p50": 48.16768498858437,
+        "p95": 55.0723995314911,
+        "mean": 49.06826312630437
+      },
+      "effective_tokens_per_second": 20848.171083356443,
+      "repeat_mean_event_ms": [
+        48.05445465087891,
+        48.00394458770752,
+        47.99110336303711,
+        48.02048835754395,
+        53.024649696350096
+      ],
+      "speedup_vs_r2": {
+        "mean": 0.07623658766598793,
+        "min": 0.07503855068746512,
+        "max": 0.079052440901213
+      }
+    },
+    "2": {
+      "calls": 1000,
+      "event_ms": {
+        "p50": 51.740177154541016,
+        "p95": 59.21822795867919,
+        "mean": 52.75584368515015
+      },
+      "wall_ms": {
+        "p50": 51.78871750831604,
+        "p95": 59.2809043242596,
+        "mean": 52.805290204356425
+      },
+      "effective_tokens_per_second": 19371.40852298913,
+      "repeat_mean_event_ms": [
+        51.66913375854492,
+        51.640567989349364,
+        51.59228620529175,
+        51.81662517547608,
+        57.06060529708862
+      ],
+      "speedup_vs_r2": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      }
+    },
+    "4": {
+      "calls": 1000,
+      "event_ms": {
+        "p50": 58.92710304260254,
+        "p95": 67.7918243408203,
+        "mean": 60.10338790512085
+      },
+      "wall_ms": {
+        "p50": 58.97361401002854,
+        "p95": 67.85261242766863,
+        "mean": 60.15275094273966
+      },
+      "effective_tokens_per_second": 17003.284434036515,
+      "repeat_mean_event_ms": [
+        58.93632696151733,
+        58.80256988525391,
+        58.776143856048584,
+        58.85981977462769,
+        65.14207904815675
+      ],
+      "speedup_vs_r2": {
+        "mean": -0.12220939696283166,
+        "min": -0.12405919290807155,
+        "max": -0.11966048530423257
+      }
+    }
+  },
+  "peak_memory_bytes": {
+    "1": 1797827072,
+    "2": 1797827072,
+    "4": 1797827072
+  },
+  "hardware_start": {
+    "index": "1",
+    "uuid": "GPU-03416495-c0b6-fb40-2fe4-8df8c8a5aed2",
+    "name": "NVIDIA RTX A6000",
+    "memory_used_mib": 2162,
+    "utilization_percent": 8,
+    "temperature_c": 60,
+    "power_w": 73.9,
+    "sm_clock_mhz": 1800,
+    "compute_processes": [
+      "GPU-03416495-c0b6-fb40-2fe4-8df8c8a5aed2, 293144, 2152"
+    ]
+  },
+  "hardware_end": {
+    "index": "1",
+    "uuid": "GPU-03416495-c0b6-fb40-2fe4-8df8c8a5aed2",
+    "name": "NVIDIA RTX A6000",
+    "memory_used_mib": 2412,
+    "utilization_percent": 32,
+    "temperature_c": 51,
+    "power_w": 101.37,
+    "sm_clock_mhz": 1800,
+    "compute_processes": [
+      "GPU-03416495-c0b6-fb40-2fe4-8df8c8a5aed2, 293144, 2402"
+    ]
+  },
+  "exclusive_at_start": true,
+  "exclusive_at_end": true,
+  "valid_for_latency_claims": true,
+  "torch_version": "2.12.1+cu130",
+  "cuda_version": "13.0",
+  "created_utc": "2026-10-26T13:56:57.199220+00:00"
+}

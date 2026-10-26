@@ -1,0 +1,6 @@
+{"time": 1793019424.5262063, "phase": "train", "update": 0, "loss": 10.50682258605957, "depth": 1, "lr": 0.0003, "grad_norm": 3.793811798095703, "supervised_tokens": 8172}
+{"time": 1793019424.5762153, "phase": "validation", "update": 1, "nll": 10.048971083231335, "ppl": 23131.9765625, "supervised_tokens": 8170, "depth": 1}
+{"time": 1793019426.4592903, "phase": "checkpoint", "path": "runs/next_2026_10_26/baseline_pilot/smoke_dense_compute/latest.pt", "sha256": "c3711b6aae172ddfc3843b2c7e8d00435e8127fb2bbbbaa4b8ae46fdeb73a2dc"}
+{"time": 1793019426.513695, "phase": "final", "nll": 10.048971083231335, "ppl": 23131.9765625, "supervised_tokens": 8170, "depth": 1}
+{"time": 1793019426.5633838, "phase": "final", "nll": 10.048971083231335, "ppl": 23131.9765625, "supervised_tokens": 8170, "depth": 2}
+{"time": 1793019426.6130235, "phase": "final", "nll": 10.048971083231335, "ppl": 23131.9765625, "supervised_tokens": 8170, "depth": 4}

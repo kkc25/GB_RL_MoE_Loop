@@ -10,6 +10,7 @@ from torch import nn
 
 from eval.counterfactual import PathCosts, evaluate_policies
 from eval.state_sampling import document_paired_bootstrap
+from experiments.followup_b_recompute import validate_backbone_config, validate_states_identity
 from experiments.r1_closed_loop import source_identity
 from experiments.r2_value import candidate_rank_rule, group_rules
 from lm_config import LMExperimentConfig
@@ -124,6 +125,7 @@ def main():
     parser.add_argument("--r2-dir", default="runs/repair_2026_10_25/r2_full")
     parser.add_argument("--config", default="configs/e00_m105_b2.json")
     parser.add_argument("--checkpoint", default="runs/e00/m105_b2/latest.pt")
+    parser.add_argument("--corpus-dir", default="runs/repair_2026_10_25/controller_corpus")
     parser.add_argument("--output-dir", default="runs/followup_2026_10_26/plan_d")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--epochs", type=int, default=10)
@@ -160,10 +162,12 @@ def main():
     device = torch.device(args.device)
     model = LoopMoE(config.model).to(device).eval()
     checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=False)
+    validate_backbone_config(config, checkpoint)
     model.load_state_dict(checkpoint["model"])
     model.requires_grad_(False)
     roles = ("controller_train", "selection", "newtest")
     states = {role: torch.load(Path(args.r2_dir) / f"states_{role}.pt", map_location="cpu", weights_only=False) for role in roles}
+    validate_states_identity(states, checkpoint_path=args.checkpoint, corpus_dir=args.corpus_dir)
     router = {role: router_features(model, states[role], device) for role in roles}
     atomic_torch = output_dir / "router_features.pt"
     torch.save(router, atomic_torch)
@@ -240,12 +244,17 @@ def main():
         "d_plan_sha256": sha256_file(plan_path),
     }
     atomic_json(output_dir / "d_summary.json", summary)
+    r2_dir = Path(args.r2_dir)
     atomic_json(output_dir / "run_manifest.json", {
         "source": source_identity(),
         "argv": sys.argv,
         "d_plan_sha256": sha256_file(plan_path),
         "d_summary_sha256": sha256_file(output_dir / "d_summary.json"),
+        "config_sha256": sha256_file(args.config),
         "checkpoint_sha256": sha256_file(args.checkpoint),
+        "corpus_manifest_sha256": sha256_file(Path(args.corpus_dir) / "manifest.json"),
+        "states_sha256": {role: sha256_file(r2_dir / f"states_{role}.pt") for role in roles},
+        "d_students_sha256": sha256_file(output_dir / "d_students.pt"),
         "router_features_sha256": sha256_file(atomic_torch),
     })
     print(json.dumps(summary["development_gate"], indent=2))

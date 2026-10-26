@@ -1,0 +1,92 @@
+{
+  "source": {
+    "commit": "571f9f66618e4167709339d304a95423187c5a5a",
+    "tree": "ead4a9cc4a2b1faa4f2603d73e1945ecdbaeda9f",
+    "uncommitted_diff_sha256": "cf8f5d62e52d810ff56f8fbfd732d13296392eed33e90ccc912a5359b38f2504",
+    "has_uncommitted_diff": true,
+    "untracked_python_sha256": {
+      "experiments/mechanism_depth_interaction.py": "ab2d18807c950cb1213cbafa97dab5e1c3d60cec037adb3a6ff6e32a3dccf4b1",
+      "experiments/plan_c_group_sensitivity.py": "1e8327dff28a959efd81617fa677e00a46c2b1d69c3c5dc39809f70320d98122",
+      "experiments/profile_fixed_depth.py": "3259c1c85ac043b367c889555b755ca0821a6434bc10cde9e4da1615c81de3d5",
+      "experiments/render_baseline_100m_report.py": "7ad8ba3471177849a8ffb6e4a7efbaf981585afe9eaf0de01aa6a2590cb4f3f2",
+      "experiments/validate_baseline_100m.py": "a77fd5632228c35b70161c258eb4a9b4f605a0cb659d4f7f0a6e02797228b7df",
+      "tests/test_mechanism_depth_interaction.py": "e0f8a68d0f1f53512c59ec17606fd03c53889350ca24318aedf7e61b8ce956f6",
+      "tests/test_profile_fixed_depth.py": "b968d217251d69a80e33116eccd8f4ee4125ab67aef7d088f85d2120846910ef",
+      "tests/test_render_baseline_100m.py": "076d55ec503fa4ce725cab1b828bc195c267915d99f32b0a837aa29f1b2162bc",
+      "tests/test_validate_baseline_100m.py": "9e750ccf3912f06176e70d6e7fe52a9d4804fc1a79fefd00230c60b7ef083f57"
+    },
+    "entrypoint": "experiments/r1_closed_loop.py",
+    "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+  },
+  "protocol_sha256": "de030cc09122eb0853d4a27b6ed077f7e57d79b45e19b66ade0fca30cbac27de",
+  "arms": {
+    "loop_r1": {
+      "parameters": 104919552,
+      "input_tokens": 99998976,
+      "padding_tokens": 768,
+      "supervised_tokens": 99806158,
+      "r1_nll": 4.2642041125347765,
+      "elapsed_seconds": 3070.118540733005,
+      "allocated_gpu_hours": 0.8528107057591681,
+      "peak_memory_bytes": 10404731904,
+      "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+      "checkpoint_update": 12207,
+      "stream_metadata": {
+        "n_sequences": 97657,
+        "batch_size": 8,
+        "sampler_seed": 17,
+        "batches_per_epoch": 12207
+      },
+      "packed_identity_verified": true,
+      "config_identity_verified": true
+    },
+    "dense_parameter": {
+      "parameters": 104870400,
+      "input_tokens": 99998976,
+      "padding_tokens": 768,
+      "supervised_tokens": 99806158,
+      "r1_nll": 4.1478639559479955,
+      "elapsed_seconds": 2261.590422434034,
+      "allocated_gpu_hours": 0.6282195617872317,
+      "peak_memory_bytes": 11500153344,
+      "checkpoint_sha256": "4c553e2f60a222f368803d0bd8d879a644bfc961a4f14486e7bec2ee4f4151a3",
+      "checkpoint_update": 12207,
+      "stream_metadata": {
+        "n_sequences": 97657,
+        "batch_size": 8,
+        "sampler_seed": 17,
+        "batches_per_epoch": 12207
+      },
+      "packed_identity_verified": true,
+      "config_identity_verified": true
+    }
+  },
+  "profiles": {
+    "loop_r1": {
+      "mean_event_ms_r1": 49.018928131103515,
+      "effective_tokens_per_second_r1": 20848.171083356443,
+      "speedup_vs_r2": {
+        "mean": 0.07623658766598793,
+        "min": 0.07503855068746512,
+        "max": 0.079052440901213
+      },
+      "summary_sha256": "dd7372a0415d371458c75ee95a1db535c5727a9ea45e598897d56a4045a8aaf8"
+    },
+    "dense_parameter": {
+      "mean_event_ms_r1": 12.677187191009521,
+      "effective_tokens_per_second_r1": 80613.70275614102,
+      "speedup_vs_r2": {
+        "mean": -0.0006127731577127759,
+        "min": -0.001996372577566685,
+        "max": 0.0002048678096218115
+      },
+      "summary_sha256": "4bc62fa9b857a7a6848e02c0af4b1adf221f5d6b3d10315e6954ea340aeda225"
+    }
+  },
+  "loop_minus_dense_nll": 0.11634015658678099,
+  "dense_is_better": true,
+  "loop_speedup_vs_dense": -0.7413817952709254,
+  "decision_protocol_sha256": "f3b6199587abed5a4f32e17e8bde3c7f72a4b17a08e47b8910047c83d8de53a6",
+  "next_stage_decision": "stop_or_fundamental_redesign",
+  "all_completion_checks_passed": true
+}

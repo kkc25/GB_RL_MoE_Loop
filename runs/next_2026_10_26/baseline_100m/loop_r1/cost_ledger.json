@@ -1,0 +1,12 @@
+{
+  "updates": 12207,
+  "input_tokens": 99998976,
+  "supervised_tokens": 99806158,
+  "ffn_rounds": 1199996928,
+  "expert_token_pairs": 2399993856,
+  "elapsed_seconds": 3070.118540733005,
+  "allocated_gpu_hours": 0.8528107057591681,
+  "peak_memory_bytes": 10404731904,
+  "schedule_phases": [],
+  "data_migrations": []
+}

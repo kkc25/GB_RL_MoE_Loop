@@ -1,8 +1,13 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 import torch
 
+import experiments.followup_d_learnability as followup_d
 from eval.counterfactual import PathCosts
+from experiments.followup_b_recompute import validate_backbone_config, validate_states_identity
 from experiments.followup_d_learnability import (
     CandidateAdvantageScorer,
     advantage_targets,
@@ -11,6 +16,7 @@ from experiments.followup_d_learnability import (
     pair_router_features,
     subset_costs,
 )
+from train.recovery_common import sha256_file
 
 
 class FollowupDTests(unittest.TestCase):
@@ -53,6 +59,37 @@ class FollowupDTests(unittest.TestCase):
         self.assertEqual(prediction.shape, (n, candidates))
         self.assertTrue(torch.isfinite(prediction).all())
         self.assertEqual(fitted["optimizer_updates"], 2)
+
+
+class FollowupDEntryIdentityTests(unittest.TestCase):
+    """Plan D must wire the same states/config identity validation as B before
+    any router-feature forward over the cached states."""
+
+    ROLES = ("controller_train", "selection", "newtest")
+
+    def test_entry_uses_shared_identity_validators(self):
+        self.assertIs(followup_d.validate_states_identity, validate_states_identity)
+        self.assertIs(followup_d.validate_backbone_config, validate_backbone_config)
+
+    def test_role_states_with_wrong_backbone_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            checkpoint = root / "checkpoint.pt"
+            checkpoint.write_bytes(b"backbone weights")
+            backbone_hash = sha256_file(checkpoint)
+            corpus = root / "corpus"
+            corpus.mkdir()
+            (corpus / "manifest.json").write_text(json.dumps({
+                "splits": {role: {"doc_map_sha256": f"{index:064x}"} for index, role in enumerate(self.ROLES, start=1)},
+            }))
+            states = {
+                role: {"backbone_hash": backbone_hash, "corpus_doc_map_sha256": f"{index:064x}"}
+                for index, role in enumerate(self.ROLES, start=1)
+            }
+            validate_states_identity(states, checkpoint_path=checkpoint, corpus_dir=corpus)
+            states["selection"]["backbone_hash"] = "0" * 64
+            with self.assertRaisesRegex(ValueError, "selection"):
+                validate_states_identity(states, checkpoint_path=checkpoint, corpus_dir=corpus)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,6 @@
+{"repeat": 0, "iteration": 0, "depth": 1, "sequence_index": 0, "valid_tokens": 1023, "event_ms": 45.48604965209961, "wall_ms": 45.576500007882714}
+{"repeat": 0, "iteration": 0, "depth": 4, "sequence_index": 0, "valid_tokens": 1023, "event_ms": 56.508384704589844, "wall_ms": 56.55757908243686}
+{"repeat": 0, "iteration": 0, "depth": 2, "sequence_index": 0, "valid_tokens": 1023, "event_ms": 48.97382354736328, "wall_ms": 49.02146500535309}
+{"repeat": 0, "iteration": 1, "depth": 4, "sequence_index": 1, "valid_tokens": 1022, "event_ms": 58.28812789916992, "wall_ms": 58.33649402484298}
+{"repeat": 0, "iteration": 1, "depth": 2, "sequence_index": 1, "valid_tokens": 1022, "event_ms": 49.523712158203125, "wall_ms": 49.57794304937124}
+{"repeat": 0, "iteration": 1, "depth": 1, "sequence_index": 1, "valid_tokens": 1022, "event_ms": 45.99296188354492, "wall_ms": 46.038129017688334}

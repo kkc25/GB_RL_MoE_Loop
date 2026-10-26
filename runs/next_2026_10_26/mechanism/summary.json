@@ -1,0 +1,467 @@
+{
+  "scope": "task3 phase1 depth-interaction mechanism audit on the frozen R2 cache; previously viewed newtest; diagnostic, not confirmation",
+  "inputs": {
+    "states_controller_train": {
+      "path": "runs/repair_2026_10_25/r2_full/states_controller_train.pt",
+      "sha256": "fcb33c5b16f9b8f48c39ed2ad37b9d37198b8b4bbc24a700b0316abe57409928"
+    },
+    "states_newtest": {
+      "path": "runs/repair_2026_10_25/r2_full/states_newtest.pt",
+      "sha256": "5b11a73fe79c93ef9d879914b2c38d118fa52d5c6c48b64b6800b4111bc3267b"
+    },
+    "plan_b_r2_summary": {
+      "path": "runs/followup_2026_10_26/plan_b/r2_summary.json",
+      "sha256": "d2e7a8e06d8bed17df1eea73c3f2e4c62caa030d340a2d6bdff1f5c4cc8239bf"
+    },
+    "backbone_hash": "47f6ec019b4d72a3229076e4f60d3dd7e41c26e6a14c12dc964536e65de33324",
+    "corpus_doc_map_sha256_newtest": "e0835b05f9c772fc7697e19c8a8668ae88ae3350cdc4198b52a6ba9db18f9431"
+  },
+  "definitions": {
+    "L1": "immediate FP32 CE after 1 forced round (cached)",
+    "L4": "Q^pi0 FP32 CE after 4 rounds under the frozen baseline policy (cached)",
+    "G": "L1 - L4 per state",
+    "I": "G_rule - G_baseline",
+    "D": "L4_rule - L4_baseline (positive = rule worse at final depth; deploy-relevant)",
+    "T1": "L1_rule - L1_baseline"
+  },
+  "rules": {
+    "pre_fixed": true,
+    "fitted_on": "controller_train costs only; no test labels or test costs are used to pick any action",
+    "baseline": "original router Top-2 action (reference)",
+    "constant_global": "single train-selected global action with fallback to the router action when absent from a state's candidate set",
+    "candidate_rank": "fixed train-selected candidate rank (local index)",
+    "uniform_candidate_expectation": "analytic per-state mean over the 4 cached candidate paths (no sampling)"
+  },
+  "rule_metadata": {
+    "constant_global_action": 20,
+    "candidate_rank": 3,
+    "min_group_states": 32
+  },
+  "baseline_reference": {
+    "mean_l1": 4.968461036682129,
+    "mean_l4": 4.967843532562256,
+    "mean_g": 0.0006173053407110274
+  },
+  "rules_report": {
+    "constant_global": {
+      "n_states": 4000,
+      "mean_l1": 5.014528751373291,
+      "mean_l4": 4.967380046844482,
+      "mean_g": 0.047148603945970535,
+      "D_l4_rule_minus_baseline": {
+        "mean": -0.00046350303455255926,
+        "doc_paired_bootstrap": {
+          "estimate": -0.00046350301562051756,
+          "ci_lo": -0.0009115421661674932,
+          "ci_hi": -4.551243387068319e-05,
+          "confidence": 0.95,
+          "se": 0.00022468678643786279,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 187,
+          "n_positive_rule_worse": 168,
+          "n_zero": 30,
+          "frac_negative_rule_better": 0.4857142857142857,
+          "frac_positive_rule_worse": 0.43636363636363634
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": -0.00046867140911472364,
+          "delta_vs_full": -5.1683934942060796e-06
+        }
+      },
+      "T1_l1_rule_minus_baseline": {
+        "mean": 0.046067800372838974,
+        "doc_paired_bootstrap": {
+          "estimate": 0.04606779653495323,
+          "ci_lo": 0.0376581747809068,
+          "ci_hi": 0.054451175365991984,
+          "confidence": 0.95,
+          "se": 0.0043418605111694725,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 102,
+          "n_positive_rule_worse": 253,
+          "n_zero": 30,
+          "frac_negative_rule_better": 0.2649350649350649,
+          "frac_positive_rule_worse": 0.6571428571428571
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": 0.045593941281743704,
+          "delta_vs_full": -0.00047385529558470474
+        }
+      },
+      "I_g_rule_minus_baseline": {
+        "mean": 0.04653129726648331,
+        "doc_paired_bootstrap": {
+          "estimate": 0.046531299589747506,
+          "ci_lo": 0.03812466484564406,
+          "ci_hi": 0.05494455708077999,
+          "confidence": 0.95,
+          "se": 0.004348029761150639,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 101,
+          "n_positive_rule_worse": 254,
+          "n_zero": 30,
+          "frac_negative_rule_better": 0.2623376623376623,
+          "frac_positive_rule_worse": 0.6597402597402597
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": 0.04606261271980904,
+          "delta_vs_full": -0.00046868690201088553
+        }
+      },
+      "fallback_fraction": 0.7457500100135803,
+      "actual_global_action_counts": {
+        "7": 55,
+        "13": 424,
+        "14": 85,
+        "15": 2077,
+        "16": 164,
+        "17": 174,
+        "20": 1017,
+        "25": 1,
+        "26": 3
+      },
+      "changed_only": {
+        "n_changed": 1017,
+        "changed_fraction": 0.2542499899864197,
+        "mean_d_l1": 0.18119093775749207,
+        "mean_d_l4": -0.0018230207497254014,
+        "mean_d_g": 0.18301397562026978,
+        "d_l4_doc_paired_bootstrap": {
+          "estimate": -0.001823020710405182,
+          "ci_lo": -0.0035968288494769296,
+          "ci_hi": -0.00017570585485496743,
+          "confidence": 0.95,
+          "se": 0.000873526732977651,
+          "n_bootstrap": 2000,
+          "n_documents": 355,
+          "n_rows": 1017,
+          "max_doc_token_share": 0.007866273352999017,
+          "effective_documents": 281.43918367346936
+        },
+        "d_l4_doc_direction": {
+          "n_documents": 355,
+          "n_negative_rule_better": 187,
+          "n_positive_rule_worse": 168,
+          "n_zero": 0,
+          "frac_negative_rule_better": 0.5267605633802817,
+          "frac_positive_rule_worse": 0.4732394366197183
+        }
+      }
+    },
+    "candidate_rank": {
+      "n_states": 4000,
+      "mean_l1": 5.114360332489014,
+      "mean_l4": 4.9673309326171875,
+      "mean_g": 0.14702895283699036,
+      "D_l4_rule_minus_baseline": {
+        "mean": -0.0005124840536154807,
+        "doc_paired_bootstrap": {
+          "estimate": -0.0005124840665084776,
+          "ci_lo": -0.0015029656190295821,
+          "ci_hi": 0.0005605777804578696,
+          "confidence": 0.95,
+          "se": 0.0005339012606511216,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 204,
+          "n_positive_rule_worse": 181,
+          "n_zero": 0,
+          "frac_negative_rule_better": 0.5298701298701298,
+          "frac_positive_rule_worse": 0.4701298701298701
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": -0.0004907756202847971,
+          "delta_vs_full": 2.170844622731839e-05
+        }
+      },
+      "T1_l1_rule_minus_baseline": {
+        "mean": 0.14589914679527283,
+        "doc_paired_bootstrap": {
+          "estimate": 0.14589914690666592,
+          "ci_lo": 0.12938470879448016,
+          "ci_hi": 0.16226381812844007,
+          "confidence": 0.95,
+          "se": 0.008364596039784865,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 67,
+          "n_positive_rule_worse": 318,
+          "n_zero": 0,
+          "frac_negative_rule_better": 0.17402597402597403,
+          "frac_positive_rule_worse": 0.825974025974026
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": 0.14553128657567932,
+          "delta_vs_full": -0.0003678604122099305
+        }
+      },
+      "I_g_rule_minus_baseline": {
+        "mean": 0.14641164243221283,
+        "doc_paired_bootstrap": {
+          "estimate": 0.1464116310371719,
+          "ci_lo": 0.12998163878802554,
+          "ci_hi": 0.1627476541861352,
+          "confidence": 0.95,
+          "se": 0.008301585297466298,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 68,
+          "n_positive_rule_worse": 317,
+          "n_zero": 0,
+          "frac_negative_rule_better": 0.17662337662337663,
+          "frac_positive_rule_worse": 0.8233766233766234
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": 0.14602206221510886,
+          "delta_vs_full": -0.0003895688583846202
+        }
+      },
+      "fallback_fraction": 0.0,
+      "actual_global_action_counts": {
+        "2": 5,
+        "3": 13,
+        "5": 22,
+        "8": 115,
+        "9": 278,
+        "11": 528,
+        "17": 1,
+        "18": 1178,
+        "20": 1016,
+        "21": 1,
+        "22": 4,
+        "23": 826,
+        "24": 4,
+        "25": 7,
+        "27": 2
+      },
+      "changed_only": {
+        "n_changed": 4000,
+        "changed_fraction": 1.0,
+        "mean_d_l1": 0.14589914679527283,
+        "mean_d_l4": -0.0005124840536154807,
+        "mean_d_g": 0.14641164243221283,
+        "d_l4_doc_paired_bootstrap": {
+          "estimate": -0.0005124840665084776,
+          "ci_lo": -0.0015029656190295821,
+          "ci_hi": 0.0005605777804578696,
+          "confidence": 0.95,
+          "se": 0.0005339012606511216,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "d_l4_doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 204,
+          "n_positive_rule_worse": 181,
+          "n_zero": 0,
+          "frac_negative_rule_better": 0.5298701298701298,
+          "frac_positive_rule_worse": 0.4701298701298701
+        }
+      }
+    },
+    "uniform_candidate_expectation": {
+      "n_states": 4000,
+      "mean_l1": 5.008935928344727,
+      "mean_l4": 4.970510959625244,
+      "mean_g": 0.03842480108141899,
+      "D_l4_rule_minus_baseline": {
+        "mean": 0.0026671704836189747,
+        "doc_paired_bootstrap": {
+          "estimate": 0.0026671705713815753,
+          "ci_lo": 0.001115938774611139,
+          "ci_hi": 0.0041431555225297945,
+          "confidence": 0.95,
+          "se": 0.0007731999826182282,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 160,
+          "n_positive_rule_worse": 225,
+          "n_zero": 0,
+          "frac_negative_rule_better": 0.4155844155844156,
+          "frac_positive_rule_worse": 0.5844155844155844
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": 0.002722984481253048,
+          "delta_vs_full": 5.581390987147291e-05
+        }
+      },
+      "T1_l1_rule_minus_baseline": {
+        "mean": 0.04047467187047005,
+        "doc_paired_bootstrap": {
+          "estimate": 0.04047466649430134,
+          "ci_lo": 0.03664137126368186,
+          "ci_hi": 0.04429181138922964,
+          "confidence": 0.95,
+          "se": 0.0019619877024647514,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 52,
+          "n_positive_rule_worse": 333,
+          "n_zero": 0,
+          "frac_negative_rule_better": 0.13506493506493505,
+          "frac_positive_rule_worse": 0.8649350649350649
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": 0.04043988071979999,
+          "delta_vs_full": -3.478578102061869e-05
+        }
+      },
+      "I_g_rule_minus_baseline": {
+        "mean": 0.03780749440193176,
+        "doc_paired_bootstrap": {
+          "estimate": 0.037807495907552946,
+          "ci_lo": 0.033655015611169535,
+          "ci_hi": 0.041859915483101764,
+          "confidence": 0.95,
+          "se": 0.0021105503110998023,
+          "n_bootstrap": 2000,
+          "n_documents": 385,
+          "n_rows": 4000,
+          "max_doc_token_share": 0.00275,
+          "effective_documents": 384.15366146458575
+        },
+        "doc_direction": {
+          "n_documents": 385,
+          "n_negative_rule_better": 62,
+          "n_positive_rule_worse": 323,
+          "n_zero": 0,
+          "frac_negative_rule_better": 0.16103896103896104,
+          "frac_positive_rule_worse": 0.8389610389610389
+        },
+        "leave_max_doc": {
+          "dropped_doc_id": 100441,
+          "dropped_token_share": 0.00275,
+          "estimate_without_doc": 0.03771689624461723,
+          "delta_vs_full": -9.059969087539532e-05
+        }
+      },
+      "fallback_fraction": null,
+      "actual_global_action_counts": null,
+      "changed_only": null,
+      "changed_only_note": "analytic per-state mixture over all candidates; there is no discrete selection, so a changed-action subset is not defined"
+    }
+  },
+  "consistency_vs_plan_b": {
+    "checks": {
+      "constant_global_deploy_improvement": {
+        "mine": 0.00046350303455255926,
+        "plan_b": 0.00046350303455255926,
+        "abs_delta": 0.0
+      },
+      "candidate_rank_deploy_improvement": {
+        "mine": 0.0005124840536154807,
+        "plan_b": 0.0005124840536154807,
+        "abs_delta": 0.0
+      },
+      "uniform_deploy_improvement": {
+        "mine": -0.0026671704836189747,
+        "plan_b": -0.0026671704836189747,
+        "abs_delta": 0.0
+      },
+      "constant_global_fallback_fraction": {
+        "mine": 0.7457500100135803,
+        "plan_b": 0.7457500100135803,
+        "abs_delta": 0.0
+      },
+      "rank_metadata": {
+        "mine": 3.0,
+        "plan_b": 3.0,
+        "abs_delta": 0.0
+      },
+      "constant_global_action": {
+        "mine": 20.0,
+        "plan_b": 20.0,
+        "abs_delta": 0.0
+      },
+      "constant_global_D_bootstrap_estimate": {
+        "mine": -0.00046350301562051756,
+        "plan_b": -0.00046350301562051756,
+        "abs_delta": 0.0
+      }
+    },
+    "matched": true
+  },
+  "n_bootstrap": 2000,
+  "seed": 0,
+  "limitations": [
+    "The cache stores only T=1 and T=4 readouts; depths T=2,3 were never measured, so G uses the two endpoints only.",
+    "Document identity is exact doc_id only: no near-duplicate / group-level near hash (e.g. MinHash) exists in this cache, so near-duplicate leakage between controller_train and newtest cannot be excluded beyond the verified empty exact doc_id intersection; this analysis does not fabricate such a hash.",
+    "All metrics are on previously viewed newtest states (diagnostic, not a confirmation split).",
+    "A large interaction I or depth gain G does not imply a deploy benefit; only D at the final depth is deploy-relevant, and every D here is orders of magnitude below the oracle gap."
+  ],
+  "conclusion": {
+    "stable": true,
+    "interpretation": "candidate_rank has a large interaction (I=0.1464) but a final-depth deploy difference D=-0.000512 whose doc-level 95% CI crosses zero; constant_global has a statistically positive but tiny improvement (-D=0.000464, 95% CI excludes zero); uniform expectation is worse than baseline. Large G/I is a mechanism statement, not deploy value.",
+    "t2_t3_recommendation": "Not warranted for a deployment claim: the largest deploy-relevant effect (constant_global, ~4.6e-4 nats, ~0.009% of baseline cost) is far below practical relevance and 1.3% of the label-informed oracle gap; a <=1024-state T2/T3 confirmation would at most re-verify a negligible D. If run anyway for sign stability, cap it at <=1024 states on a fresh split and pre-register D, not G/I, as the endpoint."
+  }
+}

@@ -1,0 +1,6 @@
+{"time": 1793019425.520202, "phase": "train", "update": 0, "loss": 10.517110824584961, "depth": 1, "lr": 0.0003, "grad_norm": 3.7114298343658447, "supervised_tokens": 8172}
+{"time": 1793019425.6212485, "phase": "validation", "update": 1, "nll": 10.058569843941248, "ppl": 23355.08203125, "supervised_tokens": 8170, "depth": 1}
+{"time": 1793019428.8140934, "phase": "checkpoint", "path": "runs/next_2026_10_26/baseline_pilot/smoke_loop_r1/latest.pt", "sha256": "601f3430a1bf9eb7c10799352a251d48810b9cdf426aeb779d3b7679134073ed"}
+{"time": 1793019428.9085922, "phase": "final", "nll": 10.058569843941248, "ppl": 23355.08203125, "supervised_tokens": 8170, "depth": 1}
+{"time": 1793019428.9998705, "phase": "final", "nll": 10.059570073439412, "ppl": 23378.458984375, "supervised_tokens": 8170, "depth": 2}
+{"time": 1793019429.0988085, "phase": "final", "nll": 10.061993191554468, "ppl": 23435.1796875, "supervised_tokens": 8170, "depth": 4}

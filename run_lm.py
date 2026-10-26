@@ -6,11 +6,30 @@ from pathlib import Path
 import platform
 import torch
 
-from data.packed_lm import PackedLMDataset, legacy_data_fingerprint, packed_data_fingerprint
+from data.packed_lm import PackedLMDataset, legacy_data_fingerprint, packed_data_fingerprint, verify_packed_splits
 from lm_config import LMExperimentConfig
 from model import LoopMoE
 from train.common import MetricWriter, seed_everything
 from train.lm import evaluate_lm, train_lm
+
+
+def mark_unverified_data_migrations(ledger: dict) -> dict:
+    """Label legacy v1 -> v2 data migrations as an unverified compatibility stage.
+
+    A version-1 checkpoint carries no packed stream metadata, so a resume that
+    only matches the legacy document-pool hash is accepted as a compatibility
+    bridge, not as verified strict equivalence with a freshly packed stream.
+    The marking is applied to the ledger copy recorded in the run summary.
+    """
+    for entry in ledger.get("data_migrations", []):
+        entry["compatibility"] = "unverified"
+        entry["equivalence"] = "not_verified"
+        entry["note"] = (
+            "v1 checkpoint lacks packed stream metadata; resumed on the legacy "
+            "document-pool hash alone. Treat as an unverified compatibility "
+            "stage, not strict equivalence with the packed v2 stream."
+        )
+    return ledger
 
 
 def main() -> None:
@@ -34,6 +53,7 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     config.save(output_dir / "resolved_config.json")
     manifest = json.loads((Path(run.data_dir) / "manifest.json").read_text())
+    packed_hashes = verify_packed_splits(run.data_dir, ("train", "validation"), manifest)
     seed_everything(run.seed)
     device = torch.device(run.device)
     model = LoopMoE(config.model).to(device)
@@ -53,9 +73,11 @@ def main() -> None:
     data_hash = packed_data_fingerprint(manifest)
     legacy_data_hash = legacy_data_fingerprint(manifest)
     environment["data_hash"] = data_hash
+    environment["packed_sha256"] = packed_hashes
     (output_dir / "environment.json").write_text(json.dumps(environment, indent=2) + "\n")
     writer = MetricWriter(output_dir / "metrics.jsonl")
     ledger = train_lm(model, train_dataset, validation_dataset, config, device, writer, data_hash=data_hash, legacy_data_hash=legacy_data_hash)
+    ledger = mark_unverified_data_migrations(ledger)
     final = {}
     for depth in (1, 2, 4):
         final[f"depth_{depth}"] = evaluate_lm(model, validation_dataset, config, device, depth, run.validation_batches)

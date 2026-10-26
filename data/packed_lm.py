@@ -28,6 +28,11 @@ same-document visibility mask from a segment-id vector.
 ``start_batch`` resumes mid-epoch after a checkpoint restart.  The dataset
 itself also takes ``offset``/``limit`` to resume at sequence granularity or
 to carve out a contiguous shard.
+
+``verify_packed_split`` / ``verify_packed_splits`` re-hash the actual on-disk
+bytes of the three files per split and reject any drift from the SHA256
+digests declared in ``manifest.json`` (including equal-length edits); training
+and evaluation entry points call them before consuming a split.
 """
 
 from __future__ import annotations
@@ -75,6 +80,73 @@ def split_paths(root: Union[str, Path], split: str) -> Dict[str, Path]:
         "segment_ids": root / f"{split}{_SEG_SUFFIX}",
         "doc_map": root / f"{split}{_MAP_SUFFIX}",
     }
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def verify_packed_split(
+    root: Union[str, Path],
+    split: str,
+    manifest: Optional[Dict] = None,
+) -> Dict[str, str]:
+    """Recompute the SHA256 of a packed split's actual bytes and compare them
+    against the manifest declarations.
+
+    Hashes the full contents of ``{split}.input_ids.u16.bin``,
+    ``{split}.segment_ids.i32.bin`` and ``{split}.doc_map.jsonl`` and requires
+    each digest to equal the ``input_ids_sha256`` / ``segment_ids_sha256`` /
+    ``doc_map_sha256`` recorded under ``manifest["splits"][split]``.  Because
+    whole-file digests are compared, any tampering — including byte-for-byte
+    edits that keep the file length unchanged — is rejected.
+
+    Returns the actual digests on success; raises ``ValueError`` on any
+    mismatch or missing declaration and ``FileNotFoundError`` on missing
+    files.  When ``manifest`` is omitted it is read from ``root/manifest.json``.
+    """
+    root = Path(root)
+    if manifest is None:
+        manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+    try:
+        declared = manifest["splits"][split]
+    except KeyError as exc:
+        raise ValueError(f"manifest declares no split {split!r} for {root}") from exc
+    actual: Dict[str, str] = {}
+    mismatches: Dict[str, Dict[str, str]] = {}
+    for name, path in split_paths(root, split).items():
+        key = f"{name}_sha256"
+        expected = declared.get(key)
+        if expected is None:
+            raise ValueError(f"manifest declares no {key} for split {split!r} in {root}")
+        digest = _sha256_file(path)
+        actual[key] = digest
+        if digest != expected:
+            mismatches[key] = {"expected": expected, "actual": digest}
+    if mismatches:
+        raise ValueError(
+            f"packed split {split!r} in {root} failed integrity check: {mismatches}"
+        )
+    return actual
+
+
+def verify_packed_splits(
+    root: Union[str, Path],
+    splits: Sequence[str] = ("train", "validation"),
+    manifest: Optional[Dict] = None,
+) -> Dict[str, Dict[str, str]]:
+    """Verify every listed split of a packed dataset against the manifest.
+
+    Returns ``{split: {file_kind: sha256}}`` of the actual on-disk bytes.
+    """
+    root = Path(root)
+    if manifest is None:
+        manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+    return {split: verify_packed_split(root, split, manifest) for split in splits}
 
 
 def _infer_seq_len(root: Path, split: str) -> int:

@@ -1,0 +1,32 @@
+{
+  "protocol": "baseline-100m-decision-v1",
+  "created_before_final_results": true,
+  "source": {
+    "commit": "571f9f66618e4167709339d304a95423187c5a5a",
+    "tree": "ead4a9cc4a2b1faa4f2603d73e1945ecdbaeda9f",
+    "uncommitted_diff_sha256": "cf8f5d62e52d810ff56f8fbfd732d13296392eed33e90ccc912a5359b38f2504",
+    "has_uncommitted_diff": true,
+    "untracked_python_sha256": {
+      "experiments/mechanism_depth_interaction.py": "ab2d18807c950cb1213cbafa97dab5e1c3d60cec037adb3a6ff6e32a3dccf4b1",
+      "experiments/plan_c_group_sensitivity.py": "1e8327dff28a959efd81617fa677e00a46c2b1d69c3c5dc39809f70320d98122",
+      "experiments/profile_fixed_depth.py": "3259c1c85ac043b367c889555b755ca0821a6434bc10cde9e4da1615c81de3d5",
+      "experiments/validate_baseline_100m.py": "3d36f79daf9f3ee1ecca318c1c78bf63b172c6675ebcc7e3f752fe7a5c33a926",
+      "tests/test_mechanism_depth_interaction.py": "e0f8a68d0f1f53512c59ec17606fd03c53889350ca24318aedf7e61b8ce956f6",
+      "tests/test_profile_fixed_depth.py": "b968d217251d69a80e33116eccd8f4ee4125ab67aef7d088f85d2120846910ef",
+      "tests/test_validate_baseline_100m.py": "92b2d85254a749dd1637c89a346cc38a3c79faa684a224ed27dbdaf0c554f7a1"
+    },
+    "entrypoint": "experiments/r1_closed_loop.py",
+    "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+  },
+  "quality_metric": "R1 NLL on the same validation stream at 12207 updates; development comparison, not independent confirmation",
+  "efficiency_metric": "full input-to-logits R1 CUDA event latency on the same confirmation inputs, exclusive A6000",
+  "delta_definition": "loop_r1_nll - dense_parameter_nll; negative favors MoE",
+  "speedup_definition": "dense_mean_event_ms / loop_mean_event_ms - 1; positive favors MoE",
+  "next_stage_gates": {
+    "controlled_replication": "delta < 0 and speedup > 0; only then discuss quality-plus-efficiency advantage",
+    "efficiency_only_redesign": "delta >= 0 and speedup > 0.05; efficiency niche only, no SOTA-quality claim and no automatic scale-up",
+    "stop_or_fundamental_redesign": "all remaining cases; no quality-plus-efficiency win and no >5% efficiency-only branch",
+    "external_sota_claim": "not allowed by this internal two-arm comparison alone"
+  },
+  "no_posthoc_changes": true
+}

@@ -1,0 +1,57 @@
+{
+  "environment": {
+    "python": "3.12.15",
+    "torch": "2.12.1+cu130",
+    "cuda": "13.0",
+    "device": "NVIDIA RTX A6000",
+    "parameters": 104919552,
+    "data_revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+    "document_list_hash": "542f45c25c41e2689835e1044fa0fb56a36d7d82ea40bc21a5ea3a703711ec11",
+    "tokenizer_hash": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+    "data_hash": "0d9b3158c653dc10482b0ec77dafd2853f0fd425d1639b8b7dab52552122f89d",
+    "packed_sha256": {
+      "train": {
+        "input_ids_sha256": "12f395524c2b26c8388f3028a187f807d8cc7eae6e0e0784536e82218ae04aaa",
+        "segment_ids_sha256": "309b7d423562529b9ec10a73b4aadd1212f17545aec4edab2f3541e2f7c027ca",
+        "doc_map_sha256": "28683378d1b577c36fc536e712b252f3b502ed69c3a529b03614aba443f191f8"
+      },
+      "validation": {
+        "input_ids_sha256": "80af12b9eedaa30df94c775f801e151cabb7a336323bb5984ab38d010740d792",
+        "segment_ids_sha256": "93680b9effc514a5d37a308759e25caffab818e1cf9987864c1690a32b80d7bd",
+        "doc_map_sha256": "2dad2538d3e345a6b084c541bd5213a5c279c270391cd3e5bca4a21c37d73f36"
+      }
+    }
+  },
+  "ledger": {
+    "updates": 12207,
+    "input_tokens": 99998976,
+    "supervised_tokens": 99806158,
+    "ffn_rounds": 1199996928,
+    "expert_token_pairs": 2399993856,
+    "elapsed_seconds": 3070.118540733005,
+    "allocated_gpu_hours": 0.8528107057591681,
+    "peak_memory_bytes": 10404731904,
+    "schedule_phases": [],
+    "data_migrations": []
+  },
+  "validation": {
+    "depth_1": {
+      "nll": 4.2642041125347765,
+      "ppl": 71.1082992553711,
+      "supervised_tokens": 130834,
+      "depth": 1
+    },
+    "depth_2": {
+      "nll": 4.306168667810929,
+      "ppl": 74.15582275390625,
+      "supervised_tokens": 130834,
+      "depth": 2
+    },
+    "depth_4": {
+      "nll": 4.486535971273713,
+      "ppl": 88.81326293945312,
+      "supervised_tokens": 130834,
+      "depth": 4
+    }
+  }
+}

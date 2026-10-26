@@ -156,13 +156,20 @@ def gather_states(model, dataset, n_states: int, *, split: str, device: torch.de
 
 @torch.no_grad()
 def readout_ce(model, h: torch.Tensor, targets: torch.Tensor, chunk: int = 256, ledger: CounterfactualLedger | None = None) -> torch.Tensor:
-    """FP32 cross-entropy through final_norm + tied head, accumulated per chunk."""
+    """FP32 cross-entropy through final_norm + tied head, accumulated per chunk.
+
+    Autocast is explicitly disabled inside the readout: casting inputs and
+    weights with ``.float()`` alone does not stop an outer autocast context
+    from running ``final_norm``/``F.linear`` in the outer dtype, so the FP32
+    head contract must be enforced here.
+    """
     weight = model.embedding.weight
     pieces = []
     for start in range(0, h.shape[0], chunk):
-        normed = model.final_norm(h[start : start + chunk])
-        logits = F.linear(normed.float(), weight.float())
-        pieces.append(F.cross_entropy(logits, targets[start : start + chunk], reduction="none"))
+        with torch.autocast(device_type=h.device.type, enabled=False):
+            normed = model.final_norm(h[start : start + chunk])
+            logits = F.linear(normed.float(), weight.float())
+            pieces.append(F.cross_entropy(logits, targets[start : start + chunk], reduction="none"))
     if ledger is not None:
         ledger.head_readouts += int(h.shape[0])
     return torch.cat(pieces) if pieces else torch.empty(0)

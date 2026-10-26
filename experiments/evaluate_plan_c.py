@@ -11,7 +11,7 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from data.packed_lm import PackedLMDataset
+from data.packed_lm import PackedLMDataset, verify_packed_split
 from eval.counterfactual import cache_last_ffn_input, counterfactual_path_costs
 from experiments.r1_closed_loop import source_identity
 from lm_config import LMExperimentConfig
@@ -19,6 +19,109 @@ from model import LoopMoE
 from model.top2 import baseline_top2_pairs
 from train.common import autocast_context
 from train.recovery_common import atomic_json, sha256_file
+
+
+def verify_frozen_inputs(plan, corpus_dir, config_path, checkpoint_path):
+    """Reject any drift from the preregistered inputs before the first model forward.
+
+    Checks, against the frozen evaluation plan and the confirmation corpus
+    manifest: the corpus manifest hash, the backbone checkpoint hash, the
+    config file hash, the frozen document-ID list hash, the actual bytes of
+    the packed confirmation split (input_ids / segment_ids / doc_map), and
+    the tokenizer identity recorded in the corpus manifest.  Returns the
+    verified digests for the run manifest.
+    """
+    corpus_dir = Path(corpus_dir)
+    corpus_manifest = json.loads((corpus_dir / "manifest.json").read_text())
+    corpus_manifest_sha256 = sha256_file(corpus_dir / "manifest.json")
+    if corpus_manifest_sha256 != plan["corpus_manifest_sha256"]:
+        raise ValueError("confirmation corpus changed after preregistration")
+    checkpoint_sha256 = sha256_file(checkpoint_path)
+    if checkpoint_sha256 != plan["checkpoint_sha256"]:
+        raise ValueError("checkpoint differs from preregistration")
+    config_sha256 = sha256_file(config_path)
+    if config_sha256 != plan["config_sha256"]:
+        raise ValueError("config file differs from preregistration")
+    frozen_ids_sha256 = sha256_file(corpus_dir / "frozen_document_ids.json")
+    if frozen_ids_sha256 != plan["frozen_document_ids_sha256"]:
+        raise ValueError("frozen document IDs changed after preregistration")
+    packed_sha256 = verify_packed_split(corpus_dir, "confirmation", corpus_manifest)
+    tokenizer = corpus_manifest.get("tokenizer") or {}
+    tokenizer_sha256 = tokenizer.get("sha256")
+    if not tokenizer_sha256:
+        raise ValueError("confirmation corpus manifest declares no tokenizer sha256")
+    tokenizer_path = tokenizer.get("path")
+    if tokenizer_path is not None:
+        if not Path(tokenizer_path).exists():
+            raise FileNotFoundError(f"tokenizer of the frozen corpus is missing: {tokenizer_path}")
+        if sha256_file(tokenizer_path) != tokenizer_sha256:
+            raise ValueError("tokenizer file differs from the frozen corpus identity")
+    return {
+        "corpus_manifest_sha256": corpus_manifest_sha256,
+        "checkpoint_sha256": checkpoint_sha256,
+        "config_sha256": config_sha256,
+        "frozen_document_ids_sha256": frozen_ids_sha256,
+        "packed_confirmation_sha256": packed_sha256,
+        "tokenizer_sha256": tokenizer_sha256,
+    }
+
+
+def supervised_positions(segments):
+    """Supervised positions of one packed sequence, from its doc-map record.
+
+    Every segment contributes all but its final token; padding and the
+    sequence-final position are never supervised.
+    """
+    positions = []
+    start = 0
+    for segment in segments:
+        positions.extend(range(start, start + segment["length"] - 1))
+        start += segment["length"]
+    return positions
+
+
+def consistency_sample(dataset, max_states=32, seed=0):
+    """Pre-fixed cross-sequence/cross-document sample of supervised states.
+
+    Deterministic in the dataset doc maps, ``max_states`` and ``seed``, and
+    computed before any model forward.  The first pass takes at most one state
+    per document (in a seeded order), the second fills any remaining slots, so
+    the auxiliary replay check spans sequences and documents instead of the
+    first 32 same-document states.  Returns a sorted list of
+    ``(sequence_index, position, doc_id)`` triples.
+    """
+    candidates = []
+    for sequence_index in range(len(dataset)):
+        item = dataset[sequence_index]
+        start = 0
+        for segment in item["segments"]:
+            for position in supervised_positions([segment]):
+                candidates.append((sequence_index, start + position, segment["doc"]))
+            start += segment["length"]
+    rng = np.random.default_rng(seed)
+    order = rng.permutation(len(candidates))
+    chosen = []
+    seen_docs = set()
+    for index in order:
+        candidate = candidates[index]
+        if candidate[2] in seen_docs:
+            continue
+        chosen.append(candidate)
+        seen_docs.add(candidate[2])
+        if len(chosen) >= max_states:
+            break
+    if len(chosen) < max_states:
+        taken = set(chosen)
+        for index in order:
+            candidate = candidates[index]
+            if candidate in taken:
+                continue
+            chosen.append(candidate)
+            taken.add(candidate)
+            if len(chosen) >= max_states:
+                break
+    chosen.sort(key=lambda candidate: (candidate[0], candidate[1]))
+    return chosen
 
 
 def accumulate_document_values(loss_sums, counts, indices, losses, doc_counts=None):
@@ -46,21 +149,22 @@ def document_bootstrap(diff_sums, counts, replicates, seed=0):
 
 
 @torch.no_grad()
-def production_consistency(model, dataset, depths, device, dtype, max_states=32):
+def production_consistency(model, dataset, depths, device, dtype, max_states=32, seed=0):
+    sample = consistency_sample(dataset, max_states=max_states, seed=seed)
+    by_sequence = {}
+    for sequence_index, position, _doc_id in sample:
+        by_sequence.setdefault(sequence_index, []).append(position)
     records = []
     layer = model.config.adaptive_layers[-1]
     block = model.blocks[layer]
-    for sequence_index in range(len(dataset)):
+    for sequence_index in sorted(by_sequence):
         item = dataset[sequence_index]
         input_ids = torch.from_numpy(item["input_ids"]).unsqueeze(0).to(device)
         labels = torch.from_numpy(item["labels"]).unsqueeze(0).to(device)
         segment_ids = torch.from_numpy(item["segment_ids"]).unsqueeze(0).to(device)
-        supervised = torch.nonzero(labels[0] != -100, as_tuple=False).squeeze(-1)
         with autocast_context(device, dtype):
             cached_h = cache_last_ffn_input(model, input_ids, segment_ids, depth=1)
-        for position in supervised.tolist():
-            if len(records) >= max_states:
-                return records
+        for position in sorted(by_sequence[sequence_index]):
             target = labels[0, position].reshape(1)
             with autocast_context(device, dtype):
                 normalized = block.ffn_norm(cached_h[:, position])
@@ -89,10 +193,7 @@ def main():
     plan_path = plan_dir / "evaluation_plan.json"
     plan = json.loads(plan_path.read_text())
     corpus_dir = plan_dir / "confirmation_corpus"
-    if sha256_file(corpus_dir / "manifest.json") != plan["corpus_manifest_sha256"]:
-        raise ValueError("confirmation corpus changed after preregistration")
-    if sha256_file(args.checkpoint) != plan["checkpoint_sha256"]:
-        raise ValueError("checkpoint differs from preregistration")
+    verified = verify_frozen_inputs(plan, corpus_dir, args.config, args.checkpoint)
     config = LMExperimentConfig.load(args.config)
     config.train.dtype = plan["dtype"]
     config.train.batch_size = plan["evaluation_batch_size"]
@@ -134,7 +235,9 @@ def main():
         "r1_minus_r4": document_bootstrap(loss_sums[1] - loss_sums[4], counts, plan["bootstrap_replicates"], plan["bootstrap_seed"]),
         "r2_minus_r4": document_bootstrap(loss_sums[2] - loss_sums[4], counts, plan["bootstrap_replicates"], plan["bootstrap_seed"]),
     }
-    consistency = production_consistency(model, dataset, depths, device, config.train.dtype)
+    consistency_states = plan.get("consistency_states", 32)
+    consistency_seed = plan.get("consistency_seed", 0)
+    consistency = production_consistency(model, dataset, depths, device, config.train.dtype, max_states=consistency_states, seed=consistency_seed)
     summary = {
         "protocol": plan["protocol"],
         "evaluation_plan_sha256": sha256_file(plan_path),
@@ -153,6 +256,13 @@ def main():
             "states": len(consistency),
             "max_abs_diff_by_depth": {str(depth): max(record["depths"][str(depth)]["abs_diff"] for record in consistency) for depth in depths},
             "full_forward_is_primary": True,
+            "sampling": {
+                "strategy": "prefixed_cross_document_v2",
+                "seed": consistency_seed,
+                "max_states": consistency_states,
+                "sequences": len({record["sequence_id"] for record in consistency}),
+                "documents": len({record["doc_id"] for record in consistency}),
+            },
         },
         "elapsed_seconds_by_depth": elapsed,
         "peak_memory_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else 0,
@@ -175,6 +285,10 @@ def main():
         "production_consistency_sha256": sha256_file(plan_dir / "production_consistency.json"),
         "checkpoint_sha256": sha256_file(args.checkpoint),
         "corpus_manifest_sha256": sha256_file(corpus_dir / "manifest.json"),
+        "config_sha256": verified["config_sha256"],
+        "frozen_document_ids_sha256": verified["frozen_document_ids_sha256"],
+        "packed_confirmation_sha256": verified["packed_confirmation_sha256"],
+        "tokenizer_sha256": verified["tokenizer_sha256"],
         "torch_version": torch.__version__,
         "device": str(device),
     }

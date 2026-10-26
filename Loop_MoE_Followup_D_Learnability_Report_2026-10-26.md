@@ -39,7 +39,9 @@
 | 8k | h-only | −0.003581 | −0.002558 | −0.001781 |
 | 8k | candidate-aware | −0.002245 | −0.002345 | −0.001548 |
 
-candidate-aware 在部分对照中改善了 h-only 的负结果，但 8k 的三个 test 结果仍全部为负。seed 0 的 selection 正值也没有复现为 test 正值。不能据此宣称表示修复已经产生可部署收益。
+六组 candidate-aware 配对点估计均优于对应 h-only：2k 的三 seed 平均改善由 −0.004252 变为 −0.000483，8k 由 −0.002640 变为 −0.002046。但这只是改善了较差的学生基线；8k 的三个 candidate-aware test 结果仍全部为负，seed 0 的 selection 正值也没有复现为 test 正值。不能据此宣称表示修复已经产生可部署收益。
+
+此外，固定 10 epochs 使 2k→8k 同时改变数据量和 optimizer updates（80→320），并改变 minibatch 组成。该曲线只说明这套训练协议没有改善，不能解释为“更多数据本身有害”。
 
 ## 4. 停止决定
 

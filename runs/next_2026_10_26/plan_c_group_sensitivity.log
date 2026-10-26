@@ -1,0 +1,32 @@
+{
+  "scope": "post-hoc normalized-text-group sensitivity; original frozen document-level analysis retained",
+  "document_ids": 990,
+  "normalized_text_groups": 988,
+  "document_primary": {
+    "estimate": 0.0016678784688157883,
+    "upper_95": 0.0017566059123453536,
+    "ci_95": [
+      0.001566648650061594,
+      0.0017732464562323382
+    ],
+    "replicates": 10000,
+    "seed": 0
+  },
+  "group_sensitivity": {
+    "estimate": 0.0016678784688157883,
+    "upper_95": 0.001756083737743514,
+    "ci_95": [
+      0.001572162913591782,
+      0.0017745437534688086
+    ],
+    "replicates": 10000,
+    "seed": 0
+  },
+  "leave_one_document_out_estimate_range": [
+    0.0016467365382569993,
+    0.0016782126430799483
+  ],
+  "valid_tokens": 1097936,
+  "per_document_sha256": "b897b1a0738d92acc2489c5183784a884e2fb10dbf24de2d7644baa92a0683f6",
+  "confirmation_documents_sha256": "f13f19959850296bfc0da9581437878c19db23afdc1bc9d7977022739b610e09"
+}

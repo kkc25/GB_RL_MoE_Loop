@@ -29,6 +29,7 @@ from eval.counterfactual import (
     gather_states,
     oracle_metrics,
     random_selection,
+    readout_ce,
 )
 from model import LoopMoE
 from model.top2 import enumerate_top2_actions
@@ -203,6 +204,35 @@ class CounterfactualTests(unittest.TestCase):
             logits = block.executor.gate_logits(block.ffn_norm(permuted))
         self.assertEqual(reference.shape, h.shape)
         self.assertEqual(tuple(logits.shape), (h.shape[0], EXPERTS))
+
+
+class ReadoutPrecisionTests(unittest.TestCase):
+    def test_readout_ce_is_invariant_to_outer_autocast(self):
+        # Regression: an outer BF16 autocast context must not leak into the
+        # FP32 head readout; casting inputs with .float() alone still lets
+        # autocast run final_norm/F.linear in the outer dtype.
+        model = tiny_model()
+        input_ids, labels, segment_ids = tiny_batch()
+        states = extract_states(model, input_ids, labels, segment_ids)
+        reference = readout_ce(model, states["h"], states["targets"])
+        with torch.autocast("cpu", dtype=torch.bfloat16):
+            protected = readout_ce(model, states["h"], states["targets"])
+            # Sanity: the unprotected pattern really is affected here,
+            # otherwise this regression test would be vacuous on CPU.
+            unprotected_logits = F.linear(
+                model.final_norm(states["h"].float()), model.embedding.weight.float()
+            )
+        self.assertEqual(unprotected_logits.dtype, torch.bfloat16)
+        torch.testing.assert_close(protected, reference, rtol=0, atol=0)
+
+    def test_readout_ce_chunking_unchanged_under_autocast(self):
+        model = tiny_model()
+        input_ids, labels, segment_ids = tiny_batch()
+        states = extract_states(model, input_ids, labels, segment_ids)
+        with torch.autocast("cpu", dtype=torch.bfloat16):
+            chunked = readout_ce(model, states["h"], states["targets"], chunk=3)
+        reference = readout_ce(model, states["h"], states["targets"])
+        torch.testing.assert_close(chunked, reference, rtol=0, atol=0)
 
 
 class SplitIsolationTests(unittest.TestCase):
