@@ -26,9 +26,10 @@ Implements spec sections 11.2-11.5 and 12:
   PPO ratio, no multi-epoch reuse, no critic.
 
 Evaluation and selection follow spec 16.1: every new run evaluates at
-update 0 and saves ``checkpoint_initial.pt`` as the first best candidate;
-fixed-interval evaluations track the best by greedy NLL with the registered
-tie rules, and an exact resume never resets that record.
+update 0 and saves ``checkpoint_initial.pt`` as the first candidate;
+fixed-interval evaluations retain NLL selection for R1; new
+R2 uses a versioned cost objective subject to a pinned selected-R1 quality
+bound. An exact resume never resets or reinterprets that record.
 """
 
 from __future__ import annotations
@@ -71,6 +72,7 @@ from rl_lm.ledger import RLLedger
 from rl_lm.objectives import rloo_advantage
 from rl_lm.readout import terminal_ce
 from rl_lm.replay import iter_context_microbatches, microbatch_pg_loss, replay_log_joint
+from rl_lm.reporting import stop_metrics
 from rl_lm.rng import make_uniform_table
 from rl_lm.types import ContextBatch
 from train.recovery_common import atomic_json, sha256_file
@@ -308,6 +310,7 @@ class Trainer:
             raise ValueError(f"train cache has {total_contexts} contexts, fewer than batch {self.batch}")
         self.batches_per_epoch = total_contexts // self.batch
         self.evaluator = evaluator
+        self.selection_policy = self._selection_policy()
 
         hidden = int(self.model.config.hidden_size)
         self.feature_dim = 2 * hidden + 2 * EXPERTS + 4
@@ -340,7 +343,8 @@ class Trainer:
         self._visited = set()
         self.lr_scale = 1.0
         self.lr_backoffs = 0
-        self.selection_state = {"best": None, "candidates": [], "evaluations": []}
+        self.selection_state = {"best": None, "candidates": [], "evaluations": [],
+                                "policy": copy.deepcopy(self.selection_policy)}
         self.warmstart_from = None
         self.start_time = time.time()
         self.resumed = resume_path is not None
@@ -404,6 +408,7 @@ class Trainer:
         payload = resume_exact(resume_path, resolved_config=self.config.to_dict())
         if resume_path.parent.resolve() != self.run_dir.resolve():
             raise ValueError("an exact resume must point at a checkpoint of this run's output_dir")
+        self._validate_selection_resume(payload["selection_state"])
         self.actor = self._build_actor()
         self.actor.load_state_dict(payload["actor_state_dict"])
         self.actor.to(self.device)
@@ -663,7 +668,7 @@ class Trainer:
             "zero_adv_context_fraction": float(same.float().mean()),
             "distinct_paths_per_context": float(np.mean(distinct)),
             "rounds_histogram": rounds_hist,
-            "stop_fraction": float((records.actions == STOP_ACTION).float().mean()),
+            **stop_metrics(records.actions, records.stop_allowed, max_calls=self.rmax),
             "pair_usage": pair_usage.tolist(),
             "expert_usage": expert_usage.tolist(),
             "teacher_pair_agreement": agreement,
@@ -700,6 +705,29 @@ class Trainer:
 
     # -------------------------------------------------------------- evaluation
 
+    def _selection_policy(self) -> dict:
+        price = float(self.config.get("cost.lambda"))
+        if self.stage == "r1":
+            # R1 has fixed cost and retains historical selection semantics.
+            return {"version": "legacy_greedy_nll_v1"}
+        identity = getattr(self.evaluator, "r1_identity", None)
+        digest = (identity or {}).get("checkpoint_sha256", "")
+        if (self.stage != "r2" or not identity or identity.get("max_calls") != 1
+                or len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest)):
+            raise ValueError("R2 selection requires a validated --r1-reference-checkpoint")
+        tolerance = float(self.config.get("evaluation.r2_quality_tolerance_nll"))
+        if tolerance != 0.005:
+            raise ValueError("R2 selection requires the spec's 0.005 NLL tolerance")
+        return {"version": "r2_selected_r1_bound_v1", "lambda": price,
+                "quality_tolerance_nll": tolerance, "r1_checkpoint_sha256": digest}
+
+    def _validate_selection_resume(self, state: dict) -> None:
+        stored = state.get("policy", {"version": "legacy_greedy_nll_v1"})
+        if stored != self.selection_policy:
+            raise ValueError("selection policy/reference changed; legacy R2 runs cannot exact-resume under the new rule")
+        if "lambda" in self.selection_policy and not math.isfinite(state.get("r1_reference_nll", float("nan"))):
+            raise ValueError("R2 resume lacks its pinned R1 selection NLL")
+
     def _evaluate_and_select(self) -> dict:
         if self.evaluator is None:
             raise RuntimeError("no selection evaluator wired; refusing to track checkpoints blind")
@@ -709,6 +737,26 @@ class Trainer:
             "greedy_nll": float(metrics["greedy_nll"]),
             "mean_rounds": float(metrics["mean_rounds"]),
         }
+        score_key = "greedy_nll"
+        eligible = True
+        if "lambda" in self.selection_policy:
+            reference = metrics.get("vs_selected_r1") or {}
+            identity = reference.get("identity") or {}
+            if identity.get("checkpoint_sha256") != self.selection_policy["r1_checkpoint_sha256"]:
+                raise ValueError("R2 selection evaluation changed or omitted the pinned R1 reference")
+            r1_nll = float(reference.get("nll", float("nan")))
+            if not all(math.isfinite(v) for v in (r1_nll, candidate["greedy_nll"], candidate["mean_rounds"])):
+                raise ValueError("R2 selection metrics must be finite")
+            if not 1 <= candidate["mean_rounds"] <= self.rmax:
+                raise ValueError("R2 selection mean_rounds outside the execution contract")
+            pinned = self.selection_state.setdefault("r1_reference_nll", r1_nll)
+            if r1_nll != pinned:
+                raise ValueError("pinned R1 selection NLL changed since initial evaluation")
+            candidate["selection_score"] = candidate["greedy_nll"] + self.selection_policy["lambda"] * (candidate["mean_rounds"] - 1)
+            candidate["quality_bound_nll"] = pinned + self.selection_policy["quality_tolerance_nll"]
+            eligible = candidate["greedy_nll"] <= candidate["quality_bound_nll"]
+            candidate["eligible"] = eligible
+            score_key = "selection_score"
         record = dict(candidate)
         record["metrics"] = metrics
         self.selection_state["evaluations"].append(record)
@@ -716,9 +764,9 @@ class Trainer:
         with (self.run_dir / "evaluations.jsonl").open("a") as handle:
             handle.write(json.dumps(record) + "\n")
         best = self.selection_state["best"]
-        is_better = best is None
-        if best is not None:
-            delta = candidate["greedy_nll"] - best["greedy_nll"]
+        is_better = eligible and best is None
+        if eligible and best is not None:
+            delta = candidate[score_key] - best[score_key]
             if delta < -self.tie_tolerance:
                 is_better = True
             elif abs(delta) < self.tie_tolerance:
@@ -813,7 +861,7 @@ class Trainer:
             atomic_json(self.run_dir / "source_identity.json", self.source_identity)
         initial = self._evaluate_and_select()
         self._save_checkpoint("initial")
-        if self.selection_state["best"] is None:
+        if self.selection_state["best"] is None and "lambda" not in self.selection_policy:
             raise RuntimeError("update-0 evaluation did not initialize the best record")
         self._save_checkpoint("latest")
         return initial
@@ -842,13 +890,18 @@ class Trainer:
         atomic_json(
             self.run_dir / "selection_manifest.json",
             {
-                "rule": "lowest greedy_nll on selection; ties within "
+                "selection_status": "selected" if self.selection_state["best"] else "no_feasible_candidate",
+                "policy": self.selection_policy,
+                "r1_reference_nll": self.selection_state.get("r1_reference_nll"),
+                "rule": ("lowest NLL + lambda*(mean_rounds-1), subject to pinned R1 NLL + 0.005; ties within "
+                         if "lambda" in self.selection_policy else "legacy lowest greedy_nll on selection; ties within ") +
                 f"{self.tie_tolerance} prefer fewer rounds then earlier update",
                 "best": self.selection_state["best"],
                 "candidates": self.selection_state["candidates"],
             },
         )
         summary = {
+            "selection_status": "selected" if self.selection_state["best"] else "no_feasible_candidate",
             "status": status,
             "run_id": self.run_id,
             "initialization": self.initialization,
@@ -876,6 +929,7 @@ class Trainer:
             f"- successful updates: {summary['successful_updates']} / planned {summary['planned_updates']}"
             f" (stop-after cap {summary['stop_after']})",
             f"- LR scale: {summary['lr_scale']}, cumulative KL backoffs: {summary['lr_backoffs']}",
+            f"- selection status: {summary.get('selection_status', 'selected' if best else 'no_feasible_candidate')}",
             f"- best: update {best.get('update')}, greedy_nll {best.get('greedy_nll')},"
             f" mean_rounds {best.get('mean_rounds')}",
             "",

@@ -10,15 +10,19 @@ the canonical teacher reference ``q``.  The same observation's ``n``/``z``
 must be reused by the executor so that actor and executor never see two
 different gate precisions.
 
-Two execution backends share the same pair/weight/residual math:
+Three execution backends share the same pair/weight/residual math:
 
 - ``canonical_all_experts_v1`` (training reward): fixed shape, chunk=64,
   zero padding, all 8 experts computed per chunk, then the actual pair is
   gathered and mixed with the original FP32 top-2 softmax weights.  Stopped
   rows keep their hidden; their computed results are discarded but counted
   as physical work.
-- ``sparse_merged_v1`` (deployment candidate): the two assignment slots are
-  merged and each expert runs only on the rows that selected it.
+- ``sparse_merged_v1`` (historical deployment candidate): sparse dispatch
+  separately for each slot/expert; its identity and arithmetic are retained.
+- ``sparse_merged_v2`` (opt-in deployment candidate): both assignment slots
+  are dispatched together per expert, reconstructed by row/slot, then mixed.
+  Variable expert batch shapes may change rounding; this is not a claim of
+  bitwise parity or a measured speedup.
 """
 
 from __future__ import annotations
@@ -35,6 +39,7 @@ from rl_lm.selector import pair_reference
 
 CANONICAL_BACKEND = "canonical_all_experts_v1"
 SPARSE_BACKEND = "sparse_merged_v1"
+MERGED_BACKEND = "sparse_merged_v2"
 EXPERTS = 8
 
 
@@ -269,14 +274,18 @@ class FrozenLastFFNExecutor(_BaseExecutor):
 
 
 class SparseMergedExecutor(_BaseExecutor):
-    """Deployment candidate (``sparse_merged_v1``): merged per-expert dispatch."""
+    """Historical ``sparse_merged_v1``: slot-by-slot sparse dispatch.
+
+    The misleading historical class/backend names are kept for compatibility.
+    Use SparseMergedV2Executor for genuinely merged expert buckets.
+    """
 
     backend = SPARSE_BACKEND
 
     @torch.no_grad()
     def step_pair(self, h: torch.Tensor, observation: FrozenObservation, actions: torch.Tensor) -> torch.Tensor:
         """Same pair/weight/residual math as the canonical backend, but each
-        expert runs only on the rows that selected it (both slots merged)."""
+        expert runs only on the rows that selected it in each separate slot."""
         self._validate_step(h, observation, actions)
         count = h.shape[0]
         pairs = self.table[actions - 1]  # [N,2]
@@ -297,11 +306,71 @@ class SparseMergedExecutor(_BaseExecutor):
         return h + self.gamma * mixed
 
 
+class SparseMergedV2Executor(_BaseExecutor):
+    """Opt-in merged dispatch; leaves canonical and historical v1 unchanged.
+
+    Each expert receives one batch containing assignments from both slots.
+    Outputs are written to unique row/slot positions, not atomically added;
+    the final FP32 mixture retains the canonical first-plus-second order.
+    Python/nonzero and variable-shape GEMMs remain, so performance and CUDA
+    numerical drift must be measured before deployment promotion.
+    """
+
+    backend = MERGED_BACKEND
+
+    @torch.no_grad()
+    def pair_update(self, n: torch.Tensor, pairs: torch.Tensor, weights: torch.Tensor) -> torch.Tensor:
+        """Pre-gamma update from normalized FP32 rows and explicit routing.
+
+        No norm, gate, softmax, residual, or STOP handling occurs here. Pairs
+        must be distinct ascending IDs, and weights are the caller's FP32
+        pair-softmax weights. Ledger counts actual assignments, including
+        safe proposals that a transition later discards for stopped rows.
+        """
+        if n.ndim != 2 or n.dtype != torch.float32:
+            raise ValueError("n must be FP32 [N,D]")
+        count, dim = n.shape
+        if pairs.shape != (count, 2) or pairs.dtype != torch.int64:
+            raise ValueError("pairs must be int64 [N,2]")
+        if weights.shape != (count, 2) or weights.dtype != torch.float32:
+            raise ValueError("weights must be FP32 [N,2]")
+        if pairs.device != n.device or weights.device != n.device:
+            raise ValueError("routing and normalized states must share a device")
+        if bool(((pairs < 0) | (pairs >= EXPERTS)).any()) or bool((pairs[:, 0] >= pairs[:, 1]).any()):
+            raise ValueError("pairs must contain ascending distinct expert IDs in [0,7]")
+        slot_outputs = n.new_empty((count * 2, dim))
+        assignments = pairs.reshape(-1)
+        with _frozen_compute(n.device, self.compute_dtype):
+            for expert in range(EXPERTS):
+                positions = torch.nonzero(assignments == expert, as_tuple=False).squeeze(-1)
+                if positions.numel() == 0:
+                    continue
+                rows = positions // 2
+                selected = n[rows]
+                hidden = F.silu(F.linear(selected, self.pool.w1[expert])) * F.linear(selected, self.pool.w3[expert])
+                out = F.linear(hidden, self.pool.w2[expert])
+                slot_outputs[positions] = out.float()
+        slot_outputs = slot_outputs.reshape(count, 2, dim)
+        mixed = weights[:, 0:1] * slot_outputs[:, 0] + weights[:, 1:2] * slot_outputs[:, 1]
+        if self.ledger is not None:
+            self.ledger.physical_expert_rows += 2 * count
+        return mixed
+
+    @torch.no_grad()
+    def step_pair(self, h: torch.Tensor, observation: FrozenObservation, actions: torch.Tensor) -> torch.Tensor:
+        self._validate_step(h, observation, actions)
+        pairs = self.table[actions - 1]
+        weights = F.softmax(observation.z.gather(1, pairs).float(), dim=-1)
+        return h + self.gamma * self.pair_update(observation.n, pairs, weights)
+
+
 def make_executor(model, backend: str, **kwargs) -> _BaseExecutor:
     if backend == CANONICAL_BACKEND:
         return FrozenLastFFNExecutor(model, **kwargs)
     if backend == SPARSE_BACKEND:
         return SparseMergedExecutor(model, **kwargs)
+    if backend == MERGED_BACKEND:
+        return SparseMergedV2Executor(model, **kwargs)
     raise ValueError(f"unknown backend: {backend!r}")
 
 

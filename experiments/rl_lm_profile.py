@@ -171,6 +171,7 @@ def main() -> None:
     parser.add_argument("--physical-gpu-index", type=int)
     parser.add_argument("--dense-config", default="runs/next_2026_10_26/baseline_100m/dense_parameter.json")
     parser.add_argument("--dense-checkpoint", default="runs/next_2026_10_26/baseline_100m/dense_parameter/latest.pt")
+    parser.add_argument("--deployment-backend", default="sparse_merged_v1", choices=["sparse_merged_v1", "sparse_merged_v2"])
     parser.add_argument("--r1-actor", default=None, help="P1 best actor checkpoint (max_calls=1 candidate)")
     parser.add_argument("--r2-actor", default=None, help="P2 candidate actor checkpoint (max_calls=2)")
     parser.add_argument("--sequences", type=int, default=32, help="fixed profile inputs from the selection split")
@@ -178,7 +179,7 @@ def main() -> None:
     parser.add_argument("--repeats", type=int, default=5)
     parser.add_argument("--measurements", type=int, default=200)
     parser.add_argument("--batch8", action="store_true", help="also run the batch=8 secondary workload")
-    parser.add_argument("--output-dir", default="runs/rl_lm_pair_v1/task_f/profile")
+    parser.add_argument("--output-dir", default=None, help="new output directory; default is metric/backend-versioned")
     args = parser.parse_args()
 
     config = resolve_config(args.config, checkpoint=args.checkpoint, corpus_dir=args.corpus_dir, tokenizer=args.tokenizer, device=args.device)
@@ -190,7 +191,9 @@ def main() -> None:
     # refer to the profiled GPU even when it is not cuda:0.
     torch.cuda.set_device(device)
     check_exclusive(device, args.physical_gpu_index)
-    output_dir = Path(args.output_dir)
+    output_dir = Path(args.output_dir or f"runs/rl_lm_pair_v1/task_f/profile_metrics_v2_{args.deployment_backend}")
+    if (output_dir / "profile_report.json").exists():
+        raise FileExistsError("profile report already exists; choose a new --output-dir to preserve it")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     model, _ = load_backbone(config, device)
@@ -223,6 +226,15 @@ def main() -> None:
 
     report = {
         "spec": "16.4",
+        "metric_schema_version": "rl_lm_profile_v2",
+        "deployment_backend": args.deployment_backend,
+        "timing_scopes": {
+            "selector_only": "terminal norm + gate + named selection/actor work; no experts or head",
+            "executor_only": "terminal expert dispatch + pair mixing + residual; precomputed norm/gate/routes",
+            "end_to_end": "full model prefix + terminal policy/all rounds + final norm/head; excludes CE",
+        },
+        "variant_semantics": {"grouped_canonical": "canonical_all_experts_v1 dense physical work; not sparse grouped GEMM",
+                              "merged_dispatch": args.deployment_backend},
         "gpu": gpu_metadata(device, args.physical_gpu_index),
         "backbone_checkpoint_sha256": sha256_file(config.get("backbone.checkpoint_path")),
         "dense_checkpoint_sha256": sha256_file(args.dense_checkpoint),
@@ -292,7 +304,7 @@ def main() -> None:
             _, z = shared(index)
             canonical_pair(z)
 
-        executor = make_executor(model, "sparse_merged_v1", chunk=chunk, compute_dtype=compute_dtype)
+        executor = make_executor(model, args.deployment_backend, chunk=chunk, compute_dtype=compute_dtype)
         rl_actor = actors.get("learned_r2", actors.get("learned_r1", (None, None)))[0]
         rounds0 = torch.zeros(batch * 1024, dtype=torch.int64, device=device)
         prev0 = torch.full((batch * 1024, 2), -1, dtype=torch.int64, device=device)
@@ -319,8 +331,8 @@ def main() -> None:
             gates = [block.moe.gate(n).float() for n in norms]
         routes = [canonical_pair(z) for z in gates]
         actions = [r + 1 for r in routes]
-        tables = [make_executor(model, "sparse_merged_v1", chunk=chunk, compute_dtype=compute_dtype).table[a - 1] for a in actions]
-        merged = make_executor(model, "sparse_merged_v1", chunk=chunk, compute_dtype=compute_dtype)
+        tables = [make_executor(model, args.deployment_backend, chunk=chunk, compute_dtype=compute_dtype).table[a - 1] for a in actions]
+        merged = make_executor(model, args.deployment_backend, chunk=chunk, compute_dtype=compute_dtype)
         grouped = make_executor(model, "canonical_all_experts_v1", chunk=chunk, compute_dtype=compute_dtype)
         rounds0 = torch.zeros(rows, dtype=torch.int64, device=device)
         prev0 = torch.full((rows, 2), -1, dtype=torch.int64, device=device)
@@ -365,7 +377,7 @@ def main() -> None:
             def run(index):
                 forward_with_last_ffn_policy(
                     model, policy, ids[index], segs[index],
-                    max_calls=calls, backend="sparse_merged_v1",
+                    max_calls=calls, backend=args.deployment_backend,
                     compute_dtype=compute_dtype, chunk=chunk, head_chunk=head_chunk,
                 )
             return run

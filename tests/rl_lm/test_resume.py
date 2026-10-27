@@ -87,23 +87,48 @@ def toy_provider(count: int, seed: int) -> TensorContextProvider:
     return TensorContextProvider(h0, targets, ref_ce, episode_ids)
 
 
+class ToyPinnedR1Evaluator:
+    """Test-only reference: pin the initial zero-STOP actor NLL, never production evidence."""
+    r1_identity = {"checkpoint_sha256": "0" * 64, "max_calls": 1, "name": "toy_initial_r1"}
+
+    def __init__(self):
+        self.base = None
+        self.nll = None
+
+    def __call__(self, model, actor, update):
+        metrics = self.base(model, actor, update)
+        if self.nll is None:
+            if update != 0:
+                raise AssertionError("toy R1 NLL must be pinned at initialization or restored")
+            self.nll = metrics["greedy_nll"]
+        metrics["vs_selected_r1"] = {"identity": self.r1_identity, "nll": self.nll}
+        return metrics
+
+
 def make_trainer(config_dict, *, resume_path=None, warmstart_path=None, stop_after=None) -> Trainer:
     config = RLConfig.from_dict(copy.deepcopy(config_dict))
     model = build_tiny_model()
+    pinned = ToyPinnedR1Evaluator() if config.get("stage") == "r2" else None
     trainer = Trainer(
         config,
         model,
         train_contexts=toy_provider(64, 1234),
-        evaluator=None,
+        evaluator=pinned,
         device=torch.device("cpu"),
         resume_path=resume_path,
         warmstart_path=warmstart_path,
         stop_after=stop_after,
     )
     selection = toy_provider(8, 777)
-    trainer.evaluator = GreedyCacheEvaluator(
+    cache_evaluator = GreedyCacheEvaluator(
         trainer.environment, selection.gather(list(range(8)), torch.device("cpu"))
     )
+    if pinned is not None:
+        pinned.base = cache_evaluator
+        pinned.nll = trainer.selection_state.get("r1_reference_nll")
+        trainer.evaluator = pinned
+    else:
+        trainer.evaluator = cache_evaluator
     return trainer
 
 

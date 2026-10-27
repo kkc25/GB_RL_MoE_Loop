@@ -49,3 +49,20 @@ python -m unittest discover -s tests -t . -v
   复现实验时需用 `experiments/rl_lm_prepare.py` / `rl_lm_corpus.py` 重新生成，
   数据源为 HuggingFace `fineweb-edu`（sample-10BT），身份见各 run 目录下的
   `source_identity.json` / `source_manifest.json`。
+
+## CPU correctness checks (not an experiment reproduction)
+
+The CPU-only suite can be run without installing the CUDA freeze or downloading
+training data/checkpoints:
+
+```bash
+python3.12 -m venv .venv-cpu
+source .venv-cpu/bin/activate
+python -m pip install torch==2.12.1 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements-test.txt
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m unittest discover -s tests -t . -v
+```
+
+GitHub Actions runs this same CPU suite. Passing it does not establish CUDA BF16
+parity, A6000 speed, or training quality; those require the separately recorded
+GPU validation protocol. The original CUDA requirements remain unchanged.

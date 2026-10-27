@@ -36,6 +36,7 @@ import torch
 from torch import nn
 
 from data.packed_lm import PackedLMDataset
+from experiments.rl_lm_single_adapt import ADAPT_CHECKPOINT_FORMAT, ADAPT_OBJECTIVE_VERSION
 from rl_lm.checkpoint import (
     capture_rng_state,
     move_optimizer_state,
@@ -46,6 +47,7 @@ from rl_lm.checkpoint import (
 from rl_lm.cli import load_backbone, write_resolved_config
 from rl_lm.objectives import rloo_advantage
 from rl_lm.readout import terminal_ce
+from rl_lm.reporting import stop_metrics
 from rl_lm.rng import make_uniform_table
 from rl_lm.single_actor import SingleActor, SingleDecisionRecords
 from rl_lm.single_config import SingleRLConfig, resolve_single_config, single_cache_identity
@@ -583,7 +585,7 @@ class SingleTrainer:
             "advantage_std": float(advantage.std(unbiased=False)),
             "zero_adv_context_fraction": float(same.float().mean()),
             "rounds_histogram": rounds_hist,
-            "stop_fraction": float((records.actions == STOP_ACTION).float().mean()),
+            **stop_metrics(records.actions, records.stop_allowed, max_calls=self.rmax),
             "expert_usage": expert_usage.tolist(),
             "teacher_expert_agreement": agreement,
             "legal_entropy_mean": float(entropy.mean()),
@@ -895,6 +897,41 @@ class SingleOnlineSelectionEvaluator:
 # ------------------------------------------------------------------ main
 
 
+def validate_adaptation_gate(gate: dict, adapted_sha: str) -> None:
+    if gate.get("objective_version") != ADAPT_OBJECTIVE_VERSION:
+        raise ValueError("legacy adaptation gate cannot authorize repaired pair-teacher single-RL")
+    if not gate.get("single_rl_allowed"):
+        raise ValueError("adaptation gate does not allow single-RL")
+    if gate.get("student_checkpoint_sha256") != adapted_sha:
+        raise ValueError("adaptation gate belongs to a different student checkpoint")
+
+
+def reference_ce_identity(cache: dict, adapted_sha: str, compute_dtype: str) -> dict:
+    # Bind actual payload/order, not only a manifest that might have stale bytes.
+    digest = hashlib.sha256()
+    for key in ("h0", "targets"):
+        array = np.asarray(cache[key])
+        digest.update(json.dumps([key, str(array.dtype), list(array.shape)]).encode())
+        for start in range(0, len(array), 2048):
+            digest.update(np.ascontiguousarray(array[start:start + 2048]).tobytes())
+    digest.update(json.dumps(cache["episode_ids"], sort_keys=True).encode())
+    return {"version": "adapted_single_reference_ce_v2", "adapted_checkpoint_sha256": adapted_sha,
+            "cache_payload_sha256": digest.hexdigest(), "cache_manifest": cache["manifest"],
+            "compute_dtype": compute_dtype, "head_contract": "production_bf16_head_v1",
+            "expert_rows_per_chunk": 2048, "head_chunk": 2048}
+
+
+def validate_reference_ce_identity(meta: dict, expected: dict) -> None:
+    if meta.get("identity") != expected:
+        raise ValueError("cached reference CE identity mismatch (checkpoint/cache/order/numerics); use a new run directory")
+
+
+def validate_adapted_objective(payload: dict) -> None:
+    if (payload.get("format_version") != ADAPT_CHECKPOINT_FORMAT
+            or payload.get("objective_version") != ADAPT_OBJECTIVE_VERSION):
+        raise ValueError("legacy/wrong-objective adapted checkpoint cannot start repaired single-RL; run a new pair-teacher adaptation")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
@@ -915,10 +952,13 @@ def main() -> None:
     if not gate_path.exists():
         raise RuntimeError("adaptation gate.json missing; run experiments.rl_lm_single_adapt first")
     gate = json.loads(gate_path.read_text())
+    if gate.get("objective_version") != ADAPT_OBJECTIVE_VERSION:
+        raise ValueError("legacy adaptation gate cannot authorize repaired pair-teacher single-RL; run a new adaptation")
     if not gate.get("single_rl_allowed"):
         raise RuntimeError(f"adaptation gate did not pass ({gate_path}); single-RL is not allowed to start")
     adapted_path = Path(config.get("adapted.checkpoint_path") or gate["student_checkpoint"])
     adapted_sha = sha256_file(adapted_path)
+    validate_adaptation_gate(gate, adapted_sha)
     if config.get("adapted.expected_checkpoint_sha256") is None:
         config.data["adapted"]["expected_checkpoint_sha256"] = adapted_sha
     config.validate_adapted_hash(adapted_sha)
@@ -932,6 +972,7 @@ def main() -> None:
     payload = torch.load(adapted_path, map_location=device, weights_only=False)
     if payload.get("kind") != "adapted_student" or payload.get("spec_version") != "RL-LM-Single-v1.0":
         raise ValueError("adapted checkpoint is not an S1 adapted student")
+    validate_adapted_objective(payload)
     if payload.get("teacher_checkpoint_sha256") != sha256_file(config.get("backbone.checkpoint_path")):
         raise ValueError("adapted student was not derived from this teacher checkpoint")
     model = copy.deepcopy(teacher)
@@ -958,10 +999,11 @@ def main() -> None:
 
     reference_path = output_dir / "reference_ce.npy"
     reference_meta_path = output_dir / "reference_ce.json"
+    reference_identity = reference_ce_identity(caches[config.get("data.train_split")], adapted_sha,
+                                               config.get("environment.frozen_compute_dtype"))
     if reference_path.exists():
         meta = json.loads(reference_meta_path.read_text())
-        if meta["adapted_checkpoint_sha256"] != adapted_sha:
-            raise ValueError("cached adapted reference CE belongs to a different adapted checkpoint")
+        validate_reference_ce_identity(meta, reference_identity)
         ref_ce = np.load(reference_path)
     else:
         ref_ce = adapted_single_reference_ce(
@@ -970,6 +1012,7 @@ def main() -> None:
         )
         np.save(reference_path, ref_ce)
         atomic_json(reference_meta_path, {
+            "identity": reference_identity,
             "adapted_checkpoint_sha256": adapted_sha,
             "rule": "adapted student, fixed argmax single expert, amplitude 1, R1",
             "states": int(ref_ce.shape[0]),

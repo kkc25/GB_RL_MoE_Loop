@@ -7,6 +7,8 @@ from pathlib import Path
 
 import torch
 
+from rl_lm.executor import CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND
+
 
 BACKBONE = {
     "config_path": str,
@@ -187,6 +189,10 @@ class RLConfig:
             raise ValueError("prior constants changed")
         if self.get("environment.frozen_compute_dtype") != "bfloat16" or self.get("environment.residual_dtype") != "float32":
             raise ValueError("mixed or unsupported environment dtype")
+        if self.get("environment.training_backend") != CANONICAL_BACKEND:
+            raise ValueError("training requires the fixed-shape canonical backend")
+        if self.get("environment.deployment_backend") not in (CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND):
+            raise ValueError("unsupported pair deployment backend")
         if self.get("environment.head_contract") != "bf16_linear_fp32_ce_v1":
             raise ValueError("unsupported head contract")
         if self.get("cost.unit") != "extra_pair_round" or self.get("cost.lambda") < 0:

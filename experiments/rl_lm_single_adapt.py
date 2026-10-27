@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import math
 import random
@@ -35,6 +36,9 @@ import torch
 from torch import nn
 
 from data.packed_lm import PackedLMDataset
+from model.top2 import top2_dispatch
+from rl_lm.actions import make_pair_table
+from rl_lm.selector import canonical_pair
 from rl_lm.cache import load_cache
 from rl_lm.cli import load_backbone, write_resolved_config
 from rl_lm.inference import CanonicalTeacherPolicy, forward_with_last_ffn_policy
@@ -56,7 +60,41 @@ from rl_lm.single_executor import (
 from rl_lm.single_readout import adapt_ce_loss, adapt_kl_loss, differentiable_logits, relative_update_error
 from train.recovery_common import atomic_json, sha256_file
 
-ADAPT_CHECKPOINT_FORMAT = "rl-lm-single-adapt-v1"
+# v1 accidentally distilled the frozen single path. Never resume its optimizer
+# under the corrected pair-teacher objective or relabel its historical outputs.
+ADAPT_CHECKPOINT_FORMAT = "rl-lm-single-adapt-v2"
+ADAPT_OBJECTIVE_VERSION = "original-pair-teacher-ce-kl-relative-update-v2"
+
+
+def validate_adaptation_resume(payload, config):
+    """Read-only identity validation shared by CLI preflight and restore."""
+    if payload.get("format_version") != ADAPT_CHECKPOINT_FORMAT:
+        raise ValueError("incompatible adaptation checkpoint: corrected pair-teacher v2 required; "
+                 "legacy single-teacher runs cannot be exactly resumed")
+    if payload.get("objective_version") != ADAPT_OBJECTIVE_VERSION:
+        raise ValueError("adaptation objective version mismatch")
+    if payload.get("spec_version") != "RL-LM-Single-v1.0":
+        raise ValueError("spec version mismatch")
+    stored = copy.deepcopy(payload["resolved_config"])
+    current = copy.deepcopy(config.to_dict())
+    stored["runtime"]["device"] = current["runtime"]["device"] = "<agnostic>"
+    if stored != current:
+        raise ValueError("exact resume requires the identical resolved config (device may differ)")
+
+
+def preflight_adaptation_output(config, *, resume_path=None, stop_after=None):
+    """Reject incompatible runs before writing config, references or caches."""
+    output_dir = Path(config.get("output_dir"))
+    if resume_path is None:
+        if output_dir.exists() and any(output_dir.iterdir()):
+            raise FileExistsError("adaptation output directory is not empty; use a new run directory or --resume")
+        return
+    payload = torch.load(Path(resume_path), map_location="cpu", weights_only=False)
+    validate_adaptation_resume(payload, config)
+    completed = int(payload["training_state"]["successful_updates"])
+    cap = int(config.get("adaptation.max_updates")) if stop_after is None else int(stop_after)
+    if cap < 1 or cap < completed:
+        raise ValueError("--stop-after must be positive and not below completed updates")
 
 
 # ------------------------------------------------------------------ cache
@@ -220,6 +258,33 @@ def _nll_from_logits(logits: torch.Tensor, labels: torch.Tensor) -> float:
     return ce_sum / int((labels != -100).sum())
 
 
+def pair_selection_reference_identity(config, input_ids, segment_ids, labels, *,
+                                      checkpoint_sha256, backbone_config_sha256):
+    """Bind a reusable NLL to the actual evaluated data, model and numerics."""
+    def tensor_identity(tensor):
+        array = tensor.detach().cpu().contiguous().numpy()
+        return {"shape": list(array.shape), "dtype": str(array.dtype),
+                "sha256": hashlib.sha256(array.tobytes()).hexdigest()}
+
+    return {
+        "version": "pair-selection-reference-v2",
+        "checkpoint_sha256": checkpoint_sha256,
+        "backbone_config_sha256": backbone_config_sha256,
+        "resolved_config_sha256": config.sha256,
+        "selection_split": config.get("data.selection_split"),
+        "input_ids": tensor_identity(input_ids),
+        "segment_ids": tensor_identity(segment_ids),
+        "labels": tensor_identity(labels),
+        "backend": "sparse_merged_v1",
+        "pair_rule": "canonical_pair",
+        "max_calls": 1,
+        "sequence_batch": 8,
+        "compute_dtype": config.get("environment.frozen_compute_dtype"),
+        "expert_chunk": int(config.get("environment.expert_chunk")),
+        "head_chunk": int(config.get("environment.head_chunk")),
+    }
+
+
 def pair_teacher_selection_nll(teacher, input_ids, segment_ids, labels, *, compute_dtype, chunk, head_chunk, seq_batch=8) -> float:
     """Full-selection NLL of the original pair teacher (canonical pair, top-2 weights)."""
     total = 0.0
@@ -284,53 +349,96 @@ def single_selection_nll(student, input_ids, segment_ids, labels, *, compute_dty
     return total / tokens
 
 
-def measure_executor_improvement(student, device, *, rows: int = 8192, warmup: int = 30, repeats: int = 200) -> dict:
-    """Real terminal-FFN execution time: original top-2 vs single sparse.
+def _terminal_ffn_timing_paths(teacher, student, h, *, compute_dtype="bfloat16"):
+    """Comparable h0→h1 paths, including norm, gate, choice, dispatch and residual.
 
-    Both paths run on the same random hidden batch under BF16 production
-    precision with CUDA-event timing; the single executor must be faster for
-    the gate to pass.
+    The original frozen pair weights are used only by the pair arm; the adapted
+    weights only by the single arm. No labels or precomputed routes are used.
+    This is terminal-FFN timing, not a full-model latency claim.
     """
-    layer = int(student.config.adaptive_layers[-1])
-    block = student.blocks[layer]
-    gamma = float(student.gammas[layer])
-    torch.manual_seed(20261027)
-    h = torch.randn(rows, student.config.hidden_size, device=device, dtype=torch.float32)
-    with torch.no_grad():
-        n = block.ffn_norm(h).float()
-        with torch.autocast(device_type=device.type, dtype=torch.bfloat16):
-            z = block.moe.gate(n)
-        experts = single_argmax_expert(z.float())
+    layer = int(teacher.config.adaptive_layers[-1])
+    teacher_block = teacher.blocks[layer]
+    student_block = student.blocks[layer]
+    table = make_pair_table().to(h.device)
 
-        def original_top2():
-            with torch.autocast(device_type=device.type, dtype=torch.bfloat16):
-                update, _, _, _ = block.executor(n)
-            return h + gamma * update
+    @torch.no_grad()
+    def original_top2():
+        n = teacher_block.ffn_norm(h).float()
+        with torch.autocast(device_type=h.device.type, dtype=torch.bfloat16,
+                            enabled=(compute_dtype == "bfloat16")):
+            z = teacher_block.moe.gate(n).float()
+            pairs = table[canonical_pair(z, table)]
+            update, _, _ = top2_dispatch(teacher_block.moe.pool, n, pairs=pairs, gate_logits=z)
+        return h + float(teacher.gammas[layer]) * update.float()
 
-        def single_sparse():
-            with torch.autocast(device_type=device.type, dtype=torch.bfloat16):
-                update = single_ffn_update(block.moe.pool, n, experts)
-            return h + gamma * update
+    @torch.no_grad()
+    def single_sparse():
+        n = student_block.ffn_norm(h).float()
+        with torch.autocast(device_type=h.device.type, dtype=torch.bfloat16,
+                            enabled=(compute_dtype == "bfloat16")):
+            z = student_block.moe.gate(n).float()
+            experts = single_argmax_expert(z)
+            update = single_ffn_update(student_block.moe.pool, n, experts)
+        return h + float(student.gammas[layer]) * update.float()
 
-        def time_fn(fn):
-            for _ in range(warmup):
-                fn()
-            torch.cuda.synchronize(device)
-            start = torch.cuda.Event(enable_timing=True)
-            end = torch.cuda.Event(enable_timing=True)
-            start.record()
-            for _ in range(repeats):
-                fn()
-            end.record()
-            torch.cuda.synchronize(device)
-            return start.elapsed_time(end) / repeats
+    return original_top2, single_sparse
 
-        original_ms = time_fn(original_top2)
-        single_ms = time_fn(single_sparse)
+
+def _interleaved_timings(pair_fn, single_fn, time_fn, *, warmup, repeats):
+    """Alternate order to avoid systematically favoring the second arm."""
+    for _ in range(warmup):
+        pair_fn()
+        single_fn()
+    samples = {"pair": [], "single": []}
+    for repeat in range(repeats):
+        paths = (("pair", pair_fn), ("single", single_fn))
+        for name, fn in (paths if repeat % 2 == 0 else paths[::-1]):
+            samples[name].append(time_fn(fn))
+    return samples
+
+
+def measure_executor_improvement(teacher, student, device, *, h0, rows: int = 8192,
+                                 warmup: int = 30, repeats: int = 200) -> dict:
+    """CUDA-event terminal-FFN timing on real selection h0, not synthetic data."""
+    if device.type != "cuda":
+        raise ValueError("the execution-time gate requires CUDA measurements")
+    if rows < 1 or warmup < 0 or repeats < 1:
+        raise ValueError("invalid timing dimensions")
+    h = torch.as_tensor(np.array(h0[:rows], copy=True), device=device, dtype=torch.float32)
+    if h.ndim != 2 or h.shape[0] == 0 or h.shape[1] != teacher.config.hidden_size:
+        raise ValueError("timing requires nonempty real selection h0[N,D]")
+    original_top2, single_sparse = _terminal_ffn_timing_paths(teacher, student, h)
+
+    def time_fn(fn):
+        torch.cuda.synchronize(device)
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
+        fn()
+        end.record()
+        torch.cuda.synchronize(device)
+        return start.elapsed_time(end)
+
+    with torch.cuda.device(device):
+        samples = _interleaved_timings(original_top2, single_sparse, time_fn,
+                                      warmup=warmup, repeats=repeats)
+    original_ms = float(np.mean(samples["pair"]))
+    single_ms = float(np.mean(samples["single"]))
     return {
-        "rows": rows,
+        "timing_contract": "terminal_norm_gate_route_dispatch_residual_v2",
+        "pair_model": "original_frozen_teacher",
+        "single_model": "adapted_student",
+        "pair_rule": "canonical_pair_fp32_top2_softmax",
+        "compute_dtype": "bfloat16",
+        "input_distribution": "selection_cache_h0",
+        "input_sha256": hashlib.sha256(h.cpu().numpy().tobytes()).hexdigest(),
+        "measurement_order": "interleaved_alternating_first_arm",
+        "full_model_speedup_measured": False,
+        "rows": int(h.shape[0]),
         "warmup": warmup,
         "repeats": repeats,
+        "original_top2_samples_ms": samples["pair"],
+        "single_sparse_samples_ms": samples["single"],
         "original_top2_ms": original_ms,
         "single_sparse_ms": single_ms,
         "speedup": original_ms / single_ms,
@@ -437,7 +545,11 @@ class AdaptTrainer:
                 z = self.teacher_block.moe.gate(n)
             experts = single_argmax_expert(z.float())
             with torch.autocast(device_type=self.device.type, dtype=torch.bfloat16, enabled=(self.compute_dtype == "bfloat16")):
-                u_teacher = single_ffn_update(self.teacher_block.moe.pool, n, experts)
+                table = make_pair_table().to(self.device)
+                pairs = table[canonical_pair(z.float(), table)]
+                u_teacher, _, _ = top2_dispatch(
+                    self.teacher_block.moe.pool, n, pairs=pairs, gate_logits=z.float()
+                )
             h_teacher = h0 + self.gamma * u_teacher
             teacher_logits = differentiable_logits(self.teacher, h_teacher).detach()
 
@@ -445,6 +557,10 @@ class AdaptTrainer:
             u_student = single_ffn_update(self.student_block.moe.pool, n, experts)
         h_student = h0 + self.gamma * u_student
         student_logits = differentiable_logits(self.student, h_student)
+        # Forward expert-row units only: pair teacher (2) + single student (1).
+        # Backward/selection/prefix costs are explicitly outside this counter.
+        self.ledger.physical_expert_rows += 3 * len(indices)
+        self.ledger.physical_head_rows += 2 * len(indices)
 
         ce = adapt_ce_loss(student_logits, targets)
         kl = adapt_kl_loss(teacher_logits, student_logits)
@@ -529,6 +645,7 @@ class AdaptTrainer:
     def _payload(self) -> dict:
         return {
             "format_version": ADAPT_CHECKPOINT_FORMAT,
+            "objective_version": ADAPT_OBJECTIVE_VERSION,
             "spec_version": "RL-LM-Single-v1.0",
             "saved_at_update": self.successful_updates,
             "resolved_config": self.config.to_dict(),
@@ -563,15 +680,7 @@ class AdaptTrainer:
 
     def _restore(self, path: Path) -> None:
         payload = torch.load(path, map_location="cpu", weights_only=False)
-        if payload.get("format_version") != ADAPT_CHECKPOINT_FORMAT:
-            raise ValueError("not an S1 adaptation checkpoint")
-        if payload.get("spec_version") != "RL-LM-Single-v1.0":
-            raise ValueError("spec version mismatch")
-        stored = copy.deepcopy(payload["resolved_config"])
-        current = copy.deepcopy(self.config.to_dict())
-        stored["runtime"]["device"] = current["runtime"]["device"] = "<agnostic>"
-        if stored != current:
-            raise ValueError("exact resume requires the identical resolved config (device may differ)")
+        validate_adaptation_resume(payload, self.config)
         self.student = build_student(self.teacher, self.whitelist).to(self.device)
         self.student.load_state_dict(payload["student_state_dict"])
         self.optimizer = torch.optim.AdamW(
@@ -642,6 +751,7 @@ def main() -> None:
         args.config, SingleAdaptConfig,
         checkpoint=args.checkpoint, corpus_dir=args.corpus_dir, tokenizer=args.tokenizer, device=args.device,
     )
+    preflight_adaptation_output(config, resume_path=args.resume, stop_after=args.stop_after)
     output_dir = Path(config.get("output_dir"))
     output_dir.mkdir(parents=True, exist_ok=True)
     write_resolved_config(config, output_dir / "resolved_config.json")
@@ -679,10 +789,13 @@ def main() -> None:
 
     input_ids, segment_ids, labels = _selection_tensors(config, device)
     reference_path = output_dir / "pair_teacher_selection.json"
-    if reference_path.exists():
-        reference = json.loads(reference_path.read_text())
-        if reference["checkpoint_sha256"] != sha256_file(config.get("backbone.checkpoint_path")):
-            raise ValueError("cached pair teacher reference belongs to a different checkpoint")
+    reference_identity = pair_selection_reference_identity(
+        config, input_ids, segment_ids, labels,
+        checkpoint_sha256=sha256_file(config.get("backbone.checkpoint_path")),
+        backbone_config_sha256=sha256_file(config.get("backbone.config_path")),
+    )
+    reference = json.loads(reference_path.read_text()) if reference_path.exists() else {}
+    if reference.get("identity") == reference_identity:
         reference_nll = float(reference["nll"])
     else:
         reference_nll = pair_teacher_selection_nll(
@@ -695,6 +808,7 @@ def main() -> None:
             reference_path,
             {
                 "nll": reference_nll,
+                "identity": reference_identity,
                 "checkpoint_sha256": sha256_file(config.get("backbone.checkpoint_path")),
                 "sequences": int(input_ids.shape[0]),
                 "tokens": int((labels != -100).sum()),
@@ -734,13 +848,23 @@ def main() -> None:
     started = time.perf_counter()
     result = trainer.run(evaluate)
     trainer.ledger.record_wall_time(time.perf_counter() - started)
-    trainer.ledger.save(output_dir / "cost_ledger.json")
+    atomic_json(output_dir / "cost_ledger.json", trainer.ledger.to_dict() | {
+        "cost_scope": "adaptation_training_forward_only_plus_run_wall_time",
+        "expert_row_unit": "one selected expert on one context, forward only",
+        "physical_backward_work": None,
+        "selection_and_prefix_physical_work": None,
+        "complete_compute_comparison_supported": False,
+    })
 
     final_eval = result["evaluations"][-1]
-    timing = measure_executor_improvement(trainer.student, device)
+    timing = measure_executor_improvement(
+        teacher, trainer.student, device,
+        h0=caches[config.get("data.selection_split")]["h0"],
+    )
     atomic_json(output_dir / "executor_timing.json", timing)
     quality_ok = final_eval["degradation_nll"] <= float(config.get("adaptation.selection_gate_tolerance_nll"))
     gate = {
+        "objective_version": ADAPT_OBJECTIVE_VERSION,
         "passed": bool(quality_ok and timing["improved"]),
         "quality_ok": bool(quality_ok),
         "final_degradation_nll": final_eval["degradation_nll"],
@@ -757,6 +881,7 @@ def main() -> None:
         torch.save(
             {
                 "format_version": ADAPT_CHECKPOINT_FORMAT,
+                "objective_version": ADAPT_OBJECTIVE_VERSION,
                 "spec_version": "RL-LM-Single-v1.0",
                 "kind": "adapted_student",
                 "saved_at_update": result["updates"],

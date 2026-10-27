@@ -28,12 +28,15 @@ from torch.nn import functional as F
 
 from data.packed_lm import PackedLMDataset
 from rl_lm.actor import PairActor
+from rl_lm.actions import action_table_identity
+from rl_lm.checkpoint import load_checkpoint
 from rl_lm.cache import cache_identity, load_cache
 from rl_lm.cli import load_backbone, resolve_config
 from rl_lm.environment import LastFFNEnvironment
 from rl_lm.executor import FrozenLastFFNExecutor
 from rl_lm.inference import CanonicalTeacherPolicy, forward_with_last_ffn_policy
 from rl_lm.ledger import RLLedger
+from rl_lm.reporting import METRIC_SCHEMA_VERSION, reference_metrics
 from rl_lm.rng import make_uniform_table
 from rl_lm.trainer import CacheContextProvider
 from train.common import autocast_context
@@ -43,8 +46,56 @@ EVAL_STREAM_UPDATE = 1_000_000_000  # reserved stream id; training updates stay 
 BOOTSTRAP_SEED = 20261027
 
 
-def _load_actor(config, checkpoint_path: Path, device) -> PairActor:
-    payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+def _validate_actor_reference(payload, config, model, *, require_r1=False) -> None:
+    stored = payload.get("resolved_config", {})
+    environment = stored.get("environment", {})
+    stage = "r1" if require_r1 else config.get("stage")
+    calls = 1 if require_r1 else config.get("environment.max_calls")
+    price = 0 if require_r1 else config.get("cost.lambda")
+    if (payload.get("stage") != stage or stored.get("stage") != stage
+            or environment.get("max_calls") != calls or environment.get("min_calls") != 1
+            or stored.get("cost", {}).get("lambda") != price):
+        raise ValueError("actor checkpoint stage/call-limit/price mismatch")
+    if payload.get("action_contract") != action_table_identity():
+        raise ValueError("actor action contract mismatch")
+    if (payload.get("feature_schema") != config.get("policy.feature_schema")
+            or payload.get("feature_dim") != 2 * model.config.hidden_size + 20):
+        raise ValueError("actor feature contract mismatch")
+    if stored.get("policy") != config.to_dict().get("policy"):
+        raise ValueError("actor policy contract mismatch")
+    backbone = payload.get("backbone_identity", {})
+    for key, path in (("checkpoint_sha256", config.get("backbone.checkpoint_path")),
+                      ("config_sha256", config.get("backbone.config_path")),
+                      ("tokenizer_sha256", config.get("data.tokenizer_path"))):
+        if backbone.get(key) != sha256_file(path):
+            raise ValueError(f"actor backbone mismatch: {key}")
+    for role, split in (("controller_train", config.get("data.train_split")),
+                        ("selection", config.get("data.selection_split"))):
+        expected = cache_identity(model, model.config,
+            checkpoint_path=config.get("backbone.checkpoint_path"), config_path=config.get("backbone.config_path"),
+            tokenizer_path=config.get("data.tokenizer_path"), data_dir=config.get("data.corpus_dir"),
+            split=split, sampling_seed=config.get("data.sampling_seed"),
+            backend_version=config.get("environment.training_backend"), head_contract=config.get("environment.head_contract"),
+            expert_chunk=config.get("environment.expert_chunk"))
+        actual = payload.get("data_identity", {}).get(role, {})
+        for key, value in expected.items():
+            if key != "source" and actual.get(key) != value:
+                raise ValueError(f"actor data/numerical mismatch: {role}.{key}")
+    for key in ("head_chunk", "frozen_compute_dtype", "residual_dtype", "head_contract"):
+        if payload.get("numerical_contract", {}).get(key) != config.get("environment." + key):
+            raise ValueError(f"actor numerical mismatch: {key}")
+
+
+def _validate_r1_reference(payload, config, model) -> None:
+    _validate_actor_reference(payload, config, model, require_r1=True)
+
+
+def _load_actor(config, checkpoint_path: Path, device, *, r1_model=None, model=None) -> PairActor:
+    payload = load_checkpoint(checkpoint_path)
+    if r1_model is not None:
+        _validate_r1_reference(payload, config, r1_model)
+    elif model is not None:
+        _validate_actor_reference(payload, config, model)
     feature_dim = int(payload["feature_dim"])
     actor = PairActor(feature_dim, train_stop=(config.get("stage") == "r2"))
     actor.load_state_dict(payload["actor_state_dict"])
@@ -69,23 +120,23 @@ def _token_ce(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
     return ce
 
 
-def _online_nll(config, model, policy, batch, device) -> dict:
+def _online_nll(config, model, policy, batch, device, *, max_calls=None) -> dict:
     output = forward_with_last_ffn_policy(
         model,
         policy,
         batch["input_ids"],
         batch["segment_ids"],
-        max_calls=int(config.get("environment.max_calls")),
+        max_calls=int(config.get("environment.max_calls")) if max_calls is None else max_calls,
         backend=config.get("environment.deployment_backend"),
         compute_dtype=config.get("environment.frozen_compute_dtype"),
         chunk=int(config.get("environment.expert_chunk")),
         head_chunk=int(config.get("environment.head_chunk")),
     )
     ce = _token_ce(output.logits, batch["labels"])
-    valid = batch["valid"]
+    valid = batch["valid"].cpu()
     return {
         "nll": float(ce.sum() / valid.sum()),
-        "mean_rounds": float(output.rounds.reshape(-1)[valid.reshape(-1)].float().mean()),
+        "mean_rounds": float(output.rounds.cpu().reshape(-1)[valid.reshape(-1)].float().mean()),
         "ce": ce,
     }
 
@@ -189,6 +240,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--config", required=True, help="resolved run config JSON")
     parser.add_argument("--actor-checkpoint", required=True, help="candidate actor checkpoint (checkpoint_best.pt)")
+    parser.add_argument("--r1-reference-checkpoint", help="strongest R1 checkpoint chosen on selection BEFORE confirmation; never selected on this split")
     parser.add_argument("--split", required=True, choices=["selection", "calibration", "newtest"])
     parser.add_argument("--mode", default="online", choices=["online"])
     parser.add_argument("--device", default=None)
@@ -215,6 +267,13 @@ def main() -> None:
             raise SystemExit(f"candidate manifest missing fields: {sorted(missing)}")
         if candidate["actor_checkpoint_sha256"] != actor_sha:
             raise SystemExit("candidate manifest actor hash does not match --actor-checkpoint")
+        for key, value in (("price_lambda", config.get("cost.lambda")),
+                           ("backend", config.get("environment.deployment_backend")),
+                           ("head_contract", config.get("environment.head_contract"))):
+            if candidate[key] != value:
+                raise ValueError(f"candidate manifest {key} mismatch")
+        if candidate.get("r1_reference_checkpoint_sha256") and not args.r1_reference_checkpoint:
+            raise ValueError("candidate manifest pins an R1 reference; --r1-reference-checkpoint required")
         if (corpus_manifest.get("rl_lm_corpus") or {}).get("development_only"):
             raise SystemExit(
                 "corpus is development_only; the independent confirmation entry refuses it "
@@ -243,13 +302,27 @@ def main() -> None:
             if row.get("role") == args.split:
                 group_of_rank[int(row["rank"])] = str(row["near_hash"])
 
-    learned_actor = _load_actor(config, actor_path, device)
+    learned_actor = _load_actor(config, actor_path, device, model=model)
     initial_path = actor_path.parent / "checkpoint_initial.pt"
-    initial_actor = _load_actor(config, initial_path, device) if initial_path.exists() else None
+    initial_actor = _load_actor(config, initial_path, device, model=model) if initial_path.exists() else None
 
     results: dict[str, dict] = {}
     results["legacy_top2_r1"] = _legacy_nll(model, batch, device)
-    results["canonical_pair_r1"] = _online_nll(config, model, CanonicalTeacherPolicy(), batch, device)
+    results["canonical_pair_r1"] = _online_nll(config, model, CanonicalTeacherPolicy(), batch, device, max_calls=1)
+    if int(config.get("environment.max_calls")) == 2:
+        results["canonical_pair_r2"] = _online_nll(config, model, CanonicalTeacherPolicy(), batch, device, max_calls=2)
+    r1_identity = None
+    if args.r1_reference_checkpoint:
+        r1_path = Path(args.r1_reference_checkpoint)
+        r1_sha = sha256_file(r1_path)
+        if args.split == "newtest" and candidate.get("r1_reference_checkpoint_sha256") != r1_sha:
+            raise ValueError("candidate manifest must pin r1_reference_checkpoint_sha256 before newtest")
+        r1_actor = _load_actor(config, r1_path, device, r1_model=model)
+        results["selected_r1_greedy"] = _online_nll(config, model, r1_actor, batch, device, max_calls=1)
+        r1_identity = {"name": "selected_r1_greedy", "checkpoint": str(r1_path),
+                       "checkpoint_sha256": r1_sha, "max_calls": 1,
+                       "selection": "caller-declared strongest R1, frozen before this evaluation",
+                       "uncertainty": "point estimate only; canonical-reference CI does not apply"}
     if initial_actor is not None:
         results["initial_actor_greedy"] = _online_nll(config, model, initial_actor, batch, device)
     results["learned_greedy"] = _online_nll(config, model, learned_actor, batch, device)
@@ -299,6 +372,12 @@ def main() -> None:
 
     report = {
         "spec_version": config.get("spec_version"),
+        "metric_schema_version": METRIC_SCHEMA_VERSION,
+        "online_gain_reference": {"name": "canonical_pair_r1", "max_calls": 1},
+        "historical_note": "v1 mislabeled the configured-depth teacher as canonical_pair_r1 in R2; v2 separates R1 and forced R2. Historical artifacts are not rewritten.",
+        "learned_vs_selected_r1": reference_metrics(results["learned_greedy"]["nll"], results["selected_r1_greedy"]["nll"], r1_identity) if r1_identity else None,
+        "selected_r1_status": "provided" if r1_identity else "not_provided; no claim of gain over strongest R1",
+        "learned_vs_forced_r2": reference_metrics(results["learned_greedy"]["nll"], results["canonical_pair_r2"]["nll"], {"name": "canonical_pair_r2", "max_calls": 2}) if "canonical_pair_r2" in results else None,
         "stage": config.get("stage"),
         "split": args.split,
         "mode": args.mode,
@@ -316,7 +395,7 @@ def main() -> None:
         "paired_bootstrap_learned_greedy_minus_canonical": paired,
         "minimum_practical_nll_gain": float(config.get("evaluation.minimum_practical_nll_gain")),
     }
-    output = Path(args.output) if args.output else actor_path.parent / f"evaluate_{args.split}.json"
+    output = Path(args.output) if args.output else actor_path.parent / f"evaluate_{args.split}_metrics_v2.json"
     atomic_json(output, report)
     printable = {k: v for k, v in report.items() if k != "sampled_cache" or True}
     print(json.dumps(printable, indent=2, sort_keys=True))

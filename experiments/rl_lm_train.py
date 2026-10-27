@@ -21,6 +21,7 @@ from data.packed_lm import PackedLMDataset
 from rl_lm.cache import cache_identity, load_cache
 from rl_lm.cli import load_backbone, resolve_config
 from rl_lm.inference import CanonicalTeacherPolicy, forward_with_last_ffn_policy
+from rl_lm.reporting import METRIC_SCHEMA_VERSION, reference_metrics
 from rl_lm.trainer import CacheContextProvider, Trainer
 from train.recovery_common import sha256_file
 
@@ -31,11 +32,12 @@ class OnlineSelectionEvaluator:
     Runs the fixed number of selection sequences through
     ``forward_with_last_ffn_policy`` with the deployment backend and computes
     token-weighted mean NLL over all valid labels; the canonical teacher
-    reference NLL is computed once and cached so ``delta_nll`` /
-    ``gain_nll`` share one frozen denominator.
+    configured-depth reference is cached for legacy ``delta_nll`` /
+    ``gain_nll``. Version 2 adds explicitly identified one-call references;
+    a gain over forced R2 is not a gain over the strongest R1.
     """
 
-    def __init__(self, config, model, device) -> None:
+    def __init__(self, config, model, device, *, r1_reference_checkpoint=None) -> None:
         self.config = config
         self.device = device
         dataset = PackedLMDataset(
@@ -54,14 +56,24 @@ class OnlineSelectionEvaluator:
             raise ValueError("selection sequences contain no valid labels")
         self.reference_nll = None
         self.reference_rounds = None
+        self.r1_reference_nll = None
+        self.selected_r1_nll = None
+        self.r1_actor = None
+        self.r1_identity = None
+        if r1_reference_checkpoint:
+            from experiments.rl_lm_evaluate import _load_actor
+            path = Path(r1_reference_checkpoint)
+            self.r1_actor = _load_actor(config, path, device, r1_model=model)
+            self.r1_identity = {"name": "selected_r1_greedy", "checkpoint": str(path),
+                                "checkpoint_sha256": sha256_file(path), "max_calls": 1}
 
-    def _forward_nll(self, policy) -> tuple[float, float]:
+    def _forward_nll(self, policy, *, max_calls=None) -> tuple[float, float]:
         output = forward_with_last_ffn_policy(
             self._model,
             policy,
             self.input_ids,
             self.segment_ids,
-            max_calls=int(self.config.get("environment.max_calls")),
+            max_calls=int(self.config.get("environment.max_calls")) if max_calls is None else max_calls,
             backend=self.config.get("environment.deployment_backend"),
             compute_dtype=self.config.get("environment.frozen_compute_dtype"),
             chunk=int(self.config.get("environment.expert_chunk")),
@@ -91,7 +103,16 @@ class OnlineSelectionEvaluator:
         greedy_nll, mean_rounds = self._forward_nll(actor)
         if self.reference_nll is None:
             self.reference_nll, self.reference_rounds = self._forward_nll(CanonicalTeacherPolicy())
+        if self.r1_reference_nll is None:
+            self.r1_reference_nll, _ = self._forward_nll(CanonicalTeacherPolicy(), max_calls=1)
+        if self.r1_actor is not None and self.selected_r1_nll is None:
+            self.selected_r1_nll, _ = self._forward_nll(self.r1_actor, max_calls=1)
         return {
+            "metric_schema_version": METRIC_SCHEMA_VERSION,
+            "legacy_gain_reference": {"name": "canonical_pair_forced_depth", "max_calls": int(self.config.get("environment.max_calls"))},
+            "vs_canonical_r1": reference_metrics(greedy_nll, self.r1_reference_nll, {"name": "canonical_pair_r1", "max_calls": 1}),
+            "vs_selected_r1": reference_metrics(greedy_nll, self.selected_r1_nll, self.r1_identity) if self.r1_identity else None,
+            "selected_r1_status": "provided" if self.r1_identity else "not_provided; no claim of gain over strongest R1",
             "greedy_nll": greedy_nll,
             "mean_rounds": mean_rounds,
             "reference_nll": self.reference_nll,
@@ -114,6 +135,7 @@ def main() -> None:
     start = parser.add_mutually_exclusive_group()
     start.add_argument("--resume", help="exact resume of the same run; mutually exclusive with --warmstart-actor")
     start.add_argument("--warmstart-actor", help="new run inheriting only the actor weights")
+    parser.add_argument("--r1-reference-checkpoint", help="preselected strongest R1; required for all R2 runs by the versioned selection contract")
     parser.add_argument("--stop-after", type=int, help="absolute lifetime cap on successful updates")
     args = parser.parse_args()
 
@@ -171,7 +193,7 @@ def main() -> None:
         config,
         model,
         train_contexts=CacheContextProvider(caches["controller_train"]),
-        evaluator=OnlineSelectionEvaluator(config, model, device),
+        evaluator=OnlineSelectionEvaluator(config, model, device, r1_reference_checkpoint=args.r1_reference_checkpoint),
         device=device,
         resume_path=args.resume,
         warmstart_path=args.warmstart_actor,
