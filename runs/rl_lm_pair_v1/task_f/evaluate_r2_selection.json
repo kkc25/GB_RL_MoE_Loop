@@ -1,0 +1,140 @@
+{
+  "spec": "16.1/17.3 task F candidate comparison",
+  "split": "selection",
+  "sequences": 128,
+  "valid_tokens": 130816,
+  "backend": "sparse_merged_v1",
+  "head_contract": "bf16_linear_fp32_ce_v1",
+  "checkpoints": {
+    "r1_best": {
+      "path": "runs/rl_lm_pair_v1/r1_seed17/checkpoint_best.pt",
+      "sha256": "290e1f25f0320701988a9b28121aad0e591f2bd9ea0647dd0f9dd3fe0ac8af09"
+    },
+    "r2_initial": {
+      "path": "runs/rl_lm_pair_v1/r2_lambda0_seed17/checkpoint_initial.pt",
+      "sha256": "837372ef20ff7330fb52db85e490fc86de273fb96e50e37e34760a26bd577aa1"
+    },
+    "r2_best": {
+      "path": "runs/rl_lm_pair_v1/r2_lambda0_seed17/checkpoint_best.pt",
+      "sha256": "837372ef20ff7330fb52db85e490fc86de273fb96e50e37e34760a26bd577aa1"
+    }
+  },
+  "online": {
+    "legacy_top2_r1": {
+      "nll": 4.173295974731445,
+      "mean_rounds": 1.0,
+      "delta_nll_vs_canonical_r1": -7.152557373046875e-06,
+      "gain_nll_vs_canonical_r1": 7.152557373046875e-06,
+      "delta_nll_vs_r1_best": 6.67572021484375e-06,
+      "selection_metric_lambda0": 4.173295974731445
+    },
+    "legacy_top2_r2": {
+      "nll": 4.217524528503418,
+      "mean_rounds": 2.0,
+      "delta_nll_vs_canonical_r1": 0.04422140121459961,
+      "gain_nll_vs_canonical_r1": -0.04422140121459961,
+      "delta_nll_vs_r1_best": 0.0442352294921875,
+      "selection_metric_lambda0": 4.217524528503418
+    },
+    "canonical_pair_r1": {
+      "nll": 4.173303127288818,
+      "mean_rounds": 1.0,
+      "delta_nll_vs_canonical_r1": 0.0,
+      "gain_nll_vs_canonical_r1": 0.0,
+      "delta_nll_vs_r1_best": 1.3828277587890625e-05,
+      "selection_metric_lambda0": 4.173303127288818
+    },
+    "canonical_pair_r2": {
+      "nll": 4.217555522918701,
+      "mean_rounds": 2.0,
+      "delta_nll_vs_canonical_r1": 0.04425239562988281,
+      "gain_nll_vs_canonical_r1": -0.04425239562988281,
+      "delta_nll_vs_r1_best": 0.0442662239074707,
+      "selection_metric_lambda0": 4.217555522918701
+    },
+    "r1_best_greedy": {
+      "nll": 4.1732892990112305,
+      "mean_rounds": 1.0,
+      "delta_nll_vs_canonical_r1": -1.3828277587890625e-05,
+      "gain_nll_vs_canonical_r1": 1.3828277587890625e-05,
+      "delta_nll_vs_r1_best": 0.0,
+      "selection_metric_lambda0": 4.1732892990112305
+    },
+    "r2_initial_greedy": {
+      "nll": 4.1732892990112305,
+      "mean_rounds": 1.0,
+      "delta_nll_vs_canonical_r1": -1.3828277587890625e-05,
+      "gain_nll_vs_canonical_r1": 1.3828277587890625e-05,
+      "delta_nll_vs_r1_best": 0.0,
+      "selection_metric_lambda0": 4.1732892990112305
+    },
+    "r2_learned_greedy": {
+      "nll": 4.1732892990112305,
+      "mean_rounds": 1.0,
+      "delta_nll_vs_canonical_r1": -1.3828277587890625e-05,
+      "gain_nll_vs_canonical_r1": 1.3828277587890625e-05,
+      "delta_nll_vs_r1_best": 0.0,
+      "selection_metric_lambda0": 4.1732892990112305
+    }
+  },
+  "paired_bootstrap": {
+    "r2_learned_minus_canonical_r1": {
+      "groups": 129,
+      "tokens": 130816,
+      "delta_nll": -1.3991044176999414e-05,
+      "ci_low": -3.4834076436060334e-05,
+      "ci_high": 4.772459179380337e-07,
+      "repetitions": 2000,
+      "confidence": 0.95
+    },
+    "r2_learned_minus_r1_best": {
+      "groups": 129,
+      "tokens": 130816,
+      "delta_nll": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "repetitions": 2000,
+      "confidence": 0.95
+    },
+    "r2_initial_minus_r1_best": {
+      "groups": 129,
+      "tokens": 130816,
+      "delta_nll": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "repetitions": 2000,
+      "confidence": 0.95
+    },
+    "canonical_r2_minus_canonical_r1": {
+      "groups": 129,
+      "tokens": 130816,
+      "delta_nll": 0.04425269678980499,
+      "ci_low": 0.041291239738568894,
+      "ci_high": 0.04710073121445665,
+      "repetitions": 2000,
+      "confidence": 0.95
+    }
+  },
+  "sampled_cache": {
+    "r2_initial_sampled": {
+      "sampled_nll": 4.211630821228027,
+      "reference_nll": 4.185035705566406,
+      "gain_nll": -0.026595115661621094,
+      "mean_rounds": 1.499176025390625,
+      "states": 2048,
+      "samples_per_context": 16,
+      "eval_stream_update": 1000000000
+    },
+    "r2_learned_sampled": {
+      "sampled_nll": 4.211630821228027,
+      "reference_nll": 4.185035705566406,
+      "gain_nll": -0.026595115661621094,
+      "mean_rounds": 1.499176025390625,
+      "states": 2048,
+      "samples_per_context": 16,
+      "eval_stream_update": 1000000000
+    }
+  },
+  "minimum_practical_nll_gain": 0.005,
+  "r2_quality_tolerance_nll": 0.005
+}

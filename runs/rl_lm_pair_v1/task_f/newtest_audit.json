@@ -1,0 +1,23 @@
+{
+  "audit": "newtest split non-use verification before any confirmation (task F, spec 16.3/13.4)",
+  "date": "2026-10-27",
+  "corpus": "data/rl_lm_pair_v1/corpus",
+  "corpus_development_only": false,
+  "newtest_split_identity": {
+    "input_ids_sha256": "ff3b0ad869be7f8376eaab23dd69d428a42b072cd0d5de00d4ba47a0128424ce",
+    "segment_ids_sha256": "c2d46fbd3beac8d42862c2e255431ce245c7d4b2700fd0a8f3c47b389e150a25",
+    "doc_map_sha256": "ed76cb8c91f1cf14a3546fd520d225050702ee06af38fc8ea1fb85c617e8b7cd",
+    "n_sequences": 256,
+    "n_tokens": 262144
+  },
+  "checks": [
+    "grep over runs/rl_lm_pair_v1/** (json/jsonl/md/log): 'newtest' occurs only as the config field name 'confirmation_split' in resolved configs and in exclusion-coverage records of the corpus build; never as an evaluation/training split argument",
+    "runs/rl_lm_pair_v1/r1_seed17/metrics.jsonl and evaluations.jsonl contain zero occurrences of 'newtest'",
+    "the only post-training evaluation log (task_e_evaluate.log) ran --split selection",
+    "trainer code path: experiments/rl_lm_train.py loads only controller_train/selection/calibration caches and the OnlineSelectionEvaluator reads only data.selection_split; rl_lm.config rejects any training read of the confirmation split (T24)",
+    "experiments/rl_lm_evaluate.py refuses --split newtest without --candidate-manifest; no candidate manifest existed before this task",
+    "cache manifests cover controller_train/selection/calibration only; no newtest cache was ever built"
+  ],
+  "conclusion": "newtest was not read by any task-E/F training, selection or evaluation; it remains sealed",
+  "decision": "recorded in the task F summary; --split newtest stays forbidden until a frozen candidate manifest exists AND the section-17 gates justify confirmation"
+}

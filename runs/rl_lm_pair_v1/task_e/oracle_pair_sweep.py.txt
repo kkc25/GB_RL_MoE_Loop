@@ -1,0 +1,126 @@
+"""Oracle diagnostic (spec 17.1): exhaustive 28-pair sweep on 128 states.
+
+For each sampled valid state, executes every one of the 28 terminal-FFN pair
+actions on the frozen prefix hidden and records the terminal CE, alongside
+the canonical teacher pair's CE.  This reads labels as oracle targets: it is
+an upper-bound diagnostic only, never an actor input, and its outputs live in
+a separate diagnostic directory.  Run with:
+
+    .venv/bin/python runs/rl_lm_pair_v1/task_e/oracle_pair_sweep.py.txt
+"""
+
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+import torch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
+from data.packed_lm import PackedLMDataset
+from eval.counterfactual import cache_last_ffn_input
+from lm_config import LMExperimentConfig
+from model import LoopMoE
+from rl_lm.environment import make_safe_observation_state
+from rl_lm.executor import FrozenLastFFNExecutor, FrozenObservation
+from rl_lm.ledger import RLLedger
+from rl_lm.readout import terminal_ce
+from train.common import autocast_context
+from train.recovery_common import sha256_file
+
+CHECKPOINT = "runs/next_2026_10_26/baseline_100m/loop_r1/latest.pt"
+CONFIG = "runs/next_2026_10_26/baseline_100m/loop_r1.json"
+CORPUS = "data/rl_lm_pair_v1/corpus"
+OUT = Path("runs/rl_lm_pair_v1/task_e/oracle_r1")
+STATES_PER_SPLIT = 128
+DEVICE = torch.device("cuda:1")
+
+
+def sweep_split(model, split):
+    dataset = PackedLMDataset(CORPUS, split, limit=2)
+    items = [dataset[i] for i in range(len(dataset))]
+    input_ids = torch.from_numpy(np.stack([it["input_ids"] for it in items])).to(DEVICE)
+    segment_ids = torch.from_numpy(np.stack([it["segment_ids"] for it in items])).to(DEVICE)
+    labels = torch.from_numpy(np.stack([it["labels"] for it in items])).to(DEVICE)
+    with torch.no_grad(), autocast_context(DEVICE, "bfloat16"):
+        prefix = cache_last_ffn_input(model, input_ids, segment_ids, depth=1)
+    rows, cols = torch.nonzero(labels != -100, as_tuple=True)
+    rows, cols = rows[:STATES_PER_SPLIT], cols[:STATES_PER_SPLIT]
+    n = int(rows.numel())
+    h0 = prefix[rows, cols].float().contiguous()
+    targets = labels[rows, cols].contiguous()
+
+    ledger = RLLedger()
+    executor = FrozenLastFFNExecutor(model, chunk=64, compute_dtype="bfloat16", ledger=ledger)
+    zeros_rounds = torch.zeros(n, dtype=torch.int64, device=DEVICE)
+    prev = torch.full((n, 2), -1, dtype=torch.int64, device=DEVICE)
+    active = torch.ones(n, dtype=torch.bool, device=DEVICE)
+    safe_h, safe_h0, safe_rounds, safe_prev = make_safe_observation_state(h0, h0, zeros_rounds, prev, active)
+    observation = executor.observe(safe_h, safe_h0, safe_rounds, safe_prev, max_calls=1)
+    canonical_action = observation.pair_reference.argmax(dim=-1) + 1  # joint id of canonical pair
+
+    # Tile every state across all 28 pair actions in one fixed-shape batch.
+    rep = 28
+    h_tile = h0.repeat_interleave(rep, dim=0)
+    obs_tile = FrozenObservation(
+        n=observation.n.repeat_interleave(rep, dim=0),
+        n0=observation.n0.repeat_interleave(rep, dim=0),
+        z=observation.z.repeat_interleave(rep, dim=0),
+        features=observation.features.repeat_interleave(rep, dim=0),
+        pair_reference=observation.pair_reference.repeat_interleave(rep, dim=0),
+    )
+    actions = (torch.arange(rep, device=DEVICE) + 1).repeat(n)
+    h_out = executor.step_pair(h_tile, obs_tile, actions)
+    ce = terminal_ce(model, h_out, targets.repeat_interleave(rep), chunk=64, ledger=ledger)
+    ce = ce.reshape(n, rep)
+
+    canonical_ce = ce.gather(1, (canonical_action - 1)[:, None]).squeeze(1)
+    best_ce, best_pair = ce.min(dim=-1)
+    result = {
+        "split": split,
+        "states": n,
+        "canonical_ce_mean": float(canonical_ce.mean()),
+        "oracle_best_ce_mean": float(best_ce.mean()),
+        "oracle_gain_over_canonical": float((canonical_ce - best_ce).mean()),
+        "oracle_gain_median": float((canonical_ce - best_ce).median()),
+        "oracle_gain_p95": float((canonical_ce - best_ce).quantile(0.95)),
+        "fraction_best_is_not_canonical": float((best_pair + 1 != canonical_action).float().mean()),
+        "worst_ce_mean": float(ce.max(dim=-1).values.mean()),
+        "median_pair_ce_mean": float(ce.median(dim=-1).values.mean()),
+        "physical_expert_rows": ledger.physical_expert_rows,
+        "physical_head_rows": ledger.physical_head_rows,
+    }
+    per_state = {
+        "canonical_ce": canonical_ce.cpu().numpy(),
+        "oracle_best_ce": best_ce.cpu().numpy(),
+        "oracle_gain": (canonical_ce - best_ce).cpu().numpy(),
+        "best_pair": (best_pair + 1).cpu().numpy(),
+        "canonical_action": canonical_action.cpu().numpy(),
+    }
+    return result, per_state
+
+
+def main():
+    config = LMExperimentConfig.load(CONFIG)
+    model = LoopMoE(config.model).to(DEVICE).eval()
+    model.load_state_dict(torch.load(CHECKPOINT, map_location=DEVICE, weights_only=False)["model"])
+    model.requires_grad_(False)
+    OUT.mkdir(parents=True, exist_ok=True)
+    summary = {
+        "kind": "oracle_upper_bound_diagnostic_not_actor_input",
+        "checkpoint": CHECKPOINT,
+        "checkpoint_sha256": sha256_file(CHECKPOINT),
+        "states_per_split": STATES_PER_SPLIT,
+        "splits": {},
+    }
+    for split in ("controller_train", "selection"):
+        result, per_state = sweep_split(model, split)
+        summary["splits"][split] = result
+        np.savez(OUT / f"per_state_{split}.npz", **per_state)
+    (OUT / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+    print(json.dumps(summary, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

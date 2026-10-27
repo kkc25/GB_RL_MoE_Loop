@@ -1,0 +1,7 @@
+{
+  "nll": 4.179893713666263,
+  "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+  "sequences": 256,
+  "tokens": 261637,
+  "rule": "canonical pair teacher, sparse_merged_v1, full selection split"
+}

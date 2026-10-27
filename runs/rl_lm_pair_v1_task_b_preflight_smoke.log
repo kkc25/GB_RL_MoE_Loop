@@ -1,0 +1,21 @@
+{
+  "status": "not_built",
+  "model_and_raw_data": "verified",
+  "caches": {
+    "controller_train": {
+      "status": "not_built"
+    },
+    "selection": {
+      "status": "not_built"
+    },
+    "calibration": {
+      "status": "not_built"
+    }
+  },
+  "environment": {
+    "python": "3.12.15",
+    "torch": "2.12.1+cu130",
+    "cuda": "13.0",
+    "device": "NVIDIA RTX A6000"
+  }
+}

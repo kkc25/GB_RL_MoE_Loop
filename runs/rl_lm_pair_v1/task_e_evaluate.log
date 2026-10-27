@@ -1,0 +1,71 @@
+{
+  "actor_checkpoint": "runs/rl_lm_pair_v1/r1_seed17/checkpoint_best.pt",
+  "actor_checkpoint_sha256": "290e1f25f0320701988a9b28121aad0e591f2bd9ea0647dd0f9dd3fe0ac8af09",
+  "backend": "sparse_merged_v1",
+  "candidate_manifest": null,
+  "corpus_development_only": false,
+  "corpus_dir": "data/rl_lm_pair_v1/corpus",
+  "head_contract": "bf16_linear_fp32_ce_v1",
+  "minimum_practical_nll_gain": 0.005,
+  "mode": "online",
+  "online": {
+    "canonical_pair_r1": {
+      "delta_nll": 0.0,
+      "gain_nll": 0.0,
+      "mean_rounds": 1.0,
+      "nll": 4.173303127288818
+    },
+    "initial_actor_greedy": {
+      "delta_nll": 0.0,
+      "gain_nll": 0.0,
+      "mean_rounds": 1.0,
+      "nll": 4.173303127288818
+    },
+    "learned_greedy": {
+      "delta_nll": -1.3828277587890625e-05,
+      "gain_nll": 1.3828277587890625e-05,
+      "mean_rounds": 1.0,
+      "nll": 4.1732892990112305
+    },
+    "legacy_top2_r1": {
+      "delta_nll": -7.152557373046875e-06,
+      "gain_nll": 7.152557373046875e-06,
+      "mean_rounds": 1.0,
+      "nll": 4.173295974731445
+    }
+  },
+  "paired_bootstrap_learned_greedy_minus_canonical": {
+    "ci_high": 4.772459179380337e-07,
+    "ci_low": -3.4834076436060334e-05,
+    "confidence": 0.95,
+    "delta_nll": -1.3991044176999414e-05,
+    "groups": 129,
+    "repetitions": 2000,
+    "tokens": 130816
+  },
+  "sampled_cache": {
+    "initial_actor_sampled": {
+      "eval_stream_update": 1000000000,
+      "gain_nll": -0.009348869323730469,
+      "mean_rounds": 1.0,
+      "reference_nll": 4.185035705566406,
+      "sampled_nll": 4.194384574890137,
+      "samples_per_context": 16,
+      "states": 2048
+    },
+    "learned_sampled": {
+      "eval_stream_update": 1000000000,
+      "gain_nll": -0.0036916732788085938,
+      "mean_rounds": 1.0,
+      "reference_nll": 4.185035705566406,
+      "sampled_nll": 4.188727378845215,
+      "samples_per_context": 16,
+      "states": 2048
+    }
+  },
+  "sequences": 128,
+  "spec_version": "RL-LM-Pair-v1.0",
+  "split": "selection",
+  "stage": "r1",
+  "valid_tokens": 130816
+}

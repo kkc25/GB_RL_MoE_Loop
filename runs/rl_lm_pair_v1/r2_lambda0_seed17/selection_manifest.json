@@ -1,0 +1,41 @@
+{
+  "rule": "lowest greedy_nll on selection; ties within 1e-06 prefer fewer rounds then earlier update",
+  "best": {
+    "update": 0,
+    "greedy_nll": 4.173289050794628,
+    "mean_rounds": 1.0,
+    "path": "checkpoint_best.pt"
+  },
+  "candidates": [
+    {
+      "update": 0,
+      "greedy_nll": 4.173289050794628,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 100,
+      "greedy_nll": 4.173376452899492,
+      "mean_rounds": 1.0026755332946777
+    },
+    {
+      "update": 200,
+      "greedy_nll": 4.1756661670781865,
+      "mean_rounds": 1.0616590976715088
+    },
+    {
+      "update": 300,
+      "greedy_nll": 4.176102684901885,
+      "mean_rounds": 1.0726211071014404
+    },
+    {
+      "update": 400,
+      "greedy_nll": 4.17605345963032,
+      "mean_rounds": 1.0731256008148193
+    },
+    {
+      "update": 500,
+      "greedy_nll": 4.176056520346326,
+      "mean_rounds": 1.0755029916763306
+    }
+  ]
+}

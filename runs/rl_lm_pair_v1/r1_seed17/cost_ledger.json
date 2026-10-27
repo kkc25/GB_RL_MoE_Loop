@@ -1,0 +1,18 @@
+{
+  "prefix_input_tokens": 0,
+  "unique_train_contexts": 65536,
+  "context_visits": 256000,
+  "rollout_episodes": 1024000,
+  "logical_pair_rounds": 1024000,
+  "logical_expert_rows": 2048000,
+  "physical_expert_rows": 8192000,
+  "physical_head_rows": 1024000,
+  "actor_decision_rows": 1024000,
+  "actor_padding_rows": 0,
+  "successful_updates": 2000,
+  "optimizer_attempts": 2000,
+  "gpu_hours": 0.0,
+  "peak_allocated_bytes": 21351483904,
+  "peak_reserved_bytes": 23555211264,
+  "wall_time_seconds": 159.42364192008972
+}

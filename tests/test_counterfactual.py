@@ -231,8 +231,13 @@ class ReadoutPrecisionTests(unittest.TestCase):
         states = extract_states(model, input_ids, labels, segment_ids)
         with torch.autocast("cpu", dtype=torch.bfloat16):
             chunked = readout_ce(model, states["h"], states["targets"], chunk=3)
+        # Autocast isolation is an exact contract at the SAME chunk shape.
+        # Different FP32 GEMM batch shapes may round differently across CPU
+        # kernels; that is not leakage of BF16 autocast into the head.
+        same_shape_reference = readout_ce(model, states["h"], states["targets"], chunk=3)
+        torch.testing.assert_close(chunked, same_shape_reference, rtol=0, atol=0)
         reference = readout_ce(model, states["h"], states["targets"])
-        torch.testing.assert_close(chunked, reference, rtol=0, atol=0)
+        torch.testing.assert_close(chunked, reference, rtol=1e-6, atol=1e-6)
 
 
 class SplitIsolationTests(unittest.TestCase):

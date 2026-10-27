@@ -1,0 +1,133 @@
+{
+  "additional_exclusion_files": [],
+  "development_only": false,
+  "exclusion_sets": {
+    "n_doc_hashes": 108209,
+    "n_near_hashes": 108192,
+    "n_text_hashes": 108192
+  },
+  "exclusion_sources": [
+    {
+      "document_table_file": "documents.jsonl",
+      "document_table_sha256": "542f45c25c41e2689835e1044fa0fb56a36d7d82ea40bc21a5ea3a703711ec11",
+      "format": "fineweb-pipeline-v1",
+      "manifest_sha256": "98f52651e0bbaa2b6b5b22ed0469452a564c764793fb2df39842c083aab42a78",
+      "n_missing_near_hash": 146522,
+      "n_tokenizer_corpus_doc_hashes": 41378,
+      "n_used_documents": 105144,
+      "path": "runs/data/fineweb_edu_100m",
+      "splits_traversed": [
+        "test",
+        "train",
+        "validation"
+      ]
+    },
+    {
+      "document_table_file": "documents.jsonl",
+      "document_table_sha256": "542f45c25c41e2689835e1044fa0fb56a36d7d82ea40bc21a5ea3a703711ec11",
+      "format": "fineweb-pipeline-v1",
+      "manifest_sha256": "c42cecda0e8fd257cb7388ef75e76e25fb2ba3cdb64fed5387808caaee5c2c39",
+      "n_missing_near_hash": 56047,
+      "n_tokenizer_corpus_doc_hashes": 41378,
+      "n_used_documents": 14669,
+      "path": "runs/data/fineweb_edu_debug",
+      "splits_traversed": [
+        "test",
+        "train",
+        "validation"
+      ]
+    },
+    {
+      "document_table_file": "documents.jsonl",
+      "document_table_sha256": "f0b3284e9c63e1bc59ab01dd1b405c315c00b609187cf26adfedd20483a780b8",
+      "format": "controller-corpus-v1",
+      "manifest_sha256": "360d23efed7181bbf2e7da445dfe4ee840f5a694e4e822e3d31e9116d63fc68d",
+      "n_missing_near_hash": 0,
+      "n_tokenizer_corpus_doc_hashes": 0,
+      "n_used_documents": 2075,
+      "path": "runs/repair_2026_10_25/controller_corpus",
+      "splits_traversed": [
+        "calibration",
+        "controller_train",
+        "newtest",
+        "selection"
+      ]
+    },
+    {
+      "document_table_file": "confirmation_documents.jsonl",
+      "document_table_sha256": "f13f19959850296bfc0da9581437878c19db23afdc1bc9d7977022739b610e09",
+      "format": "fixed-depth-confirmation-v1",
+      "manifest_sha256": "7fca0563f4db360790ef848fc446680ccbce2ad7a1927b41b2562803759685ca",
+      "n_missing_near_hash": 0,
+      "n_tokenizer_corpus_doc_hashes": 0,
+      "n_used_documents": 990,
+      "path": "runs/followup_2026_10_26/plan_c/confirmation_corpus",
+      "splits_traversed": [
+        "confirmation"
+      ]
+    }
+  ],
+  "filtered_documents": {
+    "file": "filtered_documents.jsonl",
+    "n_documents": 617379,
+    "sha256": "fd2513b595ac7df72ce2a767fd474a9f8881e644bc40eaa5b8c51bc8538cd9df"
+  },
+  "n_duplicate_doc_hash": 0,
+  "n_excluded_documents": 108621,
+  "n_source_documents": 726000,
+  "n_source_lines": 726000,
+  "near_hash_rebuild": {
+    "n_pending": 202569,
+    "n_rebuilt": 202569,
+    "n_unresolved": 0
+  },
+  "role_intersections": {
+    "calibration": {
+      "doc_hash": 0,
+      "near_hash": 0,
+      "text_hash": 0
+    },
+    "controller_train": {
+      "doc_hash": 0,
+      "near_hash": 0,
+      "text_hash": 0
+    },
+    "newtest": {
+      "doc_hash": 0,
+      "near_hash": 0,
+      "text_hash": 0
+    },
+    "selection": {
+      "doc_hash": 0,
+      "near_hash": 0,
+      "text_hash": 0
+    }
+  },
+  "role_tokens": {
+    "calibration": {
+      "actual": 262144,
+      "requested": 262144
+    },
+    "controller_train": {
+      "actual": 1048576,
+      "requested": 1048576
+    },
+    "newtest": {
+      "actual": 262144,
+      "requested": 262144
+    },
+    "selection": {
+      "actual": 262144,
+      "requested": 262144
+    }
+  },
+  "source": {
+    "path": "data/rl_lm_pair_v1/source/fineweb_edu_sample10bt_shard0_rev87f09149.jsonl",
+    "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+    "sha256": "de1276dcae11a365755ebcd55f6e24b520467f52b92fb9495b179f799c62542a",
+    "source_id": "HuggingFaceFW/fineweb-edu:sample-10BT"
+  },
+  "spec_version": "RL-LM-Corpus-v1.0",
+  "unresolved_near_hash": [],
+  "version": "rl-lm-corpus-build-v1"
+}

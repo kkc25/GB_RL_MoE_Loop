@@ -1,0 +1,5 @@
+# CPU-only correctness checks, not the CUDA experiment environment.
+# Install torch separately from the official CPU wheel index (see ENVIRONMENT.md).
+numpy==2.5.2
+PyYAML==6.0.3
+tokenizers==0.22.2

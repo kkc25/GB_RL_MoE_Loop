@@ -1,0 +1,34 @@
+{
+  "status": "completed",
+  "run_id": "rl-lm-single-0565cb88b568-20261027T133413",
+  "successful_updates": 500,
+  "planned_updates": 500,
+  "stop_after": 500,
+  "lr_scale": 1.0,
+  "lr_backoffs": 0,
+  "best": {
+    "update": 0,
+    "greedy_nll": 4.182858043454164,
+    "mean_rounds": 1.0,
+    "path": "checkpoint_best.pt"
+  },
+  "ledger": {
+    "prefix_input_tokens": 0,
+    "unique_train_contexts": 64000,
+    "context_visits": 64000,
+    "rollout_episodes": 256000,
+    "logical_single_rounds": 256000,
+    "logical_expert_rows": 256000,
+    "physical_expert_rows": 2048000,
+    "physical_head_rows": 256000,
+    "actor_decision_rows": 256000,
+    "actor_padding_rows": 0,
+    "successful_updates": 500,
+    "optimizer_attempts": 500,
+    "gpu_hours": 0.010329983962906731,
+    "peak_allocated_bytes": 22467819008,
+    "peak_reserved_bytes": 22523412480
+  },
+  "frozen_lm_hash_stable": true,
+  "run_dir": "runs/rl_lm_single_v1/rloo_seed17"
+}

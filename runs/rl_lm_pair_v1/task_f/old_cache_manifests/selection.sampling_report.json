@@ -1,0 +1,10 @@
+{
+  "states": 8192,
+  "documents": 252,
+  "max_document_weight": 0.0645751953125,
+  "duplicate_positions": 0,
+  "excluded_doc_ids_present": [],
+  "near_duplicate_coverage": "unavailable in packed reader; corpus-level near_hash must be checked separately",
+  "sampling": "uniform valid token without replacement",
+  "dataset_offset": 0
+}

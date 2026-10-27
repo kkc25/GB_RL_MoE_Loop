@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "quality_ok": true,
+  "final_degradation_nll": 0.009522862604008253,
+  "gate_tolerance_nll": 0.02,
+  "timing_ok": true,
+  "timing": {
+    "rows": 8192,
+    "warmup": 30,
+    "repeats": 200,
+    "original_top2_ms": 3.7660928344726563,
+    "single_sparse_ms": 2.0073370361328124,
+    "speedup": 1.8761636768921144,
+    "improved": true
+  },
+  "updates_completed": 1000,
+  "single_rl_allowed": true,
+  "student_checkpoint": "runs/rl_lm_single_v1/adapt_gpu_probe/student_final.pt",
+  "student_checkpoint_sha256": "553a7b83844407bd5243a9589417f7d98883b5bfd2aa5b5a5a6bcb6db84992a5"
+}

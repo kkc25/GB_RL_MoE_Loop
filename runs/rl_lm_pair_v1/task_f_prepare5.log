@@ -1,0 +1,14 @@
+{
+  "controller_train": {
+    "cache_dir": "data/rl_lm_pair_v1/cache/controller_train",
+    "states": 65536
+  },
+  "selection": {
+    "cache_dir": "data/rl_lm_pair_v1/cache/selection",
+    "states": 8192
+  },
+  "calibration": {
+    "cache_dir": "data/rl_lm_pair_v1/cache/calibration",
+    "states": 2048
+  }
+}

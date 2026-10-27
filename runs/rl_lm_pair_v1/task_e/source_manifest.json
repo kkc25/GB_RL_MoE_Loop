@@ -1,0 +1,15 @@
+{
+  "created_utc": "2026-10-27T09:40:40.506520+00:00",
+  "limit_shards": 1,
+  "max_docs": null,
+  "n_rows": 726000,
+  "output_file": "fineweb_edu_sample10bt_shard0_rev87f09149.jsonl",
+  "output_sha256": "de1276dcae11a365755ebcd55f6e24b520467f52b92fb9495b179f799c62542a",
+  "pipeline_version": "rl-lm-source-export-v1",
+  "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+  "shards": [
+    "sample/10BT/000_00000.parquet"
+  ],
+  "source": "HuggingFaceFW/fineweb-edu",
+  "source_config": "sample-10BT"
+}

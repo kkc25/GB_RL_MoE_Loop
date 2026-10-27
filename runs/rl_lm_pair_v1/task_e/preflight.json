@@ -1,0 +1,30 @@
+{
+  "status": "ready",
+  "model_and_raw_data": "verified",
+  "caches": {
+    "controller_train": {
+      "status": "ready",
+      "states": 65536,
+      "expected_states": 65536,
+      "cache_dir": "data/rl_lm_pair_v1/cache/controller_train"
+    },
+    "selection": {
+      "status": "ready",
+      "states": 8192,
+      "expected_states": 8192,
+      "cache_dir": "data/rl_lm_pair_v1/cache/selection"
+    },
+    "calibration": {
+      "status": "ready",
+      "states": 2048,
+      "expected_states": 2048,
+      "cache_dir": "data/rl_lm_pair_v1/cache/calibration"
+    }
+  },
+  "environment": {
+    "python": "3.12.15",
+    "torch": "2.12.1+cu130",
+    "cuda": "13.0",
+    "device": "NVIDIA RTX A6000"
+  }
+}

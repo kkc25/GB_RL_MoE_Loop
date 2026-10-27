@@ -1,0 +1,21 @@
+test_action_table_identity_is_stable (test_actions.ActionTests.test_action_table_identity_is_stable) ... ok
+test_full_table_and_inverse_mapping (test_actions.ActionTests.test_full_table_and_inverse_mapping) ... ok
+test_legal_mask_only_stop_changes (test_actions.ActionTests.test_legal_mask_only_stop_changes) ... ok
+test_required_examples (test_actions.ActionTests.test_required_examples) ... ok
+test_default_configs_validate (test_config_and_roles.ConfigAndRoleTests.test_default_configs_validate) ... ok
+test_invalid_groups_stage_and_training_role_fail (test_config_and_roles.ConfigAndRoleTests.test_invalid_groups_stage_and_training_role_fail) ... ok
+test_mixed_dtype_and_checkpoint_hash_fail (test_config_and_roles.ConfigAndRoleTests.test_mixed_dtype_and_checkpoint_hash_fail) ... ok
+test_required_paths_and_corpus_exclusions (test_config_and_roles.ConfigAndRoleTests.test_required_paths_and_corpus_exclusions) ... ok
+test_unknown_root_and_nested_fields_fail (test_config_and_roles.ConfigAndRoleTests.test_unknown_root_and_nested_fields_fail) ... ok
+test_joint_greedy_stop_not_hazard_threshold (test_policy_distribution.PolicyDistributionTests.test_joint_greedy_stop_not_hazard_threshold) ... ok
+test_legal_distribution (test_policy_distribution.PolicyDistributionTests.test_legal_distribution) ... ok
+test_lowest_action_wins_ties (test_policy_distribution.PolicyDistributionTests.test_lowest_action_wins_ties) ... ok
+test_r2_warmstart_preserves_r1_policy_and_resets_stop (test_policy_distribution.PolicyDistributionTests.test_r2_warmstart_preserves_r1_policy_and_resets_stop) ... ok
+test_zero_initialization_matches_canonical_teacher (test_policy_distribution.PolicyDistributionTests.test_zero_initialization_matches_canonical_teacher) ... ok
+test_bad_shape_dtype_and_padding_fail (test_types.TypeTests.test_bad_shape_dtype_and_padding_fail) ... ok
+test_valid_structures (test_types.TypeTests.test_valid_structures) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.330s
+
+OK

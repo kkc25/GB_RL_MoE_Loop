@@ -1,0 +1,6 @@
+{
+  "adapted_checkpoint_sha256": "2ad634de69d5c420ccaf34490ee9d289fe966753116a7bd0de7e54d1e35d2469",
+  "rule": "adapted student, fixed argmax single expert, amplitude 1, R1",
+  "states": 65536,
+  "mean_ce": 4.278570064084226
+}
