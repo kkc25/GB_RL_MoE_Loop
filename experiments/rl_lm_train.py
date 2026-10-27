@@ -13,6 +13,8 @@ import argparse
 import json
 from pathlib import Path
 
+from rl_lm.run_directory import guard_run_directory
+
 import numpy as np
 import torch
 from torch.nn import functional as F
@@ -149,6 +151,7 @@ def main() -> None:
     output_dir = Path(config.get("output_dir"))
     if args.resume is not None and Path(args.resume).parent.resolve() != output_dir.resolve():
         raise ValueError("--resume must point at a checkpoint inside this run's output_dir")
+    guard_run_directory(output_dir, resume=args.resume is not None)
     preflight_path = output_dir / "preflight.json"
     if not preflight_path.exists():
         raise RuntimeError("preflight.json missing; run experiments.rl_lm_preflight until it passes")

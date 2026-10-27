@@ -367,6 +367,9 @@ class Trainer:
         return torch.optim.AdamW(params, lr=0.0, betas=self.betas, eps=self.eps, weight_decay=self.weight_decay)
 
     def _start_new_run(self, warmstart_path) -> None:
+        from rl_lm.run_directory import guard_run_directory
+
+        guard_run_directory(self.run_dir, resume=False)
         if (self.run_dir / "checkpoint_latest.pt").exists():
             raise FileExistsError(
                 f"{self.run_dir} already contains a run; exact state can only be continued with --resume"
@@ -408,6 +411,7 @@ class Trainer:
         payload = resume_exact(resume_path, resolved_config=self.config.to_dict())
         if resume_path.parent.resolve() != self.run_dir.resolve():
             raise ValueError("an exact resume must point at a checkpoint of this run's output_dir")
+        self._validate_resume_identities(payload)
         self._validate_selection_resume(payload["selection_state"])
         self.actor = self._build_actor()
         self.actor.load_state_dict(payload["actor_state_dict"])
@@ -440,6 +444,48 @@ class Trainer:
             raise ValueError(
                 f"--stop-after {self.stop_after} is below the completed {self.successful_updates} updates"
             )
+
+    def _validate_resume_identities(self, payload: dict) -> None:
+        """Pin actual inputs, not just unchanged paths in the resolved config.
+
+        Git commit labels are informational: identical trees/diffs/untracked
+        Python bytes may continue across a metadata-only commit. All other
+        source fields remain pinned; this is not an implicit code migration.
+        """
+        def normalized(value):
+            if isinstance(value, dict):
+                return {key: normalized(item) for key, item in value.items() if key != "commit"}
+            if isinstance(value, list):
+                return [normalized(item) for item in value]
+            return value
+
+        if self.source_identity is None:
+            from experiments.r1_closed_loop import source_identity
+
+            self.source_identity = source_identity()
+        expected = {
+            "backbone_identity": self.backbone_identity | {"frozen_parameters_sha256": self.frozen_hash_at_start},
+            "data_identity": self.data_identity,
+            "source_identity": self.source_identity,
+            "numerical_contract": self._numerical_contract(),
+            "action_contract": action_table_identity(),
+            "feature_schema": self.config.get("policy.feature_schema"),
+            "feature_dim": self.feature_dim,
+        }
+        for key, current in expected.items():
+            if normalized(payload.get(key)) != normalized(current):
+                raise ValueError(f"exact resume {key} mismatch; changed inputs require a new run")
+
+    def _numerical_contract(self) -> dict:
+        return {
+            "training_backend": self.config.get("environment.training_backend"),
+            "expert_chunk": int(self.config.get("environment.expert_chunk")),
+            "head_chunk": int(self.config.get("environment.head_chunk")),
+            "frozen_compute_dtype": self.config.get("environment.frozen_compute_dtype"),
+            "residual_dtype": self.config.get("environment.residual_dtype"),
+            "head_contract": self.config.get("environment.head_contract"),
+            "gamma": self.executor.gamma,
+        }
 
     # ------------------------------------------------------------- scheduling
 
@@ -798,15 +844,7 @@ class Trainer:
             "action_contract": action_table_identity(),
             "feature_schema": self.config.get("policy.feature_schema"),
             "feature_dim": self.feature_dim,
-            "numerical_contract": {
-                "training_backend": self.config.get("environment.training_backend"),
-                "expert_chunk": int(self.config.get("environment.expert_chunk")),
-                "head_chunk": int(self.config.get("environment.head_chunk")),
-                "frozen_compute_dtype": self.config.get("environment.frozen_compute_dtype"),
-                "residual_dtype": self.config.get("environment.residual_dtype"),
-                "head_contract": self.config.get("environment.head_contract"),
-                "gamma": self.executor.gamma,
-            },
+            "numerical_contract": self._numerical_contract(),
             "actor_state_dict": {k: v.detach().cpu() for k, v in self.actor.state_dict().items()},
             "optimizer_state_dict": self.optimizer.state_dict(),
             "scheduler_state": {

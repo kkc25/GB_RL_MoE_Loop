@@ -49,6 +49,7 @@ from rl_lm.objectives import rloo_advantage
 from rl_lm.readout import terminal_ce
 from rl_lm.reporting import stop_metrics
 from rl_lm.rng import make_uniform_table
+from rl_lm.run_directory import guard_run_directory
 from rl_lm.single_actor import SingleActor, SingleDecisionRecords
 from rl_lm.single_config import SingleRLConfig, resolve_single_config, single_cache_identity
 from rl_lm.single_executor import (
@@ -322,6 +323,8 @@ class SingleTrainer:
                 raise ValueError("the adapted student backbone must be fully frozen before RL")
         self.device = torch.device(device) if device is not None else torch.device(self.config.get("runtime.device"))
         self.run_dir = Path(self.config.get("output_dir"))
+        guard_run_directory(self.run_dir, resume=resume_path is not None,
+                            additional_allowed=("reference_ce.npy", "reference_ce.json"))
         self.run_dir.mkdir(parents=True, exist_ok=True)
 
         self.actor_seed = int(self.config.get("actor_seed"))
@@ -641,6 +644,18 @@ class SingleTrainer:
 
     # -------------------------------------------------------------- checkpoint
 
+    def _numerical_contract(self) -> dict:
+        return {
+            "training_backend": self.config.get("environment.training_backend"),
+            "expert_chunk": int(self.config.get("environment.expert_chunk")),
+            "head_chunk": int(self.config.get("environment.head_chunk")),
+            "frozen_compute_dtype": self.config.get("environment.frozen_compute_dtype"),
+            "residual_dtype": self.config.get("environment.residual_dtype"),
+            "head_contract": self.config.get("environment.head_contract"),
+            "gamma": self.executor.gamma,
+            "physical_logical_expert_ratio": 8,
+        }
+
     def _checkpoint_payload(self) -> dict:
         return {
             "format_version": CHECKPOINT_FORMAT,
@@ -657,16 +672,7 @@ class SingleTrainer:
             "action_contract": {"action_space": "single8_stop_v1", "joint_actions": JOINT_SINGLE_ACTIONS},
             "feature_schema": self.config.get("policy.feature_schema"),
             "feature_dim": self.feature_dim,
-            "numerical_contract": {
-                "training_backend": self.config.get("environment.training_backend"),
-                "expert_chunk": int(self.config.get("environment.expert_chunk")),
-                "head_chunk": int(self.config.get("environment.head_chunk")),
-                "frozen_compute_dtype": self.config.get("environment.frozen_compute_dtype"),
-                "residual_dtype": self.config.get("environment.residual_dtype"),
-                "head_contract": self.config.get("environment.head_contract"),
-                "gamma": self.executor.gamma,
-                "physical_logical_expert_ratio": 8,
-            },
+            "numerical_contract": self._numerical_contract(),
             "actor_state_dict": {k: v.detach().cpu() for k, v in self.actor.state_dict().items()},
             "optimizer_state_dict": self.optimizer.state_dict(),
             "scheduler_state": {
@@ -697,6 +703,27 @@ class SingleTrainer:
         update_pointer_manifest(self.run_dir, kind, path)
         return path
 
+    def _validate_resume_identities(self, payload: dict) -> None:
+        def normalized(value):
+            if isinstance(value, dict):
+                return {key: normalized(item) for key, item in value.items() if key != "commit"}
+            if isinstance(value, list):
+                return [normalized(item) for item in value]
+            return value
+
+        expected = {
+            "backbone_identity": self.backbone_identity | {"frozen_parameters_sha256": self.frozen_hash_at_start},
+            "adapted_identity": self.adapted_identity,
+            "data_identity": self.data_identity,
+            "numerical_contract": self._numerical_contract(),
+            "action_contract": {"action_space": "single8_stop_v1", "joint_actions": JOINT_SINGLE_ACTIONS},
+            "feature_schema": self.config.get("policy.feature_schema"),
+            "feature_dim": self.feature_dim,
+        }
+        for key, current in expected.items():
+            if normalized(payload.get(key)) != normalized(current):
+                raise ValueError(f"exact resume {key} mismatch; changed inputs require a new run")
+
     def _restore_run(self, path: Path) -> None:
         if path.parent.resolve() != self.run_dir.resolve():
             raise ValueError("an exact resume must point at a checkpoint of this run's output_dir")
@@ -708,6 +735,7 @@ class SingleTrainer:
         stored["runtime"]["device"] = current["runtime"]["device"] = "<agnostic>"
         if stored != current:
             raise ValueError("exact resume requires the identical resolved configuration; only runtime.device may differ")
+        self._validate_resume_identities(payload)
         training = payload["training_state"]["successful_updates"]
         scheduler = payload["scheduler_state"]["successful_updates"]
         ledger = payload["ledger"]["successful_updates"]
@@ -947,6 +975,11 @@ def main() -> None:
         args.config, SingleRLConfig,
         checkpoint=args.checkpoint, corpus_dir=args.corpus_dir, tokenizer=args.tokenizer, device=args.device,
     )
+    output_dir = Path(config.get("output_dir"))
+    if args.resume is not None and Path(args.resume).parent.resolve() != output_dir.resolve():
+        raise ValueError("--resume must point at a checkpoint inside this run's output_dir")
+    guard_run_directory(output_dir, resume=args.resume is not None,
+                        additional_allowed=("reference_ce.npy", "reference_ce.json"))
     adapt_dir = Path(config.get("adapted.adapt_run_dir"))
     gate_path = adapt_dir / "gate.json"
     if not gate_path.exists():
@@ -1001,6 +1034,7 @@ def main() -> None:
     reference_meta_path = output_dir / "reference_ce.json"
     reference_identity = reference_ce_identity(caches[config.get("data.train_split")], adapted_sha,
                                                config.get("environment.frozen_compute_dtype"))
+    pending_reference_meta = None
     if reference_path.exists():
         meta = json.loads(reference_meta_path.read_text())
         validate_reference_ce_identity(meta, reference_identity)
@@ -1010,14 +1044,13 @@ def main() -> None:
             model, caches[config.get("data.train_split")], device,
             compute_dtype=config.get("environment.frozen_compute_dtype"),
         )
-        np.save(reference_path, ref_ce)
-        atomic_json(reference_meta_path, {
+        pending_reference_meta = {
             "identity": reference_identity,
             "adapted_checkpoint_sha256": adapted_sha,
             "rule": "adapted student, fixed argmax single expert, amplitude 1, R1",
             "states": int(ref_ce.shape[0]),
             "mean_ce": float(ref_ce.mean()),
-        })
+        }
 
     backbone_identity = {
         "teacher_checkpoint_path": config.get("backbone.checkpoint_path"),
@@ -1043,6 +1076,10 @@ def main() -> None:
         data_identity=data_identity,
         adapted_identity=adapted_identity,
     )
+    # Resume identities must be validated before changing any existing run bytes.
+    if pending_reference_meta is not None:
+        np.save(reference_path, ref_ce)
+        atomic_json(reference_meta_path, pending_reference_meta)
     summary = trainer.run()
     print(json.dumps(summary, indent=2))
 

@@ -201,3 +201,35 @@ Profile defaults are metric/backend-versioned and refuse an existing report;
 v2 R1-verification defaults use a separate output directory from historical v1.
 CPU validation uses Python 3.12, torch 2.12.1+cpu, numpy 2.5.2, and tokenizers
 0.22.2. Original CUDA experiment requirements are retained, not replaced.
+
+## Main-integration audit extension
+
+Promotion includes the previously unmerged research branch, not only the repair
+commit. The main-to-integration change is predominantly additive: baseline
+production modules and historical run artifacts remain unchanged.
+
+A second review found and repaired two inherited provenance hazards:
+
+- Pair exact resume now pins stored backbone/config/tokenizer/data, action,
+  feature, numerical (including gamma), and source identities before loading
+  optimizer/history state. A matching path is not evidence of matching bytes.
+  Identical source trees may retain resume compatibility across Git commit-label
+  changes; changed source content requires a new run.
+- Fresh run/preflight paths must not append to archived metrics or overwrite
+  summaries just because gitignored checkpoint files are absent. Run-directory
+  checks distinguish preparation-only files from actual run evidence and reject
+  collisions with a clear request for a fresh output directory. The corresponding
+  single-RL identity/output path is checked under the same preservation principle.
+
+The initial published repair passed both push and PR CPU workflows. Validation
+of this integration extension is recorded separately below; earlier CI is not
+substituted for the final changed tree's tests.
+
+Final integration-extension validation: **786 tests in 104.985 s, OK
+(skipped=1)** under the same CPU environment: 785 passed; the CUDA BF16 head
+check remains skipped. Full command: `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python
+-m unittest discover -s tests -t . -v`. Syntax compilation and whitespace checks
+also passed. Pair and single identical-input resume regressions remain passing.
+Legacy checkpoints that lack matching pinned identities are intentionally not
+silently treated as exact continuations; start a new run or use their recorded
+historical code/protocol. These checks do not establish GPU speed or quality.
