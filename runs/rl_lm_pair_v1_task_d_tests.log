@@ -1,0 +1,19 @@
+test_cli_rejects_resume_with_warmstart (tests.rl_lm.test_resume.ExactResumeTests.test_cli_rejects_resume_with_warmstart) ... ok
+test_continuous_vs_new_process_resume (tests.rl_lm.test_resume.ExactResumeTests.test_continuous_vs_new_process_resume) ... ok
+test_r2_warmstart_unfreezes_zeroed_stop_head (tests.rl_lm.test_resume.WarmstartTests.test_r2_warmstart_unfreezes_zeroed_stop_head) ... ok
+test_warmstart_new_run_actor_only (tests.rl_lm.test_resume.WarmstartTests.test_warmstart_new_run_actor_only) ... ok
+test_failed_run_writes_failure_and_keeps_checkpoint (tests.rl_lm.test_update_transaction.UpdateTransactionTests.test_failed_run_writes_failure_and_keeps_checkpoint) ... ok
+test_retry_exhausted_restores_and_keeps_costs (tests.rl_lm.test_update_transaction.UpdateTransactionTests.test_retry_exhausted_restores_and_keeps_costs) ... ok
+test_retry_success_halves_lr_and_persists (tests.rl_lm.test_update_transaction.UpdateTransactionTests.test_retry_success_halves_lr_and_persists) ... ok
+test_run_backoff_budget_blocks_retry (tests.rl_lm.test_update_transaction.UpdateTransactionTests.test_run_backoff_budget_blocks_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 11.676s
+
+OK
+
+T19: 20-update continuous run and 10+resume+10 split run are bitwise identical (final actor_loss=8.092681e-05, epoch=2, cursor=32)
+
+T20 retry-exhausted: attempts=2, state restored bitwise, rollout cost retained (64 episodes)
+
+T20 retry-success: KL full=6.612e-07 half=1.341e-07, attempts=2, lr_scale persisted at 0.5

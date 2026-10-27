@@ -1,0 +1,18 @@
+{
+  "status": "ready",
+  "spec_version": "RL-LM-Single-v1.0",
+  "stage": "adapt",
+  "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+  "caches": {
+    "controller_train": {
+      "states": 65536
+    },
+    "selection": {
+      "states": 8192
+    },
+    "calibration": {
+      "states": 2048
+    }
+  },
+  "created_utc": "2026-10-27T13:10:05.818592+00:00"
+}

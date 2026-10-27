@@ -1,0 +1,41 @@
+{
+  "rule": "lowest greedy_nll on selection; ties prefer fewer rounds then earlier update",
+  "best": {
+    "update": 0,
+    "greedy_nll": 4.182858043454164,
+    "mean_rounds": 1.0,
+    "path": "checkpoint_best.pt"
+  },
+  "candidates": [
+    {
+      "update": 0,
+      "greedy_nll": 4.182858043454164,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 100,
+      "greedy_nll": 4.182858043454164,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 200,
+      "greedy_nll": 4.182858043454164,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 300,
+      "greedy_nll": 4.182858043454164,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 400,
+      "greedy_nll": 4.182858043454164,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 500,
+      "greedy_nll": 4.182858043454164,
+      "mean_rounds": 1.0
+    }
+  ]
+}

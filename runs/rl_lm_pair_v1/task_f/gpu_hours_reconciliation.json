@@ -1,0 +1,19 @@
+{
+  "note": "gpu_hours derived from actually recorded wall_time_seconds (spec 14.2); historical ledger fields remain as saved (0.0), not retro-edited",
+  "runs": {
+    "r1_seed17": {
+      "recorded_gpu_hours_field": 0.0,
+      "wall_time_seconds": 159.42364192008972,
+      "derived_gpu_hours": 0.0442843449778027,
+      "peak_allocated_bytes": 21351483904,
+      "peak_reserved_bytes": 23555211264
+    },
+    "r2_lambda0_seed17": {
+      "recorded_gpu_hours_field": 0.0,
+      "wall_time_seconds": 45.45394468307495,
+      "derived_gpu_hours": 0.012626095745298598,
+      "peak_allocated_bytes": 21351486976,
+      "peak_reserved_bytes": 23553114112
+    }
+  }
+}

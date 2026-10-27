@@ -1,0 +1,99 @@
+{
+  "spec_version": "RL-LM-Pair-v1.0",
+  "stage": "r2",
+  "actor_seed": 17,
+  "backbone": {
+    "config_path": "runs/next_2026_10_26/baseline_100m/loop_r1.json",
+    "checkpoint_path": "runs/next_2026_10_26/baseline_100m/loop_r1/latest.pt",
+    "expected_checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+    "adaptive_layer": 11,
+    "freeze_all": true,
+    "prefix_depth": 1
+  },
+  "data": {
+    "corpus_dir": "data/rl_lm_pair_v1/corpus",
+    "tokenizer_path": "runs/data/fineweb_edu_100m/tokenizer.json",
+    "cache_root": "data/rl_lm_pair_v1/cache",
+    "train_split": "controller_train",
+    "selection_split": "selection",
+    "calibration_split": "calibration",
+    "confirmation_split": "newtest",
+    "train_states": 65536,
+    "selection_states": 8192,
+    "calibration_states": 2048,
+    "state_sampling": "uniform_valid_token_without_replacement",
+    "sampling_seed": 20261026,
+    "prefix_sequence_batch": 2
+  },
+  "policy": {
+    "action_space": "pair28_stop_v1",
+    "feature_schema": "h_h0_gate_previouspair_scalars_v1",
+    "hidden_width": 128,
+    "reference_epsilon": 0.1,
+    "initial_stop_hazard": 0.5,
+    "distribution": "factorized_joint29",
+    "greedy_rule": "joint_argmax_lowest_id",
+    "dropout": 0.0,
+    "price_as_input": false
+  },
+  "environment": {
+    "min_calls": 1,
+    "max_calls": 2,
+    "gamma_source": "backbone_config",
+    "training_backend": "canonical_all_experts_v1",
+    "deployment_backend": "sparse_merged_v1",
+    "expert_chunk": 64,
+    "head_chunk": 64,
+    "frozen_compute_dtype": "bfloat16",
+    "residual_dtype": "float32",
+    "head_contract": "bf16_linear_fp32_ce_v1"
+  },
+  "optimization": {
+    "algorithm": "on_policy_rloo",
+    "groups": 4,
+    "batch_contexts": 128,
+    "replay_microbatch_contexts": 32,
+    "updates": 2000,
+    "learning_rate": 5e-05,
+    "betas": [
+      0.9,
+      0.95
+    ],
+    "epsilon": 1e-08,
+    "weight_decay": 0.0,
+    "warmup_updates": 50,
+    "final_lr_ratio": 0.1,
+    "gradient_clip": 1.0,
+    "entropy_coefficient": 0.0,
+    "reference_kl_coefficient": 0.0,
+    "advantage_normalization": "none",
+    "updates_per_rollout": 1,
+    "max_update_kl_mean": 0.02,
+    "max_update_kl_state": 0.2,
+    "max_retries_per_update": 1,
+    "max_lr_backoffs_per_run": 4
+  },
+  "cost": {
+    "lambda": 0.0,
+    "unit": "extra_pair_round"
+  },
+  "evaluation": {
+    "interval_updates": 100,
+    "stochastic_samples_per_context": 16,
+    "online_selection_sequences": 128,
+    "bootstrap_repetitions": 2000,
+    "bootstrap_confidence": 0.95,
+    "minimum_practical_nll_gain": 0.005,
+    "r2_quality_tolerance_nll": 0.005,
+    "selection_tie_tolerance": 1e-06
+  },
+  "runtime": {
+    "device": "cuda:1",
+    "require_cuda": true,
+    "allow_tf32": false
+  },
+  "logging": {
+    "interval_updates": 10
+  },
+  "output_dir": "runs/rl_lm_pair_v1/r2_lambda0_seed17"
+}

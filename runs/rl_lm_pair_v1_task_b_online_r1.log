@@ -1,0 +1,28 @@
+{
+  "config": "runs/next_2026_10_26/baseline_100m/loop_r1.json",
+  "checkpoint": "runs/next_2026_10_26/baseline_100m/loop_r1/latest.pt",
+  "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+  "sequences": 2,
+  "positions": 128,
+  "gate_ties": 0,
+  "canonical_legacy_pair_differences": 0,
+  "initial_actor_canonical_action_differences": 0,
+  "backend": "bf16_linear_fp32_ce_v1",
+  "numerical_contract": {
+    "canonical_minus_legacy_ce_abs": {
+      "mean": 0.0017576035934325773,
+      "max": 0.0480729341506958,
+      "p95": 0.0041046142578125
+    },
+    "sparse_minus_legacy_ce_abs": {
+      "mean": 0.001142602995969355,
+      "max": 0.04771220684051514,
+      "p95": 0.0025434494018554688
+    },
+    "initial_actor_minus_canonical_ce_abs": {
+      "mean": 0.0007989213881955948,
+      "max": 0.029186248779296875,
+      "p95": 0.0016217231750488281
+    }
+  }
+}

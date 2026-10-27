@@ -1,0 +1,36 @@
+{
+  "checkpoint": "runs/next_2026_10_26/baseline_100m/loop_r1/latest.pt",
+  "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+  "kind": "oracle_upper_bound_diagnostic_not_actor_input",
+  "splits": {
+    "controller_train": {
+      "canonical_ce_mean": 4.495413780212402,
+      "fraction_best_is_not_canonical": 0.9375,
+      "median_pair_ce_mean": 4.6442718505859375,
+      "oracle_best_ce_mean": 4.225245475769043,
+      "oracle_gain_median": 0.2163245677947998,
+      "oracle_gain_over_canonical": 0.27016860246658325,
+      "oracle_gain_p95": 0.7732430100440979,
+      "physical_expert_rows": 28672,
+      "physical_head_rows": 3584,
+      "split": "controller_train",
+      "states": 128,
+      "worst_ce_mean": 5.028437614440918
+    },
+    "selection": {
+      "canonical_ce_mean": 4.288476943969727,
+      "fraction_best_is_not_canonical": 0.96875,
+      "median_pair_ce_mean": 4.360545635223389,
+      "oracle_best_ce_mean": 3.997694969177246,
+      "oracle_gain_median": 0.2226243019104004,
+      "oracle_gain_over_canonical": 0.29078245162963867,
+      "oracle_gain_p95": 0.8282750844955444,
+      "physical_expert_rows": 28672,
+      "physical_head_rows": 3584,
+      "split": "selection",
+      "states": 128,
+      "worst_ce_mean": 4.76922082901001
+    }
+  },
+  "states_per_split": 128
+}

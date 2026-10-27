@@ -1,0 +1,42 @@
+test_rloo_matches_exact_gradient (tests.rl_lm.test_rloo_math.ExactGradientTests.test_rloo_matches_exact_gradient) ... ok
+test_reference_ce_cancels_in_leave_one_out (tests.rl_lm.test_rloo_math.RewardShapeTests.test_reference_ce_cancels_in_leave_one_out) ... ok
+test_reward_form_matches_hand_computation (tests.rl_lm.test_rloo_math.RewardShapeTests.test_reward_form_matches_hand_computation) ... ok
+test_descent_direction_through_pair_actor (tests.rl_lm.test_rloo_math.SignAndGroupingTests.test_descent_direction_through_pair_actor) ... ok
+test_descent_increases_high_reward_action_probability (tests.rl_lm.test_rloo_math.SignAndGroupingTests.test_descent_increases_high_reward_action_probability) ... ok
+test_leave_one_out_values_by_hand (tests.rl_lm.test_rloo_math.SignAndGroupingTests.test_leave_one_out_values_by_hand) ... ok
+test_other_contexts_do_not_change_this_context (tests.rl_lm.test_rloo_math.SignAndGroupingTests.test_other_contexts_do_not_change_this_context) ... ok
+test_group_std_whitening_is_wrong (tests.rl_lm.test_rloo_math.WrongObjectiveControlTests.test_group_std_whitening_is_wrong) ... ok
+test_length_averaged_log_prob_is_wrong (tests.rl_lm.test_rloo_math.WrongObjectiveControlTests.test_length_averaged_log_prob_is_wrong) ... ok
+test_constant_group_is_exactly_zero (tests.rl_lm.test_rloo_math.ZeroSignalTests.test_constant_group_is_exactly_zero) ... ok
+test_constant_rows_zero_mixed_rows_untouched (tests.rl_lm.test_rloo_math.ZeroSignalTests.test_constant_rows_zero_mixed_rows_untouched) ... ok
+test_zero_advantage_gives_exactly_zero_gradient (tests.rl_lm.test_rloo_math.ZeroSignalTests.test_zero_advantage_gives_exactly_zero_gradient) ... ok
+test_only_actor_gets_gradients (tests.rl_lm.test_replay.GradientIsolationTests.test_only_actor_gets_gradients) ... ok
+test_microbatch_equals_full_batch (tests.rl_lm.test_replay.MicrobatchTests.test_microbatch_equals_full_batch) ... ok
+test_changed_action_must_fail (tests.rl_lm.test_replay.ReplayConsistencyTests.test_changed_action_must_fail) ... ok
+test_changed_probability_rule_must_fail (tests.rl_lm.test_replay.ReplayConsistencyTests.test_changed_probability_rule_must_fail) ... ok
+test_flipped_stop_mask_must_fail (tests.rl_lm.test_replay.ReplayConsistencyTests.test_flipped_stop_mask_must_fail) ... ok
+test_replay_matches_rollout_before_update (tests.rl_lm.test_replay.ReplayConsistencyTests.test_replay_matches_rollout_before_update) ... ok
+test_inverse_cdf_boundary_and_illegal_stop (tests.rl_lm.test_replay.RngStreamTests.test_inverse_cdf_boundary_and_illegal_stop) ... ok
+test_neighbour_early_stop_keeps_this_episodes_actions (tests.rl_lm.test_replay.RngStreamTests.test_neighbour_early_stop_keeps_this_episodes_actions) ... ok
+test_rows_follow_episode_id_not_batch_position (tests.rl_lm.test_replay.RngStreamTests.test_rows_follow_episode_id_not_batch_position) ... ok
+test_same_ids_give_identical_table (tests.rl_lm.test_replay.RngStreamTests.test_same_ids_give_identical_table) ... ok
+test_sampler_matches_environment_reference (tests.rl_lm.test_replay.RngStreamTests.test_sampler_matches_environment_reference) ... ok
+test_sampler_rejects_out_of_range_or_rounded_uniforms (tests.rl_lm.test_replay.RngStreamTests.test_sampler_rejects_out_of_range_or_rounded_uniforms) ... ok
+test_stream_depends_on_seed_update_episode_and_group (tests.rl_lm.test_replay.RngStreamTests.test_stream_depends_on_seed_update_episode_and_group) ... ok
+test_table_is_stable_across_processes (tests.rl_lm.test_replay.RngStreamTests.test_table_is_stable_across_processes) ... ok
+test_uniforms_stay_in_unit_interval (tests.rl_lm.test_replay.RngStreamTests.test_uniforms_stay_in_unit_interval) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 2.951s
+
+OK
+
+T13 exact |grad|=2.313183e-01 max|rloo-exact|=9.714e-17
+
+T14 std-whitened L2 error=8.225020e-02
+
+T14 length-averaged L2 error=1.384340e-01
+
+T18 max|microbatch-full| grad diff=2.274e-13
+
+T15 max|replay-rollout|=0.000e+00

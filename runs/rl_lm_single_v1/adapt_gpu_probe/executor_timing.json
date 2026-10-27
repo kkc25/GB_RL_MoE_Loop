@@ -1,0 +1,9 @@
+{
+  "rows": 8192,
+  "warmup": 30,
+  "repeats": 200,
+  "original_top2_ms": 3.7660928344726563,
+  "single_sparse_ms": 2.0073370361328124,
+  "speedup": 1.8761636768921144,
+  "improved": true
+}

@@ -1,0 +1,23 @@
+{
+  "spec_version": "RL-LM-Corpus-v1.0",
+  "source_jsonl": "data/rl_lm_pair_v1/source/fineweb_edu_sample10bt_shard0_rev87f09149.jsonl",
+  "source_id": "HuggingFaceFW/fineweb-edu:sample-10BT",
+  "source_revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+  "tokenizer_path": "runs/data/fineweb_edu_100m/tokenizer.json",
+  "exclude_corpus_dirs": [
+    "runs/data/fineweb_edu_100m",
+    "runs/data/fineweb_edu_debug",
+    "runs/repair_2026_10_25/controller_corpus",
+    "runs/followup_2026_10_26/plan_c/confirmation_corpus"
+  ],
+  "additional_exclusion_jsonl": [],
+  "output_dir": "data/rl_lm_pair_v1/corpus",
+  "sequence_length": 1024,
+  "tokens": {
+    "controller_train": 1048576,
+    "selection": 262144,
+    "calibration": 262144,
+    "newtest": 262144
+  },
+  "allow_existing_output": false
+}

@@ -1,0 +1,74 @@
+test_illegal_stop_at_r0_fails_fast (tests.rl_lm.test_transition.StateMachineTests.test_illegal_stop_at_r0_fails_fast) ... ERROR
+test_pair_then_stop_vs_pair_pair (tests.rl_lm.test_transition.StateMachineTests.test_pair_then_stop_vs_pair_pair) ... ok
+test_r1_environment_has_single_forced_pair_decision (tests.rl_lm.test_transition.StateMachineTests.test_r1_environment_has_single_forced_pair_decision) ... ERROR
+test_stopped_episode_hidden_not_touched_by_later_rounds (tests.rl_lm.test_transition.StateMachineTests.test_stopped_episode_hidden_not_touched_by_later_rounds) ... ok
+test_canonical_step_matches_hand_computation (tests.rl_lm.test_transition.TransitionMathTests.test_canonical_step_matches_hand_computation) ... ok
+test_canonical_step_matches_top2_reference (tests.rl_lm.test_transition.TransitionMathTests.test_canonical_step_matches_top2_reference) ... ok
+test_observation_feature_order (tests.rl_lm.test_transition.TransitionMathTests.test_observation_feature_order) ... ok
+test_sparse_backend_matches_hand_computation (tests.rl_lm.test_transition.TransitionMathTests.test_sparse_backend_matches_hand_computation) ... ok
+test_terminal_state_is_rejected (tests.rl_lm.test_transition.TransitionMathTests.test_terminal_state_is_rejected) ... ok
+test_hashes_collected_and_file_recorded (tests.rl_lm.test_corpus_manifest.AdditionalExclusionTests.test_hashes_collected_and_file_recorded) ... ok
+test_missing_file_fails (tests.rl_lm.test_corpus_manifest.AdditionalExclusionTests.test_missing_file_fails) ... ok
+test_row_without_any_hash_fails (tests.rl_lm.test_corpus_manifest.AdditionalExclusionTests.test_row_without_any_hash_fails) ... ok
+test_inline_rank_not_file_order_and_selected_not_used (tests.rl_lm.test_corpus_manifest.ConfirmationFormatTests.test_inline_rank_not_file_order_and_selected_not_used) ... ok
+test_real_builder_output (tests.rl_lm.test_corpus_manifest.ConfirmationFormatTests.test_real_builder_output) ... ok
+test_all_four_role_doc_maps_are_traversed (tests.rl_lm.test_corpus_manifest.ControllerFormatTests.test_all_four_role_doc_maps_are_traversed) ... ok
+test_confirmation_documents_hash_corruption_fails (tests.rl_lm.test_corpus_manifest.HashAndFormatFailureTests.test_confirmation_documents_hash_corruption_fails) ... ok
+test_doc_map_hash_corruption_fails (tests.rl_lm.test_corpus_manifest.HashAndFormatFailureTests.test_doc_map_hash_corruption_fails) ... ok
+test_document_list_hash_corruption_fails (tests.rl_lm.test_corpus_manifest.HashAndFormatFailureTests.test_document_list_hash_corruption_fails) ... ok
+test_missing_doc_map_file_fails (tests.rl_lm.test_corpus_manifest.HashAndFormatFailureTests.test_missing_doc_map_file_fails) ... ok
+test_missing_manifest_fails (tests.rl_lm.test_corpus_manifest.HashAndFormatFailureTests.test_missing_manifest_fails) ... ok
+test_rank_join_failure_fails (tests.rl_lm.test_corpus_manifest.HashAndFormatFailureTests.test_rank_join_failure_fails) ... ok
+test_undeclared_doc_map_fails (tests.rl_lm.test_corpus_manifest.HashAndFormatFailureTests.test_undeclared_doc_map_fails) ... ok
+test_unknown_format_fails (tests.rl_lm.test_corpus_manifest.HashAndFormatFailureTests.test_unknown_format_fails) ... ok
+test_collects_used_docs_from_all_three_splits (tests.rl_lm.test_corpus_manifest.LmFormatTests.test_collects_used_docs_from_all_three_splits) ... ok
+test_tokenizer_corpus_doc_hashes_are_excluded (tests.rl_lm.test_corpus_manifest.LmFormatTests.test_tokenizer_corpus_doc_hashes_are_excluded) ... ok
+test_bad_source_rows_fail (tests.rl_lm.test_corpus.BuildCorpusTests.test_bad_source_rows_fail) ... ok
+test_controller_train_shortfall_fails_without_commit (tests.rl_lm.test_corpus.BuildCorpusTests.test_controller_train_shortfall_fails_without_commit) ... ok
+test_deterministic_rebuild (tests.rl_lm.test_corpus.BuildCorpusTests.test_deterministic_rebuild) ... ok
+test_duplicate_doc_hash_keeps_first_and_counts (tests.rl_lm.test_corpus.BuildCorpusTests.test_duplicate_doc_hash_keeps_first_and_counts) ... ok
+test_end_to_end_excludes_history_and_meets_tokens (tests.rl_lm.test_corpus.BuildCorpusTests.test_end_to_end_excludes_history_and_meets_tokens) ... ok
+test_exact_role_shortfall_fails_without_commit (tests.rl_lm.test_corpus.BuildCorpusTests.test_exact_role_shortfall_fails_without_commit) ... ok
+test_missing_source_or_tokenizer_fail (tests.rl_lm.test_corpus.BuildCorpusTests.test_missing_source_or_tokenizer_fail) ... ok
+test_nonempty_output_refused (tests.rl_lm.test_corpus.BuildCorpusTests.test_nonempty_output_refused) ... ok
+test_unresolvable_near_hash_marks_development_only (tests.rl_lm.test_corpus.BuildCorpusTests.test_unresolvable_near_hash_marks_development_only) ... ok
+test_variant_before_original_is_excluded_via_rebuilt_near_hash (tests.rl_lm.test_corpus.BuildCorpusTests.test_variant_before_original_is_excluded_via_rebuilt_near_hash) ... ok
+test_cli_overrides_and_refuses_second_run (tests.rl_lm.test_corpus.CliTests.test_cli_overrides_and_refuses_second_run) ... ok
+
+======================================================================
+ERROR: test_illegal_stop_at_r0_fails_fast (tests.rl_lm.test_transition.StateMachineTests.test_illegal_stop_at_r0_fails_fast)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop/tests/rl_lm/test_transition.py", line 229, in test_illegal_stop_at_r0_fails_fast
+    environment.rollout(self._contexts(), ScriptActor(scripts), torch.zeros(2, 2, 1, dtype=torch.float64))
+  File "/nvme-1/zhoukegu/conda-envs/gb/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop/rl_lm/environment.py", line 151, in rollout
+    log_probs = actor(observation.features, observation.pair_reference, stop_allowed)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop/tests/rl_lm/test_transition.py", line 42, in __call__
+    raise ValueError("script does not cover every row")
+ValueError: script does not cover every row
+
+======================================================================
+ERROR: test_r1_environment_has_single_forced_pair_decision (tests.rl_lm.test_transition.StateMachineTests.test_r1_environment_has_single_forced_pair_decision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop/tests/rl_lm/test_transition.py", line 218, in test_r1_environment_has_single_forced_pair_decision
+    rollout, records = environment.rollout(self._contexts(), ScriptActor(scripts), torch.zeros(2, 2, 1, dtype=torch.float64))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nvme-1/zhoukegu/conda-envs/gb/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop/rl_lm/environment.py", line 151, in rollout
+    log_probs = actor(observation.features, observation.pair_reference, stop_allowed)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop/tests/rl_lm/test_transition.py", line 42, in __call__
+    raise ValueError("script does not cover every row")
+ValueError: script does not cover every row
+
+----------------------------------------------------------------------
+Ran 36 tests in 3.046s
+
+FAILED (errors=2)
