@@ -37,7 +37,7 @@ def validate_numeric_settings(config):
     for key in ("train_states", "selection_states", "calibration_states", "prefix_sequence_batch"):
         bound(f"data.{key}", strict=True)
     for key in ("expert_chunk", "head_chunk"):
-        bound(f"environment.{key}", strict=True)
+        bound(f"environment.{key}", strict=True, upper=8192 if key == "head_chunk" else None)
     bound("logging.interval_updates", strict=True)
     if config.get("environment.gamma_source") != "backbone_config":
         raise ValueError("unsupported gamma_source")
@@ -76,3 +76,26 @@ def validate_numeric_settings(config):
             bound(f"adaptation.{key}", strict=True)
         if opt["final_learning_rate"] > opt["learning_rate"]:
             raise ValueError("final_learning_rate exceeds learning_rate")
+
+
+def validate_split_roles(config):
+    """Keep holdout data out of training, model selection and calibration.
+
+    Names are leaf split identifiers, not paths. Case-insensitive comparison
+    also prevents aliases when the same configuration is moved to Windows.
+    Actual byte/disjoint-document validation remains a corpus responsibility.
+    """
+    names = {}
+    for role in ("train", "selection", "calibration", "confirmation"):
+        value = config.get(f"data.{role}_split")
+        if (not isinstance(value, str) or not value or value != value.strip()
+                or value in (".", "..") or any(c in value for c in ("/", "\\", "\0"))):
+            raise ValueError(f"data.{role}_split must be a nonempty leaf split name")
+        names[role] = value
+    normalized = {role: value.casefold() for role, value in names.items()}
+    if len(set(normalized.values())) != len(normalized):
+        raise ValueError("train, selection, calibration and confirmation split roles must be distinct")
+    for role in ("train", "selection", "calibration"):
+        if normalized[role] in ("newtest", normalized["confirmation"]):
+            raise ValueError(f"{role} cannot read confirmation data")
+    return names

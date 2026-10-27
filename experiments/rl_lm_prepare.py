@@ -8,6 +8,7 @@ import torch
 from data.packed_lm import PackedLMDataset
 from rl_lm.cache import build_cache, cache_identity, load_document_identities, plan_contexts
 from rl_lm.cli import load_backbone, resolve_config, write_resolved_config
+from rl_lm.run_directory import guard_run_directory
 
 
 def main():
@@ -19,6 +20,7 @@ def main():
     parser.add_argument("--device")
     args = parser.parse_args()
     config = resolve_config(args.config, checkpoint=args.checkpoint, corpus_dir=args.corpus_dir, tokenizer=args.tokenizer, device=args.device)
+    guard_run_directory(Path(config.get("output_dir")))
     write_resolved_config(config, Path(config.get("output_dir")) / "resolved_config.json")
     device = torch.device(config.get("runtime.device"))
     model, _ = load_backbone(config, device)

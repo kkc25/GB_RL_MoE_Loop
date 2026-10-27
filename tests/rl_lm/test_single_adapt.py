@@ -278,6 +278,11 @@ class PairTeacherRegressionTests(unittest.TestCase):
                         checkpoint_sha256="checkpoint-a", backbone_config_sha256="backbone-a")
             return pair_selection_reference_identity(**(args | changes))
         baseline = identity()
+        self.assertEqual(baseline["version"], "pair-selection-reference-v3")
+        self.assertEqual(baseline["evaluation_readout"]["version"], "streaming_fixed_head_fp32_ce8192_v1")
+        historical = {k: v for k, v in baseline.items() if k != "evaluation_readout"}
+        historical["version"] = "pair-selection-reference-v2"
+        self.assertNotEqual(identity(), historical)
         self.assertEqual(identity(), baseline)
         for changes in ({"input_ids": ids + 1}, {"segment_ids": seg + 1},
                         {"labels": labels + 1}, {"checkpoint_sha256": "checkpoint-b"},

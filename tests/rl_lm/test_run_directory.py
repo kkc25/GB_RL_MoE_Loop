@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import torch
 
-from experiments import rl_lm_preflight, rl_lm_train, rl_lm_single_train
+from experiments import rl_lm_prepare, rl_lm_preflight, rl_lm_train, rl_lm_single_train, rl_lm_single_adapt
 from rl_lm.run_directory import guard_run_directory, PREFLIGHT_FILES
 from tests.rl_lm import test_resume, test_single_rloo
 
@@ -35,7 +35,9 @@ class RunDirectoryTests(unittest.TestCase):
                 guard_run_directory(tmp, resume=True)
 
     def test_all_cli_guards_preserve_archives_before_model_load_or_write(self):
-        for module, resolver in ((rl_lm_preflight, "resolve_config"),
+        for module, resolver in ((rl_lm_prepare, "resolve_config"),
+                                 (rl_lm_single_adapt, "resolve_single_config"),
+                                 (rl_lm_preflight, "resolve_config"),
                                  (rl_lm_train, "resolve_config"),
                                  (rl_lm_single_train, "resolve_single_config")):
             with self.subTest(module=module.__name__), tempfile.TemporaryDirectory() as tmp:

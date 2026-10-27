@@ -49,14 +49,15 @@ from rl_lm.checkpoint import (
 from rl_lm.cli import load_backbone, write_resolved_config
 from rl_lm.objectives import rloo_advantage
 from rl_lm.readout import terminal_ce
-from rl_lm.reporting import stop_metrics
+from rl_lm.reporting import stop_metrics, evaluation_readout_identity
 from rl_lm.rng import make_uniform_table
 from rl_lm.training_state import (
     advance_epoch_batch, capture_update_snapshot, epoch_permutation, restore_update_snapshot,
 )
 from rl_lm.run_directory import guard_run_directory
+from rl_lm.run_contract import ROLES, approval_record, load_role_caches, run_contract_identity
 from rl_lm.single_actor import SingleActor, SingleDecisionRecords
-from rl_lm.single_config import SingleRLConfig, resolve_single_config, single_cache_identity
+from rl_lm.single_config import SingleRLConfig, resolve_single_config
 from rl_lm.single_executor import (
     JOINT_SINGLE_ACTIONS,
     SINGLE_ACTIONS,
@@ -73,7 +74,6 @@ from rl_lm.single_executor import (
 )
 from rl_lm.single_executor import SINGLE_SPARSE_BACKEND
 from rl_lm.trainer import categorical_kl, scheduled_base_lr
-from rl_lm.cache import load_cache
 from train.recovery_common import atomic_json, sha256_file
 
 CHECKPOINT_FORMAT = "rl-lm-single-checkpoint-v1"
@@ -885,8 +885,8 @@ class SingleOnlineSelectionEvaluator:
             head_chunk=int(config.get("environment.head_chunk")),
         )
 
-    def _forward_nll(self, model, policy) -> tuple[float, float]:
-        logits, rounds = single_online_forward(
+    def _forward_nll(self, model, policy, *, full_logits_reference=False) -> tuple[float, float]:
+        readout, rounds = single_online_forward(
             model,
             policy,
             self.input_ids,
@@ -896,18 +896,22 @@ class SingleOnlineSelectionEvaluator:
             compute_dtype=self.config.get("environment.frozen_compute_dtype"),
             chunk=int(self.config.get("environment.expert_chunk")),
             head_chunk=int(self.config.get("environment.head_chunk")),
+            output_mode="logits" if full_logits_reference else "token_ce",
+            labels=None if full_logits_reference else self.labels,
         )
-        flat_logits = logits.reshape(-1, logits.shape[-1])
-        flat_labels = self.labels.reshape(-1)
         ce_sum = 0.0
-        rows = 8192
-        for start in range(0, flat_labels.shape[0], rows):
-            ce_sum += float(
-                torch.nn.functional.cross_entropy(
-                    flat_logits[start:start + rows].float(), flat_labels[start:start + rows],
+        if full_logits_reference:
+            flat_logits = readout.reshape(-1, readout.shape[-1])
+            flat_labels = self.labels.reshape(-1)
+            for start in range(0, flat_labels.numel(), 8192):
+                ce_sum += float(torch.nn.functional.cross_entropy(
+                    flat_logits[start:start + 8192].float(), flat_labels[start:start + 8192],
                     reduction="none", ignore_index=-100,
-                ).sum()
-            )
+                ).sum())
+        else:
+            flat_ce = readout.reshape(-1)
+            for start in range(0, flat_ce.numel(), 8192):
+                ce_sum += float(flat_ce[start:start + 8192].to(self.labels.device).sum())
         nll = ce_sum / int(self.valid.sum())
         mean_rounds = float(rounds.reshape(-1)[self.valid.reshape(-1)].float().mean())
         return nll, mean_rounds
@@ -915,6 +919,7 @@ class SingleOnlineSelectionEvaluator:
     def __call__(self, model, actor, update: int) -> dict:
         greedy_nll, mean_rounds = self._forward_nll(model, actor)
         return {
+            "evaluation_readout": evaluation_readout_identity(self.config),
             "greedy_nll": greedy_nll,
             "mean_rounds": mean_rounds,
             "reference_nll_adapted_single": self.adapted_reference_nll,
@@ -1050,23 +1055,10 @@ def main() -> None:
     model.load_state_dict(payload["student_state_dict"])
     model.eval().requires_grad_(False)
 
-    data_identity = {}
-    caches = {}
-    for split in (config.get("data.train_split"), config.get("data.selection_split")):
-        pair_manifest = json.loads((Path(config.get("data.pair_cache_root")) / split / "manifest.json").read_text())
-        identity = single_cache_identity(
-            teacher,
-            checkpoint_path=config.get("backbone.checkpoint_path"),
-            config_path=config.get("backbone.config_path"),
-            tokenizer_path=config.get("data.tokenizer_path"),
-            data_dir=config.get("data.corpus_dir"),
-            split=split,
-            sampling_seed=config.get("data.sampling_seed"),
-            expert_chunk=config.get("environment.expert_chunk"),
-            pair_manifest=pair_manifest,
-        )
-        caches[split] = load_cache(Path(config.get("data.cache_root")) / split, identity)
-        data_identity[split] = caches[split]["verified_identity"]
+    role_caches, contract = load_role_caches(config, teacher, single=True)
+    caches = {config.get(f"data.{split_key}"): role_caches[role] for role, split_key, _ in ROLES}
+    data_identity = {split: cache["verified_identity"] for split, cache in caches.items()}
+    data_identity["run_contract"] = run_contract_identity(contract)
 
     reference_path = output_dir / "reference_ce.npy"
     reference_meta_path = output_dir / "reference_ce.json"
@@ -1119,6 +1111,8 @@ def main() -> None:
         data_identity=data_identity,
         adapted_identity=adapted_identity,
     )
+    # Constructor exact-resume validation must precede any run artifact writes.
+    atomic_json(output_dir / "run_contract.json", approval_record(contract))
     # Resume identities must be validated before changing any existing run bytes.
     if pending_reference_meta is not None:
         temporary = reference_path.with_name(reference_path.name + ".tmp")

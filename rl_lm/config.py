@@ -7,7 +7,7 @@ from pathlib import Path
 
 import torch
 
-from rl_lm.validation import check_schema as _check_schema, validate_numeric_settings
+from rl_lm.validation import check_schema as _check_schema, validate_numeric_settings, validate_split_roles
 
 from rl_lm.executor import CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND, ACTIVE_MERGED_BACKEND
 
@@ -146,6 +146,7 @@ class RLConfig:
     def validate(self, *, runtime=False, backbone_model=None):
         _check_schema(self.data, SCHEMA)
         validate_numeric_settings(self)
+        validate_split_roles(self)
         if self.get("policy.feature_schema") != "h_h0_gate_previouspair_scalars_v1":
             raise ValueError("invalid pair feature schema")
         stage = self.get("stage")
@@ -187,8 +188,6 @@ class RLConfig:
             raise ValueError("R1 requires lambda=0")
         if self.get("backbone.adaptive_layer") != 11 or not self.get("backbone.freeze_all") or self.get("backbone.prefix_depth") != 1:
             raise ValueError("only frozen terminal layer 11 is supported")
-        if self.get("data.train_split") == "newtest" or self.get("data.train_split") == self.get("data.confirmation_split"):
-            raise ValueError("training cannot read confirmation data")
         if self.get("data.state_sampling") != "uniform_valid_token_without_replacement":
             raise ValueError("unsupported sampling")
         if self.get("optimization.replay_microbatch_contexts") <= 0:

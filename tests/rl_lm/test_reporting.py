@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import numpy as np
 import torch
 
-from rl_lm.reporting import stop_metrics
+from rl_lm.reporting import stop_metrics, evaluation_readout_identity
 from experiments.rl_lm_evaluate import _online_nll, _validate_r1_reference, _validate_actor_reference
 from rl_lm.actions import action_table_identity
 from experiments.rl_lm_train import OnlineSelectionEvaluator
@@ -17,6 +17,15 @@ from experiments.rl_lm_single_train import (
 
 
 class ReportingTests(unittest.TestCase):
+    def test_evaluation_readout_is_versioned_and_numerically_explicit(self):
+        config = {'environment.head_chunk': 64, 'environment.frozen_compute_dtype': 'bfloat16'}
+        identity = evaluation_readout_identity(config)
+        self.assertEqual(identity['version'], 'streaming_fixed_head_fp32_ce8192_v1')
+        self.assertEqual(identity['head_chunk'], 64)
+        self.assertEqual(identity['ce_window'], 8192)
+        self.assertEqual(identity['compute_dtype'], 'bfloat16')
+        self.assertFalse(identity['materializes_full_logits'])
+
     def test_stop_denominators_are_distinct(self):
         m = stop_metrics(torch.tensor([1, 2, 0, 1]), torch.tensor([False, False, True, True]), max_calls=2)
         self.assertEqual(m['stop_fraction'], .25)
@@ -30,7 +39,7 @@ class ReportingTests(unittest.TestCase):
 
     def test_online_explicit_r1_overrides_r2_config(self):
         config = {'environment.max_calls': 2, 'environment.expert_chunk': 64, 'environment.head_chunk': 64}
-        output = SimpleNamespace(logits=torch.zeros(1, 2, 3), rounds=torch.ones(1, 2, dtype=torch.long))
+        output = SimpleNamespace(token_ce=torch.tensor([[1.0986123, 0.]]), rounds=torch.ones(1, 2, dtype=torch.long))
         batch = {'input_ids': torch.ones(1, 2, dtype=torch.long), 'segment_ids': None,
                  'labels': torch.tensor([[0, -100]]), 'valid': torch.tensor([[True, False]])}
         with patch('experiments.rl_lm_evaluate.forward_with_last_ffn_policy', return_value=output) as f:
@@ -46,6 +55,7 @@ class ReportingTests(unittest.TestCase):
         e.valid = torch.ones(1, 2, dtype=torch.bool)
         e._forward_nll = lambda p, max_calls=None: (5.0, 1.0) if max_calls == 1 else (6.0, 2.0)
         m = e(None, None, 0)
+        self.assertEqual(m['evaluation_readout']['version'], 'streaming_fixed_head_fp32_ce8192_v1')
         self.assertEqual(m['gain_nll'], 0.0)
         self.assertEqual(m['legacy_gain_reference']['max_calls'], 2)
         self.assertEqual(m['vs_canonical_r1']['gain_nll'], -1.0)

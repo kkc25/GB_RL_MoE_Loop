@@ -20,6 +20,13 @@ timings, mean/p50/p95, effective tokens/s, peak allocated/reserved memory,
 GPU UUID/clocks/power and software versions are saved.  The selected GPU
 must be exclusive: the script refuses to run when another process holds the
 device.  No torch.compile or profiler is used in the timed region.
+
+Optional ``--factorial-end-to-end`` interleaves all four legacy/merged prefix
+x historical-v1/active-v3 online terminal cells with identical policies and
+inputs. Original MoE controls always use an entirely legacy model runtime.
+Component measurements always use shared legacy-prefix hidden-state fixtures;
+they cannot establish a combined prefix+terminal speedup. Runtime selection
+and identity validation occur before every E2E call, outside both timers.
 """
 
 from __future__ import annotations
@@ -30,6 +37,7 @@ import os
 import platform
 import subprocess
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -39,7 +47,8 @@ from data.packed_lm import PackedLMDataset
 from eval.counterfactual import cache_last_ffn_input
 from lm_config import LMExperimentConfig
 from model import LoopMoE
-from model.top2 import baseline_top2_pairs, top2_dispatch
+from model.top2 import (baseline_top2_pairs, top2_dispatch, set_top2_dispatch_backend,
+                        TOP2_DISPATCH_CONTRACTS, top2_dispatch_identity)
 from rl_lm.actor import PairActor
 from rl_lm.cli import load_backbone, resolve_config
 from rl_lm.executor import make_executor
@@ -100,10 +109,12 @@ def check_exclusive(device: torch.device, physical_index: int | None = None) -> 
 
 
 @torch.no_grad()
-def measure(fn, *, warmup: int, repeats: int, measurements: int, tokens: int) -> dict:
+def measure(fn, *, warmup: int, repeats: int, measurements: int, tokens: int, before_call=None) -> dict:
     """Time ``fn`` with CUDA events and wall clock; raw values are kept."""
     validate_profile_protocol(warmup=warmup, repeats=repeats, measurements=measurements, sequences=tokens)
     for _ in range(warmup):
+        if before_call is not None:
+            before_call()
         fn()
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
@@ -114,6 +125,8 @@ def measure(fn, *, warmup: int, repeats: int, measurements: int, tokens: int) ->
         event_ms = []
         wall_ms = []
         for _ in range(measurements):
+            if before_call is not None:
+                before_call()
             start = torch.cuda.Event(enable_timing=True)
             end = torch.cuda.Event(enable_timing=True)
             start.record()
@@ -201,18 +214,42 @@ def measure_variants(builders, *, groups, warmup, repeats, measurements, tokens,
             # Separate warmup from measured indices so every repeat starts at
             # identical input zero, independent of warmup count and ordering.
             fn = functions[name]
+            identity = None
+            verified_calls = 0
+            def prepare():
+                nonlocal identity, verified_calls
+                verified_calls += 1
+                observed = fn.prepare()
+                if identity is not None and observed != identity:
+                    raise RuntimeError(f"runtime identity changed within {name}")
+                identity = observed
+            prepare_call = prepare if isinstance(fn, RuntimeVariant) else None
             if repeat == 0:
                 for i in range(warmup):
+                    if prepare_call is not None:
+                        prepare_call()
                     fn(i % groups)
+            verified_calls = 0
             counter = 0
             def call():
                 nonlocal counter
                 fn(counter % groups)
                 counter += 1
-            records[name].append(measure_fn(call, warmup=0, repeats=1, measurements=measurements, tokens=tokens))
+            options = {"before_call": prepare_call} if prepare_call is not None else {}
+            window = measure_fn(call, warmup=0, repeats=1, measurements=measurements, tokens=tokens, **options)
+            if prepare_call is not None:
+                if identity is None or verified_calls != measurements:
+                    raise RuntimeError("measurement function did not verify runtime identity before every call")
+                window["runtime_identity"] = identity
+                window["runtime_identity_verified_measurements"] = verified_calls
+            records[name].append(window)
     results = {}
     for name, windows in records.items():
+        if any(window.get("runtime_identity") != windows[0].get("runtime_identity") for window in windows):
+            raise RuntimeError(f"runtime identity changed across windows for {name}")
         result = dict(windows[0])
+        if "runtime_identity" in result:
+            result["runtime_identity_verified_measurements"] = sum(window["runtime_identity_verified_measurements"] for window in windows)
         result.update(warmup=warmup, repeats=repeats,
                       repeat_order_positions=[order.index(name) for order in schedule],
                       raw=[window["raw"][0] for window in windows])
@@ -234,6 +271,114 @@ def measure_variants(builders, *, groups, warmup, repeats, measurements, tokens,
             result[field] = windows[-1][field]
         results[name] = result
     return results
+
+
+def configure_prefix(model, backend):
+    """Restore all runtime executors first; never inherit a previous cell."""
+    set_top2_dispatch_backend(model, "legacy")
+    terminal = model.config.adaptive_layers[-1]
+    for block in model.blocks[:terminal]:
+        set_top2_dispatch_backend(block, backend)
+    for index, block in enumerate(model.blocks):
+        expected = backend if index < terminal else "legacy"
+        if any(item["backend"] != expected for item in top2_dispatch_identity(block)["executors"]):
+            raise RuntimeError("effective Top2 runtime backend differs from selected profile cell")
+    return top2_dispatch_identity(model)
+
+
+@dataclass(frozen=True)
+class RuntimeVariant:
+    """One E2E cell. Preparation is called outside *every* timed invocation."""
+    model: object
+    fn: object
+    prefix_backend: str
+    terminal_backend: str
+    policy: str
+    max_calls: int
+
+    def prepare(self):
+        identity = configure_prefix(self.model, self.prefix_backend)
+        return {"prefix_backend": self.prefix_backend,
+                "prefix_dispatch_contract": TOP2_DISPATCH_CONTRACTS[self.prefix_backend],
+                "terminal_backend": self.terminal_backend,
+                "policy": self.policy, "max_calls": self.max_calls,
+                "top2_dispatch_identity": identity}
+
+    def __call__(self, index):
+        return self.fn(index)
+
+
+def end_to_end_cells(*, factorial, prefix_backend, deployment_backend):
+    """The legacy terminal cell is historical online v1, not original MoE.
+
+    Same policy/call limit across all four cells isolates execution changes.
+    Original MoE is an additional, always fully legacy, baseline.
+    """
+    if factorial:
+        return [(prefix, terminal) for prefix in ("legacy", "merged")
+                for terminal in ("sparse_merged_v1", "sparse_active_merged_v3")]
+    return [(prefix_backend, deployment_backend)]
+
+
+def build_component_hidden_batches(model, input_ids, segment_ids, batch, device, compute_dtype):
+    """All component benchmarks share legacy-prefix inputs, never candidate h0."""
+    configure_prefix(model, "legacy")
+    rows = []
+    for start in range(0, len(input_ids), batch):
+        with torch.no_grad(), autocast_context(device, compute_dtype):
+            prefix = cache_last_ffn_input(model, torch.cat(input_ids[start:start + batch]),
+                                          torch.cat(segment_ids[start:start + batch]))
+        rows.append(prefix.float().reshape(-1, model.config.hidden_size).contiguous())
+    return rows
+
+
+def build_end_to_end_variants(batch, *, model, dense_model, all_input_ids, all_segment_ids,
+                              args, actors, device, compute_dtype, chunk, head_chunk):
+    if batch == 1:
+        ids, segs = all_input_ids, all_segment_ids
+    else:
+        ids = [torch.cat(all_input_ids[i:i + batch]) for i in range(0, args.sequences, batch)]
+        segs = [torch.cat(all_segment_ids[i:i + batch]) for i in range(0, args.sequences, batch)]
+
+    def legacy_r1(index):
+        with torch.no_grad(), autocast_context(device, compute_dtype):
+            model(ids[index], None, depth=1, segment_ids=segs[index])
+
+    def legacy_r2(index):
+        with torch.no_grad(), autocast_context(device, compute_dtype):
+            model(ids[index], None, depth=2, segment_ids=segs[index])
+
+    def dense(index):
+        with torch.no_grad(), autocast_context(device, compute_dtype):
+            dense_model(ids[index], None, depth=1, segment_ids=segs[index])
+
+    def online(policy, calls, backend):
+        def run(index):
+            forward_with_last_ffn_policy(
+                model, policy, ids[index], segs[index],
+                max_calls=calls, backend=backend,
+                compute_dtype=compute_dtype, chunk=chunk, head_chunk=head_chunk,
+            )
+        return run
+
+    variants = [
+        ("original_moe_r1__prefix_legacy__terminal_original_top2_legacy",
+         RuntimeVariant(model, legacy_r1, "legacy", "original_top2_legacy", "original_moe", 1)),
+        ("original_moe_r2__prefix_legacy__terminal_original_top2_legacy",
+         RuntimeVariant(model, legacy_r2, "legacy", "original_top2_legacy", "original_moe", 2)),
+        ("dense_parameter", dense),
+    ]
+    policies = [("canonical_pair_r1", CanonicalTeacherPolicy(), 1),
+                ("canonical_pair_r2", CanonicalTeacherPolicy(), 2)]
+    policies += [(name, actor, calls) for name, (actor, calls) in actors.items()]
+    for prefix, backend in end_to_end_cells(
+            factorial=args.factorial_end_to_end, prefix_backend=args.prefix_backend,
+            deployment_backend=args.deployment_backend):
+        for name, policy, calls in policies:
+            identity = f"{name}__prefix_{prefix}__terminal_{backend}"
+            variants.append((identity, RuntimeVariant(
+                model, online(policy, calls, backend), prefix, backend, name, calls)))
+    return variants
 
 
 def profile_ledger_summary(ledger, layers):
@@ -265,6 +410,7 @@ def main() -> None:
     parser.add_argument("--dense-checkpoint", default="runs/next_2026_10_26/baseline_100m/dense_parameter/latest.pt")
     parser.add_argument("--deployment-backend", default="sparse_merged_v1", choices=["sparse_merged_v1", "sparse_merged_v2", "sparse_active_merged_v3"])
     parser.add_argument("--prefix-backend", default="legacy", choices=["legacy", "merged"], help="opt-in nonterminal Top2MoE dispatch; default preserves historical execution")
+    parser.add_argument("--factorial-end-to-end", action="store_true", help="interleave legacy/merged prefix x historical v1/active v3 terminal for identical policies; ignores selected prefix/deployment backend for E2E cells")
     parser.add_argument("--r1-actor", default=None, help="P1 best actor checkpoint (max_calls=1 candidate)")
     parser.add_argument("--r2-actor", default=None, help="P2 candidate actor checkpoint (max_calls=2)")
     parser.add_argument("--sequences", type=int, default=32, help="fixed profile inputs from the selection split")
@@ -285,15 +431,13 @@ def main() -> None:
     # refer to the profiled GPU even when it is not cuda:0.
     torch.cuda.set_device(device)
     check_exclusive(device, args.physical_gpu_index)
-    output_dir = Path(args.output_dir or f"runs/rl_lm_pair_v1/task_f/profile_metrics_v3_{args.deployment_backend}_prefix_{args.prefix_backend}")
+    output_dir = Path(args.output_dir or f"runs/rl_lm_pair_v1/task_f/profile_metrics_v4_{'factorial' if args.factorial_end_to_end else 'selected'}_{args.deployment_backend}_prefix_{args.prefix_backend}")
     if (output_dir / "profile_report.json").exists():
         raise FileExistsError("profile report already exists; choose a new --output-dir to preserve it")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     model, _ = load_backbone(config, device)
-    from model.top2 import set_top2_dispatch_backend, TOP2_DISPATCH_CONTRACTS, top2_dispatch_identity
-    for block in model.blocks[:model.config.adaptive_layers[-1]]:
-        set_top2_dispatch_backend(block, args.prefix_backend)
+    configure_prefix(model, "legacy")
     max_calls = int(config.get("environment.max_calls"))
     chunk = int(config.get("environment.expert_chunk"))
     head_chunk = int(config.get("environment.head_chunk"))
@@ -325,13 +469,17 @@ def main() -> None:
 
     report = {
         "spec": "16.4",
-        "metric_schema_version": "rl_lm_profile_v3",
-        "prefix_backend": args.prefix_backend,
+        "metric_schema_version": "rl_lm_profile_v4",
+        "factorial_end_to_end": args.factorial_end_to_end,
+        "end_to_end_cells": end_to_end_cells(factorial=args.factorial_end_to_end, prefix_backend=args.prefix_backend, deployment_backend=args.deployment_backend),
+        "component_fixture_prefix_backend": "legacy",
+        "component_fixture_semantics": "Identical legacy-prefix hidden states for all component variants, independent of selected E2E prefix; component timings cannot establish combined prefix+terminal speedup.",
+        "requested_prefix_backend": args.prefix_backend,
         "prefix_candidate_caveat": "Merged prefix changes GEMM shapes and may change floating-point rounding; opt-in candidate only, not established parity or speedup.",
         "memory_semantics": "Absolute process CUDA allocator levels including shared live models/fixtures; reserved blocks depend on prior workloads. Peak counter resets do not clear or isolate allocator caches. Per-repeat baselines are recorded; these are not per-variant incremental ownership measurements.",
-        "prefix_dispatch_contract": TOP2_DISPATCH_CONTRACTS[args.prefix_backend],
-        "top2_dispatch_identity": top2_dispatch_identity(model),
-        "deployment_backend": args.deployment_backend,
+        "requested_prefix_dispatch_contract": TOP2_DISPATCH_CONTRACTS[args.prefix_backend],
+        "initial_top2_dispatch_identity": top2_dispatch_identity(model),
+        "requested_deployment_backend": args.deployment_backend,
         "timing_scopes": {
             "selector_only": "terminal norm + gate + named selection/actor work; no experts or head",
             "executor_only": "terminal expert dispatch + pair mixing + residual; precomputed norm/gate/routes",
@@ -356,6 +504,7 @@ def main() -> None:
             "compile_or_profiler_in_timed_region": False,
             "grad_mode": "no_grad",
             "variant_order": "rotating_repeat_interleave",
+            "runtime_configuration": "set and verified before every E2E warmup and measured call, outside timer; per-variant identity recorded",
         },
         "layers": {},
     }
@@ -373,17 +522,8 @@ def main() -> None:
 
     # ---------------------------------------------------------------- layer 1
     def hidden_batches(batch: int):
-        """[batch*1024, D] frozen prefix rows, one per fixed input group."""
-        rows = []
-        for start in range(0, args.sequences, batch):
-            with torch.no_grad(), autocast_context(device, compute_dtype):
-                prefix = cache_last_ffn_input(
-                    model,
-                    torch.cat(all_input_ids[start : start + batch]),
-                    torch.cat(all_segment_ids[start : start + batch]),
-                )
-            rows.append(prefix.float().reshape(-1, model.config.hidden_size).contiguous())
-        return rows
+        return build_component_hidden_batches(model, all_input_ids, all_segment_ids,
+                                              batch, device, compute_dtype)
 
     def selector_variants(batch: int):
         h0s = hidden_batches(batch)
@@ -453,50 +593,15 @@ def main() -> None:
         return [("original_two_slot", two_slot), ("merged_dispatch", merged_dispatch), ("grouped_canonical", grouped_dispatch)]
 
     # ---------------------------------------------------------------- layer 3
-    def end_to_end_variants(batch: int):
-        if batch == 1:
-            ids, segs = all_input_ids, all_segment_ids
-        else:
-            ids = [torch.cat(all_input_ids[i:i + batch]) for i in range(0, args.sequences, batch)]
-            segs = [torch.cat(all_segment_ids[i:i + batch]) for i in range(0, args.sequences, batch)]
-
-        def legacy_r1(index):
-            with torch.no_grad(), autocast_context(device, compute_dtype):
-                model(ids[index], None, depth=1, segment_ids=segs[index])
-
-        def legacy_r2(index):
-            with torch.no_grad(), autocast_context(device, compute_dtype):
-                model(ids[index], None, depth=2, segment_ids=segs[index])
-
-        def dense(index):
-            with torch.no_grad(), autocast_context(device, compute_dtype):
-                dense_model(ids[index], None, depth=1, segment_ids=segs[index])
-
-        def online(policy, calls):
-            def run(index):
-                forward_with_last_ffn_policy(
-                    model, policy, ids[index], segs[index],
-                    max_calls=calls, backend=args.deployment_backend,
-                    compute_dtype=compute_dtype, chunk=chunk, head_chunk=head_chunk,
-                )
-            return run
-
-        variants = [
-            ("original_moe_r1", legacy_r1),
-            ("original_moe_r2", legacy_r2),
-            ("dense_parameter", dense),
-            ("canonical_pair_r1", online(CanonicalTeacherPolicy(), 1)),
-            ("canonical_pair_r2", online(CanonicalTeacherPolicy(), 2)),
-        ]
-        for name, (actor, calls) in actors.items():
-            variants.append((name, online(actor, calls)))
-        return variants
 
     for batch in ([1, 8] if args.batch8 else [1]):
         tag = f"batch{batch}_s1024"
         run_workload(f"selector_only_{tag}", selector_variants(batch), batch)
         run_workload(f"executor_only_{tag}", executor_variants(batch), batch)
-        run_workload(f"end_to_end_{tag}", end_to_end_variants(batch), batch)
+        run_workload(f"end_to_end_{tag}", build_end_to_end_variants(
+            batch, model=model, dense_model=dense_model, all_input_ids=all_input_ids,
+            all_segment_ids=all_segment_ids, args=args, actors=actors, device=device,
+            compute_dtype=compute_dtype, chunk=chunk, head_chunk=head_chunk), batch)
 
     ledger.record_wall_time(time.time() - wall_start, gpus=1)
     report["profile_ledger"] = profile_ledger_summary(ledger, report["layers"])

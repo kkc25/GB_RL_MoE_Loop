@@ -37,7 +37,7 @@ from rl_lm.environment import LastFFNEnvironment
 from rl_lm.executor import FrozenLastFFNExecutor
 from rl_lm.inference import CanonicalTeacherPolicy, forward_with_last_ffn_policy
 from rl_lm.ledger import RLLedger
-from rl_lm.reporting import METRIC_SCHEMA_VERSION, reference_metrics
+from rl_lm.reporting import METRIC_SCHEMA_VERSION, reference_metrics, evaluation_readout_identity
 from rl_lm.rng import make_uniform_table
 from rl_lm.trainer import CacheContextProvider
 from train.common import autocast_context
@@ -160,6 +160,7 @@ def _load_actor(config, checkpoint_path: Path, device, *, r1_model=None, model=N
 
 
 def _token_ce(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    """Legacy native-head CE and explicit full-logits parity oracle."""
     # Chunked over positions: a monolithic [B*S,V] FP32 CE does not fit in
     # memory next to the BF16 logits at the real 100M scale.
     ce = torch.zeros(labels.shape, dtype=torch.float32)
@@ -177,7 +178,7 @@ def _token_ce(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
     return ce
 
 
-def _online_nll(config, model, policy, batch, device, *, max_calls=None) -> dict:
+def _online_nll(config, model, policy, batch, device, *, max_calls=None, full_logits_reference=False) -> dict:
     output = forward_with_last_ffn_policy(
         model,
         policy,
@@ -188,8 +189,11 @@ def _online_nll(config, model, policy, batch, device, *, max_calls=None) -> dict
         compute_dtype=config.get("environment.frozen_compute_dtype"),
         chunk=int(config.get("environment.expert_chunk")),
         head_chunk=int(config.get("environment.head_chunk")),
+        output_mode="logits" if full_logits_reference else "token_ce",
+        labels=None if full_logits_reference else batch["labels"],
     )
-    ce = _token_ce(output.logits, batch["labels"])
+    # Full logits remain an explicit diagnostic oracle, never the default.
+    ce = _token_ce(output.logits, batch["labels"]) if full_logits_reference else output.token_ce
     valid = batch["valid"].cpu()
     return {
         "nll": float(ce.sum() / valid.sum()),
@@ -200,7 +204,9 @@ def _online_nll(config, model, policy, batch, device, *, max_calls=None) -> dict
 
 def _legacy_nll(model, batch, device) -> dict:
     with torch.no_grad(), autocast_context(device, "bfloat16"):
-        legacy = model(batch["input_ids"], batch["labels"], depth=1, segment_ids=batch["segment_ids"])
+        # Preserve the native monolithic head contract, but do not ask the
+        # backbone to allocate an unused full FP32 CE/loss before chunked CE.
+        legacy = model(batch["input_ids"], labels=None, depth=1, segment_ids=batch["segment_ids"])
     ce = _token_ce(legacy.logits, batch["labels"])
     return {"nll": float(ce.sum() / batch["valid"].sum()), "mean_rounds": 1.0, "ce": ce}
 
@@ -313,7 +319,7 @@ def main() -> None:
     corpus_dir = Path(config.get("data.corpus_dir"))
     corpus_manifest = json.loads((corpus_dir / "manifest.json").read_text())
     actor_path = Path(args.actor_checkpoint)
-    output = Path(args.output) if args.output else actor_path.parent / f"evaluate_{args.split}_metrics_v3.json"
+    output = Path(args.output) if args.output else actor_path.parent / f"evaluate_{args.split}_metrics_v4.json"
     if output.exists() and not args.overwrite_output:
         raise FileExistsError(f"report already exists: {output}; choose a new --output or explicitly --overwrite-output")
     actor_sha = sha256_file(actor_path)
@@ -439,9 +445,21 @@ def main() -> None:
     )
 
     report = {
-        "report_schema_version": "rl-lm-verified-evaluation-v3",
+        "report_schema_version": "rl-lm-verified-evaluation-v4",
         "spec_version": config.get("spec_version"),
         "metric_schema_version": METRIC_SCHEMA_VERSION,
+        "evaluation_readout": evaluation_readout_identity(config),
+        "evaluation_readout_scope": "online policy variants only; sampled_cache uses its existing terminal reward readout",
+        "evaluation_readout_exceptions": {
+            "legacy_top2_r1": {
+                "version": "native_full_logits_chunked_fp32_ce8192_v1",
+                "head_chunk": None,
+                "compute_dtype": "bfloat16" if device.type == "cuda" else "float32",
+                "ce_dtype": "float32", "ce_window": 8192,
+                "materializes_full_logits": True,
+                "unused_model_loss": False,
+            },
+        },
         "online_gain_reference": {"name": "canonical_pair_r1", "max_calls": 1},
         "historical_note": "v1 mislabeled the configured-depth teacher as canonical_pair_r1 in R2; v2 separates R1 and forced R2. Historical artifacts are not rewritten.",
         "learned_vs_selected_r1": reference_metrics(results["learned_greedy"]["nll"], results["selected_r1_greedy"]["nll"], r1_identity) if r1_identity else None,
