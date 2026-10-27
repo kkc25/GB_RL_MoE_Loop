@@ -190,7 +190,7 @@ def main() -> None:
             expert_chunk=config.get("environment.expert_chunk"),
         )
         caches[role] = load_cache(Path(config.get("data.cache_root")) / split, expected)
-        data_identity[role] = expected
+        data_identity[role] = caches[role]["verified_identity"]
 
     trainer = Trainer(
         config,

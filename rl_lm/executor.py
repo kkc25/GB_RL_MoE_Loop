@@ -10,7 +10,7 @@ the canonical teacher reference ``q``.  The same observation's ``n``/``z``
 must be reused by the executor so that actor and executor never see two
 different gate precisions.
 
-Three execution backends share the same pair/weight/residual math:
+Four execution backends share the same pair/weight/residual math:
 
 - ``canonical_all_experts_v1`` (training reward): fixed shape, chunk=64,
   zero padding, all 8 experts computed per chunk, then the actual pair is
@@ -23,6 +23,8 @@ Three execution backends share the same pair/weight/residual math:
   are dispatched together per expert, reconstructed by row/slot, then mixed.
   Variable expert batch shapes may change rounding; this is not a claim of
   bitwise parity or a measured speedup.
+- ``sparse_active_merged_v3`` (opt-in deployment): online inference compacts
+  continuing rows before merged dispatch; STOP rows execute no experts.
 """
 
 from __future__ import annotations
@@ -40,6 +42,7 @@ from rl_lm.selector import pair_reference
 CANONICAL_BACKEND = "canonical_all_experts_v1"
 SPARSE_BACKEND = "sparse_merged_v1"
 MERGED_BACKEND = "sparse_merged_v2"
+ACTIVE_MERGED_BACKEND = "sparse_active_merged_v3"
 EXPERTS = 8
 
 
@@ -364,7 +367,42 @@ class SparseMergedV2Executor(_BaseExecutor):
         return h + self.gamma * self.pair_update(observation.n, pairs, weights)
 
 
+class SparseActiveMergedV3Executor(SparseMergedV2Executor):
+    """Deployment-only active-row compaction with the v2 merged pair math.
+
+    Online inference calls ``step_active`` so STOP/finished rows never reach
+    an expert. Observation/actor shapes remain unchanged. Variable expert
+    batch shapes can change rounding; v1/v2 retain their reference identities.
+    """
+
+    backend = ACTIVE_MERGED_BACKEND
+
+    @torch.no_grad()
+    def step_active(self, h: torch.Tensor, observation: FrozenObservation,
+                    actions: torch.Tensor, take_pair: torch.Tensor) -> torch.Tensor:
+        """Apply safe pair actions only at ``take_pair``; preserve other rows.
+
+        Actions use the existing safe [1,28] contract, even for skipped rows.
+        Physical accounting is performed by pair_update on compact rows only.
+        """
+        self._validate_step(h, observation, actions)
+        if take_pair.shape != (h.shape[0],) or take_pair.dtype != torch.bool or take_pair.device != h.device:
+            raise ValueError("take_pair must be bool [N] on the hidden device")
+        rows = torch.nonzero(take_pair, as_tuple=False).squeeze(-1)
+        proposed = h.clone()
+        if rows.numel() == 0:
+            return proposed
+        pairs = self.table[actions.index_select(0, rows) - 1]
+        z = observation.z.index_select(0, rows)
+        weights = F.softmax(z.gather(1, pairs).float(), dim=-1)
+        update = self.pair_update(observation.n.index_select(0, rows), pairs, weights)
+        proposed.index_copy_(0, rows, h.index_select(0, rows) + self.gamma * update)
+        return proposed
+
+
 def make_executor(model, backend: str, **kwargs) -> _BaseExecutor:
+    if backend == ACTIVE_MERGED_BACKEND:
+        return SparseActiveMergedV3Executor(model, **kwargs)
     if backend == CANONICAL_BACKEND:
         return FrozenLastFFNExecutor(model, **kwargs)
     if backend == SPARSE_BACKEND:

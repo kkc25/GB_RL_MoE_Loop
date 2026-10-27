@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import shutil
+import tempfile
 import os
 from pathlib import Path
 import random
@@ -11,13 +14,16 @@ import torch
 from data.packed_lm import verify_packed_split
 from eval.counterfactual import cache_last_ffn_input, last_adaptive_layer
 from experiments.r1_closed_loop import source_identity
-from model.top2 import baseline_top2_pairs
+from model.top2 import Top2MoE, baseline_top2_pairs
 from rl_lm.readout import terminal_ce
 from rl_lm.selector import canonical_pair
 from train.common import autocast_context
 from train.recovery_common import atomic_json, sha256_file
 
-CACHE_FORMAT = "rl-lm-cache-v1"
+CACHE_FORMAT = "rl-lm-cache-v2"
+PAYLOAD_FORMAT = "rl-lm-cache-payload-v2"
+ARRAY_FILES = ("h0", "targets", "positions", "sequence_indices")
+JSON_FILES = ("episode_ids.jsonl", "baseline.jsonl", "sampling_report.json")
 
 
 def load_document_identities(corpus_dir):
@@ -65,6 +71,7 @@ def plan_contexts(dataset, n_states, *, seed, corpus_id, document_records=None):
 
 
 def cache_identity(model, config, *, checkpoint_path, config_path, tokenizer_path, data_dir, split, sampling_seed, backend_version, head_contract, expert_chunk):
+    _require_legacy_prefix(model)
     layer = last_adaptive_layer(model)
     manifest = json.loads((Path(data_dir) / "manifest.json").read_text())
     packed = verify_packed_split(data_dir, split, manifest)
@@ -172,66 +179,161 @@ def canonical_pair_table():
     return make_pair_table()
 
 
+def _require_legacy_prefix(model):
+    if any(isinstance(module, Top2MoE) and getattr(module, "dispatch_backend", "legacy") != "legacy"
+           for module in model.modules()):
+        raise ValueError("canonical cache requires legacy prefix dispatch; optimized dispatch is profiling-only")
+
+
 def build_cache(model, dataset, contexts, *, output_dir, identity, dtype="bfloat16", sequence_batch=2):
+    _require_legacy_prefix(model)
+    if sequence_batch < 1 or not contexts:
+        raise ValueError("sequence_batch and context count must be positive")
     output_dir = Path(output_dir)
     if output_dir.exists() and any(output_dir.iterdir()):
         raise FileExistsError(f"refusing to overwrite nonempty cache: {output_dir}")
-    staging = output_dir.with_name(output_dir.name + ".staging")
-    staging.mkdir(parents=True, exist_ok=False)
-    model.eval().requires_grad_(False)
-    device = next(model.parameters()).device
-    count = len(contexts)
-    width = model.config.hidden_size
-    h0 = np.zeros((count, width), dtype=np.float32)
-    targets = np.zeros(count, dtype=np.int64)
-    positions = np.zeros(count, dtype=np.int64)
-    sequences = np.zeros(count, dtype=np.int64)
-    by_sequence = {}
-    for row, context in enumerate(contexts):
-        by_sequence.setdefault(context["sequence_index"], []).append((row, context))
-    with torch.no_grad():
-        for start in range(0, len(by_sequence), sequence_batch):
-            entries = list(by_sequence.items())[start : start + sequence_batch]
-            items = [dataset[sequence_index - dataset.offset] for sequence_index, _ in entries]
-            input_ids = torch.from_numpy(np.stack([item["input_ids"] for item in items])).to(device)
-            segment_ids = torch.from_numpy(np.stack([item["segment_ids"] for item in items])).to(device)
-            with autocast_context(device, dtype):
-                prefix = cache_last_ffn_input(model, input_ids, segment_ids, depth=1)
-            for batch_row, (_, rows) in enumerate(entries):
-                item = items[batch_row]
-                for row, context in rows:
-                    position = context["position"]
-                    h0[row] = prefix[batch_row, position].float().cpu().numpy()
-                    targets[row] = item["labels"][position]
-                    positions[row] = position
-                    sequences[row] = context["sequence_index"]
-    np.save(staging / "h0.npy", h0)
-    np.save(staging / "targets.npy", targets)
-    np.save(staging / "positions.npy", positions)
-    np.save(staging / "sequence_indices.npy", sequences)
-    _write_jsonl(staging / "episode_ids.jsonl", contexts)
-    baseline = _baseline_records(model, dataset, contexts, device, dtype)
-    _write_jsonl(staging / "baseline.jsonl", baseline)
-    excluded = identity.pop("excluded_doc_ids", set())
-    atomic_json(staging / "sampling_report.json", _sampling_report(contexts, dataset, excluded))
-    atomic_json(staging / "manifest.json", identity | {"n": count, "d": width})
-    os.replace(staging, output_dir)
-    return output_dir
+    output_dir.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=output_dir.name + ".staging-", dir=output_dir.parent))
+    try:
+        model.eval().requires_grad_(False)
+        device = next(model.parameters()).device
+        count = len(contexts)
+        width = model.config.hidden_size
+        h0 = np.zeros((count, width), dtype=np.float32)
+        targets = np.zeros(count, dtype=np.int64)
+        positions = np.zeros(count, dtype=np.int64)
+        sequences = np.zeros(count, dtype=np.int64)
+        by_sequence = {}
+        for row, context in enumerate(contexts):
+            by_sequence.setdefault(context["sequence_index"], []).append((row, context))
+        sequence_entries = list(by_sequence.items())
+        with torch.no_grad():
+            for start in range(0, len(sequence_entries), sequence_batch):
+                entries = sequence_entries[start : start + sequence_batch]
+                items = [dataset[sequence_index - dataset.offset] for sequence_index, _ in entries]
+                input_ids = torch.from_numpy(np.stack([item["input_ids"] for item in items])).to(device)
+                segment_ids = torch.from_numpy(np.stack([item["segment_ids"] for item in items])).to(device)
+                with autocast_context(device, dtype):
+                    prefix = cache_last_ffn_input(model, input_ids, segment_ids, depth=1)
+                for batch_row, (_, rows) in enumerate(entries):
+                    item = items[batch_row]
+                    for row, context in rows:
+                        position = context["position"]
+                        h0[row] = prefix[batch_row, position].float().cpu().numpy()
+                        targets[row] = item["labels"][position]
+                        positions[row] = position
+                        sequences[row] = context["sequence_index"]
+        np.save(staging / "h0.npy", h0)
+        np.save(staging / "targets.npy", targets)
+        np.save(staging / "positions.npy", positions)
+        np.save(staging / "sequence_indices.npy", sequences)
+        _write_jsonl(staging / "episode_ids.jsonl", contexts)
+        baseline = _baseline_records(model, dataset, contexts, device, dtype)
+        _write_jsonl(staging / "baseline.jsonl", baseline)
+        identity = dict(identity)
+        excluded = identity.pop("excluded_doc_ids", set())
+        atomic_json(staging / "sampling_report.json", _sampling_report(contexts, dataset, excluded))
+        seal_cache(staging, identity, count=count, width=width)
+        os.replace(staging, output_dir)
+        return output_dir
+    finally:
+        if staging.exists():
+            shutil.rmtree(staging)
+
+
+def _canonical_hash(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+
+
+def _finite_json(value):
+    if isinstance(value, dict):
+        return all(_finite_json(v) for v in value.values())
+    if isinstance(value, list):
+        return all(_finite_json(v) for v in value)
+    return not isinstance(value, float) or bool(np.isfinite(value))
+
+
+def _read_payload(directory, count, width):
+    arrays = {name: np.load(directory / (name + ".npy"), mmap_mode="r", allow_pickle=False) for name in ARRAY_FILES}
+    for name, array in arrays.items():
+        shape = (count, width) if name == "h0" else (count,)
+        dtype = np.dtype("float32" if name == "h0" else "int64")
+        if array.shape != shape or array.dtype != dtype:
+            raise ValueError(f"cache {name} dtype/shape mismatch")
+        for start in range(0, count, 65536):
+            if not np.isfinite(array[start:start + 65536]).all():
+                raise ValueError(f"cache {name} contains non-finite values")
+        if name != "h0" and np.any(array < 0):
+            raise ValueError(f"cache {name} contains negative values")
+    rows = {name: [json.loads(line) for line in (directory / (name + ".jsonl")).read_text().splitlines()]
+            for name in ("episode_ids", "baseline")}
+    sampling = json.loads((directory / "sampling_report.json").read_text())
+    if any(len(value) != count for value in rows.values()) or sampling.get("states") != count:
+        raise ValueError("cache payload row count mismatch")
+    if not _finite_json(rows) or not _finite_json(sampling):
+        raise ValueError("cache JSON contains non-finite values")
+    episodes = rows["episode_ids"]
+    if any(not isinstance(row.get("episode_id"), str) or not row["episode_id"] for row in episodes):
+        raise ValueError("cache episode IDs must be nonempty strings")
+    if len({row["episode_id"] for row in episodes}) != count:
+        raise ValueError("cache episode IDs must be unique")
+    for index, row in enumerate(episodes):
+        if row["sequence_index"] != int(arrays["sequence_indices"][index]) or row["position"] != int(arrays["positions"][index]):
+            raise ValueError("cache episode position/sequence mismatch")
+    for row in rows["baseline"]:
+        required = ("single_teacher_ce", "gate_margin", "single_expert", "pair_canonical_ce") if "single_teacher_ce" in row else ("canonical_ce", "legacy_ce", "gate_margin", "canonical_pair_index")
+        if any(key not in row or not isinstance(row[key], (int, float)) or isinstance(row[key], bool) for key in required):
+            raise ValueError("cache baseline record schema mismatch")
+    return arrays | rows | {"sampling_report": sampling}
+
+
+def seal_cache(directory, identity, *, count, width):
+    """Seal newly generated bytes only; never use to migrate unverified old caches.
+
+    Callers generate into a private staging directory and publish by rename.
+    """
+    directory = Path(directory)
+    if count <= 0 or width <= 0:
+        raise ValueError("cache dimensions must be positive")
+    payload = _read_payload(directory, count, width)
+    files = {}
+    for name in ARRAY_FILES:
+        path = directory / (name + ".npy")
+        array = payload[name]
+        files[path.name] = {"sha256": sha256_file(path), "bytes": path.stat().st_size,
+                            "dtype": str(array.dtype), "shape": list(array.shape)}
+    for name in JSON_FILES:
+        path = directory / name
+        files[name] = {"sha256": sha256_file(path), "bytes": path.stat().st_size}
+    content = {"format": PAYLOAD_FORMAT, "n": count, "d": width, "files": files}
+    manifest = identity | {"n": count, "d": width, "payload": content, "content_sha256": _canonical_hash(content)}
+    atomic_json(directory / "manifest.json", manifest)
+    return manifest
 
 
 def load_cache(output_dir, expected_identity):
     output_dir = Path(output_dir)
     manifest = json.loads((output_dir / "manifest.json").read_text())
+    content = manifest.get("payload", {})
+    if content.get("format") != PAYLOAD_FORMAT:
+        raise ValueError("unverified legacy cache: rebuild from the verified backbone and packed corpus into a new cache directory; in-place certification is not supported")
     validate_cache_identity(manifest, expected_identity)
-    episode_ids = [json.loads(line) for line in (output_dir / "episode_ids.jsonl").read_text().splitlines()]
-    baseline = [json.loads(line) for line in (output_dir / "baseline.jsonl").read_text().splitlines()]
-    return {
-        "manifest": manifest,
-        "h0": np.load(output_dir / "h0.npy", mmap_mode="r"),
-        "targets": np.load(output_dir / "targets.npy", mmap_mode="r"),
-        "positions": np.load(output_dir / "positions.npy", mmap_mode="r"),
-        "sequence_indices": np.load(output_dir / "sequence_indices.npy", mmap_mode="r"),
-        "episode_ids": episode_ids,
-        "baseline": baseline,
-        "sampling_report": json.loads((output_dir / "sampling_report.json").read_text()),
-    }
+    if _canonical_hash(content) != manifest.get("content_sha256"):
+        raise ValueError("cache content identity mismatch")
+    count, width = manifest["n"], manifest["d"]
+    if type(count) is not int or type(width) is not int or count <= 0 or width <= 0 or content.get("n") != count or content.get("d") != width:
+        raise ValueError("cache dimensions mismatch")
+    expected_files = {name + ".npy" for name in ARRAY_FILES} | set(JSON_FILES)
+    if set(content.get("files", {})) != expected_files:
+        raise ValueError("cache payload file inventory mismatch")
+    for name, entry in content["files"].items():
+        path = output_dir / name
+        if path.stat().st_size != entry["bytes"] or sha256_file(path) != entry["sha256"]:
+            raise ValueError(f"cache payload hash mismatch: {name}")
+    payload = _read_payload(output_dir, count, width)
+    for name in ARRAY_FILES:
+        entry = content["files"][name + ".npy"]
+        if entry.get("dtype") != str(payload[name].dtype) or entry.get("shape") != list(payload[name].shape):
+            raise ValueError(f"cache array metadata mismatch: {name}")
+    verified = {key: value for key, value in manifest.items() if key not in ("payload", "n", "d")}
+    return payload | {"manifest": manifest, "verified_identity": verified}

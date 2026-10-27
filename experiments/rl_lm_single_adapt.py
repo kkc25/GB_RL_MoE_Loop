@@ -2,8 +2,8 @@
 
 Pipeline:
 
-1. derive the S1 caches (new ``rl-lm-single-cache-v1`` identity) from the
-   pair-v1 payload after re-verifying every prefix-defining hash against the
+1. derive the S1 caches (new ``rl-lm-single-cache-v2`` identity) from the
+   verified pair-v2 payload after re-verifying every prefix-defining hash against the
    loaded teacher; single baseline records are recomputed with the frozen
    teacher at amplitude 1;
 2. adapt only ``blocks.11.moe.pool.w1/w2/w3`` of a student copy with
@@ -28,6 +28,7 @@ import math
 import random
 import shutil
 import time
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -39,7 +40,7 @@ from data.packed_lm import PackedLMDataset
 from model.top2 import top2_dispatch
 from rl_lm.actions import make_pair_table
 from rl_lm.selector import canonical_pair
-from rl_lm.cache import load_cache
+from rl_lm.cache import CACHE_FORMAT, _require_legacy_prefix, load_cache, seal_cache
 from rl_lm.cli import load_backbone, write_resolved_config
 from rl_lm.inference import CanonicalTeacherPolicy, forward_with_last_ffn_policy
 from rl_lm.readout import terminal_ce
@@ -75,6 +76,8 @@ def validate_adaptation_resume(payload, config):
         raise ValueError("adaptation objective version mismatch")
     if payload.get("spec_version") != "RL-LM-Single-v1.0":
         raise ValueError("spec version mismatch")
+    if "verified_train_cache" not in payload:
+        raise ValueError("unverified legacy adaptation checkpoint; start a new run with rebuilt caches")
     stored = copy.deepcopy(payload["resolved_config"])
     current = copy.deepcopy(config.to_dict())
     stored["runtime"]["device"] = current["runtime"]["device"] = "<agnostic>"
@@ -109,8 +112,8 @@ def _recompute_single_baseline(model, h0: np.ndarray, targets: np.ndarray, devic
     count = h0.shape[0]
     with torch.no_grad():
         for start in range(0, count, chunk):
-            h = torch.from_numpy(np.ascontiguousarray(h0[start:start + chunk])).to(device)
-            y = torch.from_numpy(np.ascontiguousarray(targets[start:start + chunk])).to(device)
+            h = torch.from_numpy(np.array(h0[start:start + chunk], copy=True)).to(device)
+            y = torch.from_numpy(np.array(targets[start:start + chunk], copy=True)).to(device)
             n = block.ffn_norm(h).float()
             with torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=(compute_dtype == "bfloat16")):
                 z = block.moe.gate(n)
@@ -141,11 +144,13 @@ def derive_single_cache(config, model, split: str, device) -> Path:
     the manifest is a new cache/environment version and the single baseline
     is always recomputed.
     """
+    _require_legacy_prefix(model)
     pair_dir = Path(config.get("data.pair_cache_root")) / split
     output_dir = Path(config.get("data.cache_root")) / split
-    pair_manifest = json.loads((pair_dir / "manifest.json").read_text())
-    if pair_manifest.get("cache_format") != "rl-lm-cache-v1":
-        raise ValueError(f"{pair_dir} is not a pair-v1 cache")
+    pair_cache = load_cache(pair_dir, {})
+    pair_manifest = pair_cache["manifest"]
+    if pair_manifest.get("cache_format") != CACHE_FORMAT:
+        raise ValueError(f"{pair_dir} is unverified; rebuild pair and derived caches into new directories")
     identity = single_cache_identity(
         model,
         checkpoint_path=config.get("backbone.checkpoint_path"),
@@ -160,29 +165,33 @@ def derive_single_cache(config, model, split: str, device) -> Path:
     if output_dir.exists():
         load_cache(output_dir, identity)  # validates the existing manifest
         return output_dir
-    staging = output_dir.with_name(output_dir.name + ".staging")
-    if staging.exists():
-        shutil.rmtree(staging)
-    staging.mkdir(parents=True)
-    for name in ("h0.npy", "targets.npy", "positions.npy", "sequence_indices.npy", "episode_ids.jsonl", "sampling_report.json"):
-        shutil.copy2(pair_dir / name, staging / name)
-    h0 = np.load(pair_dir / "h0.npy", mmap_mode="r")
-    targets = np.load(pair_dir / "targets.npy", mmap_mode="r")
-    pair_baseline = [json.loads(line) for line in (pair_dir / "baseline.jsonl").read_text().splitlines()]
-    single_records = _recompute_single_baseline(
-        model, h0, targets, device, chunk=4096, compute_dtype=config.get("environment.frozen_compute_dtype")
-    )
-    if len(single_records) != len(pair_baseline):
-        raise RuntimeError("single baseline length mismatch")
-    rows = []
-    for single, pair in zip(single_records, pair_baseline):
-        rows.append(single | {"pair_canonical_ce": pair["canonical_ce"]})
-    with (staging / "baseline.jsonl").open("w") as handle:
-        for row in rows:
-            handle.write(json.dumps(row) + "\n")
-    atomic_json(staging / "manifest.json", identity | {"n": int(h0.shape[0]), "d": int(h0.shape[1])})
-    staging.rename(output_dir)
-    return output_dir
+    output_dir.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=output_dir.name + ".staging-", dir=output_dir.parent))
+    try:
+        for name in ("h0.npy", "targets.npy", "positions.npy", "sequence_indices.npy", "episode_ids.jsonl", "sampling_report.json"):
+            shutil.copy2(pair_dir / name, staging / name)
+            if sha256_file(staging / name) != pair_cache["manifest"]["payload"]["files"][name]["sha256"]:
+                raise ValueError(f"pair cache changed during derivation: {name}")
+        h0 = np.load(staging / "h0.npy", mmap_mode="r", allow_pickle=False)
+        targets = np.load(staging / "targets.npy", mmap_mode="r", allow_pickle=False)
+        pair_baseline = pair_cache["baseline"]
+        single_records = _recompute_single_baseline(
+            model, h0, targets, device, chunk=4096, compute_dtype=config.get("environment.frozen_compute_dtype")
+        )
+        if len(single_records) != len(pair_baseline):
+            raise RuntimeError("single baseline length mismatch")
+        rows = []
+        for single, pair in zip(single_records, pair_baseline):
+            rows.append(single | {"pair_canonical_ce": pair["canonical_ce"]})
+        with (staging / "baseline.jsonl").open("w") as handle:
+            for row in rows:
+                handle.write(json.dumps(row) + "\n")
+        seal_cache(staging, identity, count=int(h0.shape[0]), width=int(h0.shape[1]))
+        staging.rename(output_dir)
+        return output_dir
+    finally:
+        if staging.exists():
+            shutil.rmtree(staging)
 
 
 # ------------------------------------------------------------------ student
@@ -473,6 +482,9 @@ class AdaptTrainer:
         if self.stop_after < 1:
             raise ValueError("--stop-after must be a positive absolute cap")
 
+        self.verified_train_cache = copy.deepcopy(train_cache.get("verified_identity"))
+        if "manifest" in train_cache and self.verified_train_cache is None:
+            raise ValueError("adaptation requires a verified cache; rebuild legacy caches")
         self._h0 = train_cache["h0"]
         self._targets = train_cache["targets"]
         self._episode_ids = tuple(row["episode_id"] for row in train_cache["episode_ids"])
@@ -646,6 +658,7 @@ class AdaptTrainer:
         return {
             "format_version": ADAPT_CHECKPOINT_FORMAT,
             "objective_version": ADAPT_OBJECTIVE_VERSION,
+            "verified_train_cache": self.verified_train_cache,
             "spec_version": "RL-LM-Single-v1.0",
             "saved_at_update": self.successful_updates,
             "resolved_config": self.config.to_dict(),
@@ -681,6 +694,8 @@ class AdaptTrainer:
     def _restore(self, path: Path) -> None:
         payload = torch.load(path, map_location="cpu", weights_only=False)
         validate_adaptation_resume(payload, self.config)
+        if "verified_train_cache" not in payload or payload["verified_train_cache"] != self.verified_train_cache:
+            raise ValueError("adaptation verified_train_cache mismatch; unverified legacy checkpoints cannot exactly resume")
         self.student = build_student(self.teacher, self.whitelist).to(self.device)
         self.student.load_state_dict(payload["student_state_dict"])
         self.optimizer = torch.optim.AdamW(

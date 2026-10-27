@@ -7,7 +7,9 @@ from pathlib import Path
 
 import torch
 
-from rl_lm.executor import CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND
+from rl_lm.validation import check_schema as _check_schema, validate_numeric_settings
+
+from rl_lm.executor import CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND, ACTIVE_MERGED_BACKEND
 
 
 BACKBONE = {
@@ -111,26 +113,6 @@ FREE = {
 SCHEMA = ROOT | FREE
 
 
-def _check_schema(value, schema, path="config"):
-    if not isinstance(value, dict):
-        raise ValueError(f"{path} must be an object")
-    unknown = set(value) - set(schema)
-    if unknown:
-        raise ValueError(f"unknown fields at {path}: {sorted(unknown)}")
-    missing = set(schema) - set(value)
-    if missing:
-        raise ValueError(f"missing fields at {path}: {sorted(missing)}")
-    for key, expected in schema.items():
-        item = value[key]
-        if isinstance(expected, dict):
-            _check_schema(item, expected, f"{path}.{key}")
-        elif expected is list:
-            if not isinstance(item, list):
-                raise ValueError(f"{path}.{key} must be a list")
-        elif not isinstance(item, expected) or isinstance(item, bool) and expected is not bool and expected != (float, int):
-            raise ValueError(f"{path}.{key} has invalid type {type(item).__name__}")
-
-
 def _canonical_hash(data):
     return hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
@@ -162,6 +144,10 @@ class RLConfig:
         return value
 
     def validate(self, *, runtime=False, backbone_model=None):
+        _check_schema(self.data, SCHEMA)
+        validate_numeric_settings(self)
+        if self.get("policy.feature_schema") != "h_h0_gate_previouspair_scalars_v1":
+            raise ValueError("invalid pair feature schema")
         stage = self.get("stage")
         if stage not in ("r1", "r2"):
             raise ValueError("stage must be r1 or r2")
@@ -191,7 +177,7 @@ class RLConfig:
             raise ValueError("mixed or unsupported environment dtype")
         if self.get("environment.training_backend") != CANONICAL_BACKEND:
             raise ValueError("training requires the fixed-shape canonical backend")
-        if self.get("environment.deployment_backend") not in (CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND):
+        if self.get("environment.deployment_backend") not in (CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND, ACTIVE_MERGED_BACKEND):
             raise ValueError("unsupported pair deployment backend")
         if self.get("environment.head_contract") != "bf16_linear_fp32_ce_v1":
             raise ValueError("unsupported head contract")
@@ -223,7 +209,7 @@ class RLConfig:
 
     def validate_required_paths(self):
         for key in ("backbone.checkpoint_path", "data.corpus_dir", "data.tokenizer_path"):
-            if self.get(key) is None:
+            if not self.get(key):
                 raise ValueError(f"{key} must be provided before running")
         return self
 
@@ -260,6 +246,13 @@ class CorpusConfig:
         return _canonical_hash(self.data)
 
     def validate_required(self):
+        _check_schema(self.data, self.SCHEMA)
+        _check_schema(self.data["tokens"], {"controller_train": int, "selection": int, "calibration": int, "newtest": int}, "tokens")
+        if self.data["sequence_length"] <= 0 or any(value <= 0 for value in self.data["tokens"].values()):
+            raise ValueError("corpus sequence length and token budgets must be positive")
+        for key in ("exclude_corpus_dirs", "additional_exclusion_jsonl"):
+            if any(not isinstance(value, str) or not value for value in self.data[key]):
+                raise ValueError(f"{key} must contain nonempty paths")
         if self.data["spec_version"] != "RL-LM-Corpus-v1.0":
             raise ValueError("unsupported corpus spec")
         for key in ("source_jsonl", "source_revision", "tokenizer_path"):

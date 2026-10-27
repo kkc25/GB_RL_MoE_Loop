@@ -99,12 +99,16 @@ def check_exclusive(device: torch.device, physical_index: int | None = None) -> 
         raise RuntimeError(f"GPU {index} is not exclusive; compute apps still present: {others}")
 
 
+@torch.no_grad()
 def measure(fn, *, warmup: int, repeats: int, measurements: int, tokens: int) -> dict:
     """Time ``fn`` with CUDA events and wall clock; raw values are kept."""
+    validate_profile_protocol(warmup=warmup, repeats=repeats, measurements=measurements, sequences=tokens)
     for _ in range(warmup):
         fn()
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
+    baseline_allocated = int(torch.cuda.memory_allocated())
+    baseline_reserved = int(torch.cuda.memory_reserved())
     repeats_out = []
     for _ in range(repeats):
         event_ms = []
@@ -143,9 +147,10 @@ def measure(fn, *, warmup: int, repeats: int, measurements: int, tokens: int) ->
         "measurements_per_repeat": measurements,
         "cuda_event": stats(flat_event),
         "wall": stats(flat_wall),
-        # Absolute steady-state levels after the measurement loop; the peaks
-        # above are window maxima after a reset and stay near zero when the
-        # caching allocator reuses blocks (no new allocations per call).
+        # Absolute allocator levels, not incremental allocations. Peak counters
+        # include already-live tensors even when cached blocks are reused.
+        "baseline_allocated_bytes": baseline_allocated,
+        "baseline_reserved_bytes": baseline_reserved,
         "allocated_bytes": int(torch.cuda.memory_allocated()),
         "reserved_bytes": int(torch.cuda.memory_reserved()),
         "peak_allocated_bytes": int(torch.cuda.max_memory_allocated()),
@@ -161,6 +166,93 @@ def load_actor_payload(path: str, *, train_stop: bool, device) -> PairActor:
     return actor.to(device).eval()
 
 
+def validate_profile_protocol(*, warmup, repeats, measurements, sequences, batch8=False):
+    for name, value in (("warmup", warmup), ("repeats", repeats), ("measurements", measurements), ("sequences", sequences)):
+        if isinstance(value, bool) or not isinstance(value, int) or value < (0 if name == "warmup" else 1):
+            raise ValueError(f"{name} must be {'nonnegative' if name == 'warmup' else 'positive'} integer")
+    if batch8 and sequences % 8:
+        raise ValueError("--batch8 requires sequences divisible by 8 (no partial batches)")
+
+
+def variant_schedule(names, repeats):
+    """Deterministic cyclic order: variants alternate between repeat windows."""
+    names = list(names)
+    if not names or len(names) != len(set(names)):
+        raise ValueError("variant names must be nonempty and unique")
+    return [names[r % len(names):] + names[:r % len(names)] for r in range(repeats)]
+
+
+@torch.no_grad()
+def measure_variants(builders, *, groups, warmup, repeats, measurements, tokens, measure_fn=None):
+    """Same input indices per repeat, no actor autograd, interleaved variants.
+
+    High-water counters reset per variant/repeat, then aggregate by maximum.
+    These are absolute process allocator levels, not variant-owned deltas:
+    shared live fixtures/models and cached blocks from prior variants remain.
+    Resetting counters does not isolate the caching allocator.
+    """
+    validate_profile_protocol(warmup=warmup, repeats=repeats, measurements=measurements, sequences=groups)
+    measure_fn = measure if measure_fn is None else measure_fn
+    functions = dict(builders)
+    schedule = variant_schedule([name for name, _ in builders], repeats)
+    records = {name: [] for name in functions}
+    for repeat, order in enumerate(schedule):
+        for name in order:
+            # Separate warmup from measured indices so every repeat starts at
+            # identical input zero, independent of warmup count and ordering.
+            fn = functions[name]
+            if repeat == 0:
+                for i in range(warmup):
+                    fn(i % groups)
+            counter = 0
+            def call():
+                nonlocal counter
+                fn(counter % groups)
+                counter += 1
+            records[name].append(measure_fn(call, warmup=0, repeats=1, measurements=measurements, tokens=tokens))
+    results = {}
+    for name, windows in records.items():
+        result = dict(windows[0])
+        result.update(warmup=warmup, repeats=repeats,
+                      repeat_order_positions=[order.index(name) for order in schedule],
+                      raw=[window["raw"][0] for window in windows])
+        for field, raw_key in (("cuda_event", "event_ms"), ("wall", "wall_ms")):
+            values = np.asarray([v for rep in result["raw"] for v in rep[raw_key]], dtype=np.float64)
+            mean = float(values.mean())
+            result[field] = {"mean_ms": mean, "p50_ms": float(np.quantile(values, .5)),
+                             "p95_ms": float(np.quantile(values, .95)), "min_ms": float(values.min()),
+                             "max_ms": float(values.max()), "tokens_per_second": tokens / (mean / 1e3)}
+        result["memory_windows"] = [
+            {key: window.get(key) for key in (
+                "baseline_allocated_bytes", "baseline_reserved_bytes", "allocated_bytes",
+                "reserved_bytes", "peak_allocated_bytes", "peak_reserved_bytes")}
+            for window in windows
+        ]
+        for field in ("peak_allocated_bytes", "peak_reserved_bytes"):
+            result[field] = max(window[field] for window in windows)
+        for field in ("allocated_bytes", "reserved_bytes"):
+            result[field] = windows[-1][field]
+        results[name] = result
+    return results
+
+
+def profile_ledger_summary(ledger, layers):
+    """Summarize measured windows, without inventing uninstrumented work."""
+    summary = ledger.to_dict()
+    measured = {"gpu_hours", "peak_allocated_bytes", "peak_reserved_bytes"}
+    uninstrumented = sorted(set(summary) - measured)
+    for key in uninstrumented:
+        summary[key] = None
+    for key in ("peak_allocated_bytes", "peak_reserved_bytes"):
+        summary[key] = max((result[key] for variants in layers.values()
+                            for result in variants.values()), default=None)
+    summary["work_counters_status"] = "not_instrumented_in_timed_region"
+    summary["uninstrumented_fields"] = uninstrumented
+    summary["peak_scope"] = "maximum_absolute_process_allocator_level_across_all_measured_windows; excludes_preparation_and_warmup_peaks"
+    return summary
+
+
+@torch.no_grad()
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--config", required=True)
@@ -171,7 +263,8 @@ def main() -> None:
     parser.add_argument("--physical-gpu-index", type=int)
     parser.add_argument("--dense-config", default="runs/next_2026_10_26/baseline_100m/dense_parameter.json")
     parser.add_argument("--dense-checkpoint", default="runs/next_2026_10_26/baseline_100m/dense_parameter/latest.pt")
-    parser.add_argument("--deployment-backend", default="sparse_merged_v1", choices=["sparse_merged_v1", "sparse_merged_v2"])
+    parser.add_argument("--deployment-backend", default="sparse_merged_v1", choices=["sparse_merged_v1", "sparse_merged_v2", "sparse_active_merged_v3"])
+    parser.add_argument("--prefix-backend", default="legacy", choices=["legacy", "merged"], help="opt-in nonterminal Top2MoE dispatch; default preserves historical execution")
     parser.add_argument("--r1-actor", default=None, help="P1 best actor checkpoint (max_calls=1 candidate)")
     parser.add_argument("--r2-actor", default=None, help="P2 candidate actor checkpoint (max_calls=2)")
     parser.add_argument("--sequences", type=int, default=32, help="fixed profile inputs from the selection split")
@@ -181,6 +274,7 @@ def main() -> None:
     parser.add_argument("--batch8", action="store_true", help="also run the batch=8 secondary workload")
     parser.add_argument("--output-dir", default=None, help="new output directory; default is metric/backend-versioned")
     args = parser.parse_args()
+    validate_profile_protocol(warmup=args.warmup, repeats=args.repeats, measurements=args.measurements, sequences=args.sequences, batch8=args.batch8)
 
     config = resolve_config(args.config, checkpoint=args.checkpoint, corpus_dir=args.corpus_dir, tokenizer=args.tokenizer, device=args.device)
     device = torch.device(config.get("runtime.device"))
@@ -191,12 +285,15 @@ def main() -> None:
     # refer to the profiled GPU even when it is not cuda:0.
     torch.cuda.set_device(device)
     check_exclusive(device, args.physical_gpu_index)
-    output_dir = Path(args.output_dir or f"runs/rl_lm_pair_v1/task_f/profile_metrics_v2_{args.deployment_backend}")
+    output_dir = Path(args.output_dir or f"runs/rl_lm_pair_v1/task_f/profile_metrics_v3_{args.deployment_backend}_prefix_{args.prefix_backend}")
     if (output_dir / "profile_report.json").exists():
         raise FileExistsError("profile report already exists; choose a new --output-dir to preserve it")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     model, _ = load_backbone(config, device)
+    from model.top2 import set_top2_dispatch_backend, TOP2_DISPATCH_CONTRACTS, top2_dispatch_identity
+    for block in model.blocks[:model.config.adaptive_layers[-1]]:
+        set_top2_dispatch_backend(block, args.prefix_backend)
     max_calls = int(config.get("environment.max_calls"))
     chunk = int(config.get("environment.expert_chunk"))
     head_chunk = int(config.get("environment.head_chunk"))
@@ -217,6 +314,8 @@ def main() -> None:
     if len(dataset) < args.sequences:
         raise ValueError("selection split smaller than the fixed profile input set")
     items = [dataset[i] for i in range(args.sequences)]
+    if any(len(item["input_ids"]) != 1024 for item in items):
+        raise ValueError("formal profile requires S=1024 for accurate token accounting")
     all_input_ids = [torch.from_numpy(item["input_ids"]).unsqueeze(0).to(device) for item in items]
     all_segment_ids = [torch.from_numpy(item["segment_ids"]).unsqueeze(0).to(device) for item in items]
 
@@ -226,7 +325,12 @@ def main() -> None:
 
     report = {
         "spec": "16.4",
-        "metric_schema_version": "rl_lm_profile_v2",
+        "metric_schema_version": "rl_lm_profile_v3",
+        "prefix_backend": args.prefix_backend,
+        "prefix_candidate_caveat": "Merged prefix changes GEMM shapes and may change floating-point rounding; opt-in candidate only, not established parity or speedup.",
+        "memory_semantics": "Absolute process CUDA allocator levels including shared live models/fixtures; reserved blocks depend on prior workloads. Peak counter resets do not clear or isolate allocator caches. Per-repeat baselines are recorded; these are not per-variant incremental ownership measurements.",
+        "prefix_dispatch_contract": TOP2_DISPATCH_CONTRACTS[args.prefix_backend],
+        "top2_dispatch_identity": top2_dispatch_identity(model),
         "deployment_backend": args.deployment_backend,
         "timing_scopes": {
             "selector_only": "terminal norm + gate + named selection/actor work; no experts or head",
@@ -234,7 +338,8 @@ def main() -> None:
             "end_to_end": "full model prefix + terminal policy/all rounds + final norm/head; excludes CE",
         },
         "variant_semantics": {"grouped_canonical": "canonical_all_experts_v1 dense physical work; not sparse grouped GEMM",
-                              "merged_dispatch": args.deployment_backend},
+                              "merged_dispatch": args.deployment_backend,
+                              "active_compaction_scope": "v3 online end-to-end only; executor-only has no STOP rows"},
         "gpu": gpu_metadata(device, args.physical_gpu_index),
         "backbone_checkpoint_sha256": sha256_file(config.get("backbone.checkpoint_path")),
         "dense_checkpoint_sha256": sha256_file(args.dense_checkpoint),
@@ -249,6 +354,8 @@ def main() -> None:
             "expert_chunk": chunk,
             "head_chunk": head_chunk,
             "compile_or_profiler_in_timed_region": False,
+            "grad_mode": "no_grad",
+            "variant_order": "rotating_repeat_interleave",
         },
         "layers": {},
     }
@@ -257,18 +364,10 @@ def main() -> None:
         """builders: list of (variant_name, callable(input_index)->None)."""
         tokens = batch * 1024
         groups = max(1, args.sequences // batch)
-        results = {}
-        for variant, fn in builders:
-            counter = {"i": 0}
-
-            def call():
-                fn(counter["i"] % groups)
-                counter["i"] += 1
-
-            results[variant] = measure(
-                call, warmup=args.warmup, repeats=args.repeats,
-                measurements=args.measurements, tokens=tokens,
-            )
+        results = measure_variants(
+            builders, groups=groups, warmup=args.warmup, repeats=args.repeats,
+            measurements=args.measurements, tokens=tokens,
+        )
         report["layers"][name] = results
         print(json.dumps({name: {v: {"event_mean_ms": r["cuda_event"]["mean_ms"], "tokens_per_second": r["cuda_event"]["tokens_per_second"]} for v, r in results.items()}}))
 
@@ -400,8 +499,7 @@ def main() -> None:
         run_workload(f"end_to_end_{tag}", end_to_end_variants(batch), batch)
 
     ledger.record_wall_time(time.time() - wall_start, gpus=1)
-    ledger.merge_peak(device)
-    report["profile_ledger"] = ledger.to_dict()
+    report["profile_ledger"] = profile_ledger_summary(ledger, report["layers"])
     atomic_json(output_dir / "profile_report.json", report)
     print(json.dumps({"ledger": report["profile_ledger"]}))
 

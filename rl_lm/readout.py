@@ -113,7 +113,7 @@ def production_logits(
         raise ValueError("compute_dtype must be bfloat16 or float32")
     if h.shape[0] == 0:
         return h.new_empty((0, model.embedding.weight.shape[0]))
-    pieces = []
+    output = None
     chunks = 0
     for start in range(0, h.shape[0], chunk):
         valid = min(chunk, h.shape[0] - start)
@@ -126,8 +126,13 @@ def production_logits(
         else:
             with torch.autocast(device_type=h.device.type, enabled=False):
                 logits = F.linear(model.final_norm(hc), model.embedding.weight)
-        pieces.append(logits[:valid])
+        if output is None:
+            # Allocate in the actual autocast output dtype, not h.dtype.
+            output = logits.new_empty((h.shape[0], logits.shape[1]))
+        output[start:start + valid].copy_(logits[:valid])
+        # Do not retain the previous chunk while computing the next one.
+        del logits
         chunks += 1
     if ledger is not None:
         ledger.physical_head_rows += chunks * chunk
-    return torch.cat(pieces)
+    return output

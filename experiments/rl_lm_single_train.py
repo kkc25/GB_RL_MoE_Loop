@@ -23,6 +23,8 @@ from __future__ import annotations
 import argparse
 import copy
 import hashlib
+import io
+import os
 import json
 import math
 import random
@@ -49,6 +51,9 @@ from rl_lm.objectives import rloo_advantage
 from rl_lm.readout import terminal_ce
 from rl_lm.reporting import stop_metrics
 from rl_lm.rng import make_uniform_table
+from rl_lm.training_state import (
+    advance_epoch_batch, capture_update_snapshot, epoch_permutation, restore_update_snapshot,
+)
 from rl_lm.run_directory import guard_run_directory
 from rl_lm.single_actor import SingleActor, SingleDecisionRecords
 from rl_lm.single_config import SingleRLConfig, resolve_single_config, single_cache_identity
@@ -268,8 +273,12 @@ class SingleCacheContextProvider:
     """Contexts over the S1 cache; ref_ce is the adapted single-R1 reference."""
 
     def __init__(self, cache: dict, ref_ce: np.ndarray) -> None:
+        if not isinstance(cache.get("verified_identity"), dict) or not cache["verified_identity"].get("content_sha256"):
+            raise ValueError("cache provider requires content-verified load_cache output")
+        self.verified_cache_identity = copy.deepcopy(cache["verified_identity"])
         self._h0 = cache["h0"]
         self._targets = cache["targets"]
+        self.verified_cache_identity["reference_ce"] = reference_ce_payload_identity(ref_ce, len(self._h0))
         self._ref_ce = np.asarray(ref_ce, dtype=np.float32)
         self._episode_ids = tuple(row["episode_id"] for row in cache["episode_ids"])
         if not (len(self._h0) == len(self._targets) == len(self._ref_ce) == len(self._episode_ids)):
@@ -379,6 +388,10 @@ class SingleTrainer:
 
         self.backbone_identity = dict(backbone_identity or {})
         self.data_identity = dict(data_identity or {})
+        verified_cache_identity = getattr(train_contexts, "verified_cache_identity", None)
+        if verified_cache_identity is not None:
+            # Caller-supplied source identity cannot override verified payload identity.
+            self.data_identity["verified_train_cache"] = copy.deepcopy(verified_cache_identity)
         self.adapted_identity = dict(adapted_identity or {})
         self.frozen_hash_at_start = _model_parameter_hash(self.model)
 
@@ -419,19 +432,16 @@ class SingleTrainer:
     # ------------------------------------------------------------------- data
 
     def _epoch_permutation(self) -> np.ndarray:
-        key = json.dumps([PERMUTATION_DOMAIN, self.actor_seed, self.epoch], separators=(",", ":"))
-        seed = int.from_bytes(hashlib.sha256(key.encode()).digest()[:16], "little")
-        return np.random.Generator(np.random.Philox(seed)).permutation(len(self.train_contexts))
+        return epoch_permutation(domain=PERMUTATION_DOMAIN, actor_seed=self.actor_seed,
+                                 epoch=self.epoch, count=len(self.train_contexts))
 
-    def _next_batch_indices(self):
+    def _next_batch_indices(self) -> list[int]:
         if self._permutation is None:
             self._permutation = self._epoch_permutation()
-        indices = [int(i) for i in self._permutation[self.epoch_cursor:self.epoch_cursor + self.batch]]
-        self.epoch_cursor += self.batch
-        if self.epoch_cursor >= self.batches_per_epoch * self.batch:
-            self.epoch += 1
-            self.epoch_cursor = 0
-            self._permutation = None
+        indices, self.epoch, self.epoch_cursor, self._permutation = advance_epoch_batch(
+            self._permutation, epoch=self.epoch, cursor=self.epoch_cursor,
+            batch=self.batch, batches_per_epoch=self.batches_per_epoch,
+        )
         return indices
 
     # ----------------------------------------------------------------- update
@@ -491,20 +501,15 @@ class SingleTrainer:
             return self.actor(records.features, records.reference, records.stop_allowed)
 
     def _restore_snapshot(self, snapshot) -> None:
-        self.actor.load_state_dict(copy.deepcopy(snapshot["actor"]))
-        self.optimizer.load_state_dict(copy.deepcopy(snapshot["optimizer"]))
-        move_optimizer_state(self.optimizer, self.device)
-        self.lr_scale = snapshot["lr_scale"]
-        self.lr_backoffs = snapshot["lr_backoffs"]
+        self.lr_scale, self.lr_backoffs = restore_update_snapshot(
+            self.actor, self.optimizer, snapshot, device=self.device,
+        )
 
     def _guarded_step(self, records) -> dict:
         j = self.successful_updates + 1
-        snapshot = {
-            "actor": copy.deepcopy(self.actor.state_dict()),
-            "optimizer": copy.deepcopy(self.optimizer.state_dict()),
-            "lr_scale": self.lr_scale,
-            "lr_backoffs": self.lr_backoffs,
-        }
+        snapshot = capture_update_snapshot(
+            self.actor, self.optimizer, lr_scale=self.lr_scale, lr_backoffs=self.lr_backoffs,
+        )
         attempts = 0
         while True:
             lr = self.base_lr(j) * self.lr_scale
@@ -954,6 +959,39 @@ def validate_reference_ce_identity(meta: dict, expected: dict) -> None:
         raise ValueError("cached reference CE identity mismatch (checkpoint/cache/order/numerics); use a new run directory")
 
 
+def reference_ce_payload_identity(ref_ce, count):
+    array = np.asarray(ref_ce)
+    if array.dtype not in (np.dtype("float32"), np.dtype("float64")) or array.shape != (count,):
+        raise ValueError("reference CE dtype/shape mismatch")
+    if not np.isfinite(array).all() or np.any(np.abs(array) > np.finfo(np.float32).max):
+        raise ValueError("reference CE contains non-finite or float32-unrepresentable values")
+    return {"version": "reference-ce-payload-v3", "dtype": str(array.dtype),
+            "shape": list(array.shape),
+            "content_sha256": hashlib.sha256(np.ascontiguousarray(array).tobytes()).hexdigest()}
+
+
+def reference_ce_artifact(ref_ce, identity, count):
+    payload = reference_ce_payload_identity(ref_ce, count)
+    stream = io.BytesIO()
+    np.save(stream, ref_ce, allow_pickle=False)
+    content = stream.getvalue()
+    return content, {"format": "reference-ce-artifact-v3", "identity": identity,
+                     "payload": payload, "file_sha256": hashlib.sha256(content).hexdigest()}
+
+
+def load_reference_ce(path, meta, expected_identity, count):
+    if meta.get("format") != "reference-ce-artifact-v3":
+        raise ValueError("unverified legacy reference CE; rebuild in a new run directory")
+    validate_reference_ce_identity(meta, expected_identity)
+    content = Path(path).read_bytes()
+    if hashlib.sha256(content).hexdigest() != meta.get("file_sha256"):
+        raise ValueError("reference CE file hash mismatch")
+    array = np.load(io.BytesIO(content), allow_pickle=False)
+    if reference_ce_payload_identity(array, count) != meta.get("payload"):
+        raise ValueError("reference CE payload identity mismatch")
+    return array
+
+
 def validate_adapted_objective(payload: dict) -> None:
     if (payload.get("format_version") != ADAPT_CHECKPOINT_FORMAT
             or payload.get("objective_version") != ADAPT_OBJECTIVE_VERSION):
@@ -1028,29 +1066,34 @@ def main() -> None:
             pair_manifest=pair_manifest,
         )
         caches[split] = load_cache(Path(config.get("data.cache_root")) / split, identity)
-        data_identity[split] = identity
+        data_identity[split] = caches[split]["verified_identity"]
 
     reference_path = output_dir / "reference_ce.npy"
     reference_meta_path = output_dir / "reference_ce.json"
     reference_identity = reference_ce_identity(caches[config.get("data.train_split")], adapted_sha,
                                                config.get("environment.frozen_compute_dtype"))
     pending_reference_meta = None
+    reference_count = len(caches[config.get("data.train_split")]["targets"])
     if reference_path.exists():
+        if not reference_meta_path.exists():
+            raise ValueError("unverified reference CE without sidecar; rebuild in a new run directory")
         meta = json.loads(reference_meta_path.read_text())
-        validate_reference_ce_identity(meta, reference_identity)
-        ref_ce = np.load(reference_path)
+        ref_ce = load_reference_ce(reference_path, meta, reference_identity, reference_count)
     else:
+        if args.resume or reference_meta_path.exists():
+            raise ValueError("reference CE artifact missing; rebuild in a new run directory")
         ref_ce = adapted_single_reference_ce(
             model, caches[config.get("data.train_split")], device,
             compute_dtype=config.get("environment.frozen_compute_dtype"),
         )
-        pending_reference_meta = {
+        pending_reference_bytes, pending_reference_meta = reference_ce_artifact(ref_ce, reference_identity, reference_count)
+        pending_reference_meta.update({
             "identity": reference_identity,
             "adapted_checkpoint_sha256": adapted_sha,
             "rule": "adapted student, fixed argmax single expert, amplitude 1, R1",
             "states": int(ref_ce.shape[0]),
             "mean_ce": float(ref_ce.mean()),
-        }
+        })
 
     backbone_identity = {
         "teacher_checkpoint_path": config.get("backbone.checkpoint_path"),
@@ -1078,7 +1121,12 @@ def main() -> None:
     )
     # Resume identities must be validated before changing any existing run bytes.
     if pending_reference_meta is not None:
-        np.save(reference_path, ref_ce)
+        temporary = reference_path.with_name(reference_path.name + ".tmp")
+        with temporary.open("wb") as handle:
+            handle.write(pending_reference_bytes)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, reference_path)
         atomic_json(reference_meta_path, pending_reference_meta)
     summary = trainer.run()
     print(json.dumps(summary, indent=2))
