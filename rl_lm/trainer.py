@@ -74,6 +74,9 @@ from rl_lm.readout import terminal_ce
 from rl_lm.replay import iter_context_microbatches, microbatch_pg_loss, replay_log_joint
 from rl_lm.reporting import stop_metrics
 from rl_lm.rng import make_uniform_table
+from rl_lm.training_state import (
+    advance_epoch_batch, capture_update_snapshot, epoch_permutation, restore_update_snapshot,
+)
 from rl_lm.types import ContextBatch
 from train.recovery_common import atomic_json, sha256_file
 
@@ -146,6 +149,9 @@ class CacheContextProvider:
     """Context provider over a validated prefix cache (``rl_lm.cache.load_cache``)."""
 
     def __init__(self, cache: dict) -> None:
+        if not isinstance(cache.get("verified_identity"), dict) or not cache["verified_identity"].get("content_sha256"):
+            raise ValueError("cache provider requires content-verified load_cache output")
+        self.verified_cache_identity = copy.deepcopy(cache["verified_identity"])
         self._h0 = cache["h0"]
         self._targets = cache["targets"]
         self._ref_ce = np.asarray([row["canonical_ce"] for row in cache["baseline"]], dtype=np.float32)
@@ -334,6 +340,10 @@ class Trainer:
         self.source_identity = source_identity
         self.backbone_identity = dict(backbone_identity or {})
         self.data_identity = dict(data_identity or {})
+        verified_cache_identity = getattr(train_contexts, "verified_cache_identity", None)
+        if verified_cache_identity is not None:
+            # Caller-supplied source identity cannot override verified payload identity.
+            self.data_identity["verified_train_cache"] = copy.deepcopy(verified_cache_identity)
         self.frozen_hash_at_start = model_parameter_hash(self.model)
 
         self.successful_updates = 0
@@ -500,22 +510,16 @@ class Trainer:
     # ------------------------------------------------------------------- data
 
     def _epoch_permutation(self) -> np.ndarray:
-        key = json.dumps(
-            [PERMUTATION_DOMAIN, self.actor_seed, self.epoch], ensure_ascii=True, separators=(",", ":")
-        )
-        seed = int.from_bytes(hashlib.sha256(key.encode("utf-8")).digest()[:16], "little")
-        return np.random.Generator(np.random.Philox(seed)).permutation(len(self.train_contexts))
+        return epoch_permutation(domain=PERMUTATION_DOMAIN, actor_seed=self.actor_seed,
+                                 epoch=self.epoch, count=len(self.train_contexts))
 
     def _next_batch_indices(self) -> list[int]:
         if self._permutation is None:
             self._permutation = self._epoch_permutation()
-        start = self.epoch_cursor
-        indices = [int(i) for i in self._permutation[start : start + self.batch]]
-        self.epoch_cursor += self.batch
-        if self.epoch_cursor >= self.batches_per_epoch * self.batch:
-            self.epoch += 1
-            self.epoch_cursor = 0
-            self._permutation = None
+        indices, self.epoch, self.epoch_cursor, self._permutation = advance_epoch_batch(
+            self._permutation, epoch=self.epoch, cursor=self.epoch_cursor,
+            batch=self.batch, batches_per_epoch=self.batches_per_epoch,
+        )
         return indices
 
     # ----------------------------------------------------------------- update
@@ -591,21 +595,16 @@ class Trainer:
             return self.actor(records.features, records.pair_reference, records.stop_allowed)
 
     def _restore_snapshot(self, snapshot) -> None:
-        self.actor.load_state_dict(copy.deepcopy(snapshot["actor"]))
-        self.optimizer.load_state_dict(copy.deepcopy(snapshot["optimizer"]))
-        move_optimizer_state(self.optimizer, self.device)
-        self.lr_scale = snapshot["lr_scale"]
-        self.lr_backoffs = snapshot["lr_backoffs"]
+        self.lr_scale, self.lr_backoffs = restore_update_snapshot(
+            self.actor, self.optimizer, snapshot, device=self.device,
+        )
 
     def _guarded_step(self, records) -> dict:
         """One monitored optimizer step with at most one halved-LR retry."""
         j = self.successful_updates + 1
-        snapshot = {
-            "actor": copy.deepcopy(self.actor.state_dict()),
-            "optimizer": copy.deepcopy(self.optimizer.state_dict()),
-            "lr_scale": self.lr_scale,
-            "lr_backoffs": self.lr_backoffs,
-        }
+        snapshot = capture_update_snapshot(
+            self.actor, self.optimizer, lr_scale=self.lr_scale, lr_backoffs=self.lr_backoffs,
+        )
         attempts = 0
         while True:
             lr = self.base_lr(j) * self.lr_scale

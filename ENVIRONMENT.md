@@ -44,7 +44,8 @@ python -m unittest discover -s tests -t . -v
 
 ## 分支与数据
 
-- RL 代码在分支 `research/rl-lm-pair-v1`；`main` 为此前 MoE 基线工作。
+- `main` 已合入 RL 实现和正确性修复；`research/rl-lm-pair-v1` 保留原始研究阶段。
+- 新运行不要覆盖 `runs/` 中的历史目录。使用新的 output_dir；缓存契约升级后需重新生成缓存，不得只改旧 manifest 的版本号。
 - 原始数据、packed cache（`data/rl_lm_pair_v1/`、`data/rl_lm_single_v1/`，约 7GB）与 checkpoint（`*.pt`）不进入 Git。
   复现实验时需用 `experiments/rl_lm_prepare.py` / `rl_lm_corpus.py` 重新生成，
   数据源为 HuggingFace `fineweb-edu`（sample-10BT），身份见各 run 目录下的

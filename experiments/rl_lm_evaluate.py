@@ -19,6 +19,7 @@ marked ``development_only``; the trainer has no way to read newtest.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -26,7 +27,7 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from data.packed_lm import PackedLMDataset
+from data.packed_lm import PackedLMDataset, verify_packed_split
 from rl_lm.actor import PairActor
 from rl_lm.actions import action_table_identity
 from rl_lm.checkpoint import load_checkpoint
@@ -44,6 +45,62 @@ from train.recovery_common import atomic_json, sha256_file
 
 EVAL_STREAM_UPDATE = 1_000_000_000  # reserved stream id; training updates stay < planned_updates
 BOOTSTRAP_SEED = 20261027
+
+
+def verified_evaluation_scope(corpus_dir, split, n_sequences):
+    """Freeze this result as candidate['confirmation_scope'] BEFORE confirmation.
+
+    Legacy candidates have no verified denominator: create a new candidate
+    manifest with this scope, rather than relabeling an existing report.
+    This reads and verifies data only; it never evaluates an actor.
+    """
+    corpus_dir = Path(corpus_dir)
+    manifest = json.loads((corpus_dir / "manifest.json").read_text())
+    packed = verify_packed_split(corpus_dir, split, manifest)
+    if n_sequences < 1:
+        raise ValueError("evaluation sequence count must be positive")
+    if manifest.get("document_list_file"):
+        filename = manifest["document_list_file"]
+        expected = manifest.get("document_list_sha256")
+    elif manifest.get("pipeline_version") == "fixed-depth-confirmation-v1":
+        filename = "confirmation_documents.jsonl"
+        expected = manifest.get("confirmation_documents_sha256")
+    else:
+        raise ValueError("unknown corpus document identity format")
+    document_bytes = (corpus_dir / filename).read_bytes()
+    document_sha = hashlib.sha256(document_bytes).hexdigest()
+    if document_sha != expected:
+        raise ValueError("document identity file hash mismatch")
+    groups = {}
+    for line in document_bytes.decode("utf-8").splitlines():
+        row = json.loads(line)
+        rank = int(row["rank"])
+        if rank in groups or not row.get("near_hash"):
+            raise ValueError("document grouping requires unique ranks and nonempty near_hash")
+        groups[rank] = str(row["near_hash"])
+    dataset = PackedLMDataset(corpus_dir, split, limit=n_sequences)
+    if len(dataset) != n_sequences:
+        raise ValueError("requested evaluation sequence count exceeds split size")
+    sequence_ids = []
+    for i in range(len(dataset)):
+        item = dataset[i]
+        sequence_ids.append(int(item["index"]))
+        for rank in np.unique(item["doc_ids"][item["labels"] != -100]):
+            if int(rank) not in groups:
+                raise ValueError(f"doc rank {rank} missing from the corpus document list")
+    scope = {
+        "format_version": "rl-lm-confirmation-scope-v1",
+        "corpus_manifest_sha256": sha256_file(corpus_dir / "manifest.json"),
+        "split": split,
+        "packed_sha256": packed,
+        "document_list_file": filename,
+        "document_list_sha256": document_sha,
+        "sequence_count": n_sequences,
+        "sequence_ids": sequence_ids,
+        "sequence_ids_sha256": hashlib.sha256(
+            json.dumps(sequence_ids, separators=(",", ":")).encode()).hexdigest(),
+    }
+    return scope, dataset, groups
 
 
 def _validate_actor_reference(payload, config, model, *, require_r1=False) -> None:
@@ -248,6 +305,7 @@ def main() -> None:
     parser.add_argument("--sequences", type=int, default=None, help="override online evaluation sequence count")
     parser.add_argument("--sampled-states", type=int, default=2048, help="cache states for the sampled diagnostic")
     parser.add_argument("--output", default=None, help="report JSON path")
+    parser.add_argument("--overwrite-output", action="store_true", help="explicitly replace an existing report; omitted by default")
     args = parser.parse_args()
 
     config = resolve_config(args.config, device=args.device)
@@ -255,12 +313,19 @@ def main() -> None:
     corpus_dir = Path(config.get("data.corpus_dir"))
     corpus_manifest = json.loads((corpus_dir / "manifest.json").read_text())
     actor_path = Path(args.actor_checkpoint)
+    output = Path(args.output) if args.output else actor_path.parent / f"evaluate_{args.split}_metrics_v3.json"
+    if output.exists() and not args.overwrite_output:
+        raise FileExistsError(f"report already exists: {output}; choose a new --output or explicitly --overwrite-output")
     actor_sha = sha256_file(actor_path)
 
+    candidate = None
+    candidate_sha = None
     if args.split == "newtest":
         if args.candidate_manifest is None:
             raise SystemExit("--split newtest requires --candidate-manifest PATH")
-        candidate = json.loads(Path(args.candidate_manifest).read_text())
+        candidate_bytes = Path(args.candidate_manifest).read_bytes()
+        candidate = json.loads(candidate_bytes)
+        candidate_sha = hashlib.sha256(candidate_bytes).hexdigest()
         required = {"actor_checkpoint_sha256", "price_lambda", "backend", "head_contract", "selection_rule"}
         missing = required - set(candidate)
         if missing:
@@ -280,12 +345,21 @@ def main() -> None:
                 "until exclusion coverage is rebuilt"
             )
 
+    if args.split == "newtest":
+        if "confirmation_scope" not in candidate:
+            raise ValueError("legacy candidate lacks confirmation_scope; freeze a NEW candidate "
+                             "using verified_evaluation_scope before confirmation; do not relabel old reports")
+        n_sequences = candidate["confirmation_scope"]["sequence_count"]
+        if args.sequences is not None and args.sequences != n_sequences:
+            raise ValueError("--sequences differs from frozen confirmation scope")
+    else:
+        n_sequences = (args.sequences if args.sequences is not None
+                       else int(config.get("evaluation.online_selection_sequences")))
+    evaluated_scope, dataset, group_of_rank = verified_evaluation_scope(
+        corpus_dir, args.split, n_sequences)
+    if candidate is not None and candidate["confirmation_scope"] != evaluated_scope:
+        raise ValueError("candidate confirmation scope mismatch")
     model, _ = load_backbone(config, device)
-
-    n_sequences = args.sequences or int(config.get("evaluation.online_selection_sequences"))
-    dataset = PackedLMDataset(corpus_dir, args.split, limit=n_sequences)
-    if len(dataset) < 1:
-        raise ValueError(f"split {args.split!r} is empty")
     items = [dataset[i] for i in range(len(dataset))]
     batch = {
         "input_ids": torch.from_numpy(np.stack([item["input_ids"] for item in items])).to(device),
@@ -295,22 +369,10 @@ def main() -> None:
     batch["valid"] = batch["labels"] != -100
     doc_ids = torch.from_numpy(np.stack([item["doc_ids"] for item in items])).to(device)
 
-    group_of_rank: dict[int, str] = {}
-    with open(corpus_dir / "documents.jsonl", "r", encoding="utf-8") as handle:
-        for line in handle:
-            row = json.loads(line)
-            if row.get("role") == args.split:
-                group_of_rank[int(row["rank"])] = str(row["near_hash"])
-
     learned_actor = _load_actor(config, actor_path, device, model=model)
     initial_path = actor_path.parent / "checkpoint_initial.pt"
     initial_actor = _load_actor(config, initial_path, device, model=model) if initial_path.exists() else None
 
-    results: dict[str, dict] = {}
-    results["legacy_top2_r1"] = _legacy_nll(model, batch, device)
-    results["canonical_pair_r1"] = _online_nll(config, model, CanonicalTeacherPolicy(), batch, device, max_calls=1)
-    if int(config.get("environment.max_calls")) == 2:
-        results["canonical_pair_r2"] = _online_nll(config, model, CanonicalTeacherPolicy(), batch, device, max_calls=2)
     r1_identity = None
     if args.r1_reference_checkpoint:
         r1_path = Path(args.r1_reference_checkpoint)
@@ -318,11 +380,17 @@ def main() -> None:
         if args.split == "newtest" and candidate.get("r1_reference_checkpoint_sha256") != r1_sha:
             raise ValueError("candidate manifest must pin r1_reference_checkpoint_sha256 before newtest")
         r1_actor = _load_actor(config, r1_path, device, r1_model=model)
-        results["selected_r1_greedy"] = _online_nll(config, model, r1_actor, batch, device, max_calls=1)
         r1_identity = {"name": "selected_r1_greedy", "checkpoint": str(r1_path),
                        "checkpoint_sha256": r1_sha, "max_calls": 1,
                        "selection": "caller-declared strongest R1, frozen before this evaluation",
                        "uncertainty": "point estimate only; canonical-reference CI does not apply"}
+    results: dict[str, dict] = {}
+    results["legacy_top2_r1"] = _legacy_nll(model, batch, device)
+    results["canonical_pair_r1"] = _online_nll(config, model, CanonicalTeacherPolicy(), batch, device, max_calls=1)
+    if int(config.get("environment.max_calls")) == 2:
+        results["canonical_pair_r2"] = _online_nll(config, model, CanonicalTeacherPolicy(), batch, device, max_calls=2)
+    if r1_identity is not None:
+        results["selected_r1_greedy"] = _online_nll(config, model, r1_actor, batch, device, max_calls=1)
     if initial_actor is not None:
         results["initial_actor_greedy"] = _online_nll(config, model, initial_actor, batch, device)
     results["learned_greedy"] = _online_nll(config, model, learned_actor, batch, device)
@@ -371,6 +439,7 @@ def main() -> None:
     )
 
     report = {
+        "report_schema_version": "rl-lm-verified-evaluation-v3",
         "spec_version": config.get("spec_version"),
         "metric_schema_version": METRIC_SCHEMA_VERSION,
         "online_gain_reference": {"name": "canonical_pair_r1", "max_calls": 1},
@@ -386,6 +455,9 @@ def main() -> None:
         "actor_checkpoint": str(actor_path),
         "actor_checkpoint_sha256": actor_sha,
         "candidate_manifest": args.candidate_manifest,
+        "candidate_manifest_sha256": candidate_sha,
+        "candidate_manifest_content": candidate,
+        "evaluated_data_identity": evaluated_scope,
         "sequences": int(batch["input_ids"].shape[0]),
         "valid_tokens": int(batch["valid"].sum()),
         "backend": config.get("environment.deployment_backend"),
@@ -395,7 +467,8 @@ def main() -> None:
         "paired_bootstrap_learned_greedy_minus_canonical": paired,
         "minimum_practical_nll_gain": float(config.get("evaluation.minimum_practical_nll_gain")),
     }
-    output = Path(args.output) if args.output else actor_path.parent / f"evaluate_{args.split}_metrics_v2.json"
+    if output.exists() and not args.overwrite_output:
+        raise FileExistsError(f"report appeared during evaluation: {output}; refusing overwrite")
     atomic_json(output, report)
     printable = {k: v for k, v in report.items() if k != "sampled_cache" or True}
     print(json.dumps(printable, indent=2, sort_keys=True))

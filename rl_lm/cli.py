@@ -35,6 +35,8 @@ def resolve_config(path, *, checkpoint=None, corpus_dir=None, tokenizer=None, de
 
 
 def load_backbone(config, device):
+    # Reject invalid configuration before model allocation or checkpoint I/O.
+    config.validate(runtime=True)
     model_config = LMExperimentConfig.load(config.get("backbone.config_path"))
     model = LoopMoE(model_config.model).to(device).eval()
     checkpoint_path = config.get("backbone.checkpoint_path")

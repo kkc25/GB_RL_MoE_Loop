@@ -2,7 +2,7 @@
 
 ``RL-LM-Single-v1.0`` is an independent spec version (spec section 18).  It
 never reuses the pair-v1 frozen-environment manifest: the S1 cache carries
-``cache_format = "rl-lm-single-cache-v1"`` and ``environment_version =
+``cache_format = "rl-lm-single-cache-v2"`` and ``environment_version =
 "single8_stop_v1"``.  The prefix payload (``h0``) is derived from the pair
 cache only after every prefix-defining hash (checkpoint/config/tokenizer/
 packed data/layer/gamma/prefix depth and dtype) is re-verified against the
@@ -19,6 +19,8 @@ from pathlib import Path
 
 import torch
 
+from rl_lm.validation import check_schema as _check_schema, validate_numeric_settings
+
 from rl_lm.single_executor import (
     SINGLE_CANONICAL_BACKEND,
     SINGLE_FEATURE_SCHEMA,
@@ -26,7 +28,7 @@ from rl_lm.single_executor import (
     SINGLE_SPEC_VERSION,
 )
 
-SINGLE_CACHE_FORMAT = "rl-lm-single-cache-v1"
+SINGLE_CACHE_FORMAT = "rl-lm-single-cache-v2"
 SINGLE_ENVIRONMENT_VERSION = "single8_stop_v1"
 
 _BACKBONE = {
@@ -150,26 +152,6 @@ SINGLE_RLOO_SCHEMA = {
 }
 
 
-def _check_schema(value, schema, path="config"):
-    if not isinstance(value, dict):
-        raise ValueError(f"{path} must be an object")
-    unknown = set(value) - set(schema)
-    if unknown:
-        raise ValueError(f"unknown fields at {path}: {sorted(unknown)}")
-    missing = set(schema) - set(value)
-    if missing:
-        raise ValueError(f"missing fields at {path}: {sorted(missing)}")
-    for key, expected in schema.items():
-        item = value[key]
-        if isinstance(expected, dict):
-            _check_schema(item, expected, f"{path}.{key}")
-        elif expected is list:
-            if not isinstance(item, list):
-                raise ValueError(f"{path}.{key} must be a list")
-        elif not isinstance(item, expected) or isinstance(item, bool) and expected is not bool and expected != (float, int):
-            raise ValueError(f"{path}.{key} has invalid type {type(item).__name__}")
-
-
 def _canonical_hash(data):
     return hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
@@ -199,6 +181,8 @@ class _BaseSingleConfig:
         return value
 
     def _validate_common(self, *, runtime=False, backbone_model=None):
+        _check_schema(self.data, self.SCHEMA)
+        validate_numeric_settings(self)
         if self.get("spec_version") != SINGLE_SPEC_VERSION:
             raise ValueError("unsupported spec_version for the single branch")
         if self.get("backbone.adaptive_layer") != 11 or not self.get("backbone.freeze_all") or self.get("backbone.prefix_depth") != 1:
@@ -228,7 +212,7 @@ class _BaseSingleConfig:
 
     def validate_required_paths(self):
         for key in ("backbone.checkpoint_path", "data.corpus_dir", "data.tokenizer_path"):
-            if self.get(key) is None:
+            if not self.get(key):
                 raise ValueError(f"{key} must be provided before running")
         return self
 
@@ -319,13 +303,19 @@ class SingleRLConfig(_BaseSingleConfig):
 def single_cache_identity(model, *, checkpoint_path, config_path, tokenizer_path, data_dir, split, sampling_seed, expert_chunk, pair_manifest):
     """New S1 cache identity; prefix fields are re-verified against the pair manifest.
 
-    ``pair_manifest`` is the pair-v1 cache manifest the payload derives from.
+    ``pair_manifest`` is the verified pair-v2 cache manifest the payload derives from.
     Every prefix-defining field must match the freshly loaded teacher; the
     returned identity has the new cache format and environment version, so
     the pair frozen-environment manifest can never validate as an S1 cache.
     """
     from train.recovery_common import sha256_file
 
+    from data.packed_lm import verify_packed_split
+    from rl_lm.cache import CACHE_FORMAT
+    if pair_manifest.get("cache_format") != CACHE_FORMAT or not pair_manifest.get("content_sha256"):
+        raise ValueError("unverified pair cache; rebuild pair and derived caches into new directories")
+    if pair_manifest.get("split") != split or pair_manifest.get("sampling_seed") != sampling_seed:
+        raise ValueError("pair cache split/sampling seed mismatch")
     layer = int(model.config.adaptive_layers[-1])
     prefix_fields = (
         "checkpoint_sha256",
@@ -342,7 +332,7 @@ def single_cache_identity(model, *, checkpoint_path, config_path, tokenizer_path
         "checkpoint_sha256": sha256_file(checkpoint_path),
         "config_sha256": sha256_file(config_path),
         "tokenizer_sha256": sha256_file(tokenizer_path),
-        "packed_sha256": pair_manifest.get("packed_sha256"),
+        "packed_sha256": verify_packed_split(data_dir, split),
         "document_manifest_sha256": sha256_file(Path(data_dir) / "manifest.json"),
         "layer_index": layer,
         "gamma": float(model.gammas[layer]),

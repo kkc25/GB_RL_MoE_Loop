@@ -14,7 +14,7 @@ from model import LoopMoE
 from model.top2 import baseline_top2_pairs, pair_to_action
 from rl_lm.actions import make_pair_table
 from rl_lm.actor import PairActor
-from rl_lm.executor import CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND
+from rl_lm.executor import CANONICAL_BACKEND, SPARSE_BACKEND, MERGED_BACKEND, ACTIVE_MERGED_BACKEND
 from rl_lm.inference import CanonicalTeacherPolicy, forward_with_last_ffn_policy
 from rl_lm.selector import canonical_pair
 from train.common import autocast_context
@@ -31,8 +31,8 @@ def build_parser():
     parser.add_argument("--max-positions", type=int, default=128)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--output-dir", default=None,
-                        help="Default: historical online_r1 for v1; online_r1_sparse_merged_v2 for v2")
-    parser.add_argument("--deployment-backend", choices=(SPARSE_BACKEND, MERGED_BACKEND), default=SPARSE_BACKEND,
+                        help="Default: historical online_r1 for v1; backend-specific directory otherwise")
+    parser.add_argument("--deployment-backend", choices=(SPARSE_BACKEND, MERGED_BACKEND, ACTIVE_MERGED_BACKEND), default=SPARSE_BACKEND,
                         help="Opt-in sparse executor to compare against the fixed-shape canonical reference")
     return parser
 

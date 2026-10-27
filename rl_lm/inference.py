@@ -23,7 +23,7 @@ import torch
 from eval.counterfactual import cache_last_ffn_input
 from rl_lm.actions import JOINT_ACTIONS, STOP_ACTION
 from rl_lm.environment import action_for_safe_execution, make_safe_observation_state
-from rl_lm.executor import _frozen_compute, make_executor
+from rl_lm.executor import ACTIVE_MERGED_BACKEND, _frozen_compute, make_executor
 from rl_lm.ledger import RLLedger
 from rl_lm.readout import production_logits
 
@@ -124,8 +124,14 @@ def forward_with_last_ffn_policy(
             raise RuntimeError("illegal STOP selected at r=0; fail fast instead of remapping")
         take_pair = active & (actions > STOP_ACTION)
         voluntary_stop = active & (actions == STOP_ACTION)
-        proposed = executor.step_pair(safe_h, observation, action_for_safe_execution(actions, active))
-        h = torch.where(take_pair[:, None], proposed, h)
+        safe_actions = action_for_safe_execution(actions, active)
+        if backend == ACTIVE_MERGED_BACKEND:
+            # Preserve real stopped hidden states, not their safe observation
+            # placeholders. Only continuing rows are gathered into expert GEMMs.
+            h = executor.step_active(h, observation, safe_actions, take_pair)
+        else:
+            proposed = executor.step_pair(safe_h, observation, safe_actions)
+            h = torch.where(take_pair[:, None], proposed, h)
         pairs = executor.table[(actions.clamp_min(1) - 1)]
         previous_pair = torch.where(take_pair[:, None], pairs, previous_pair)
         rounds = rounds + take_pair.to(torch.int64)
