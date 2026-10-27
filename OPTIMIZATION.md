@@ -1,5 +1,7 @@
 # Verified integrity and opt-in runtime optimization
 
+For an operator checklist in Chinese, see [MIGRATION.md](MIGRATION.md).
+
 This update is based on main `ead65b2`. It does **not** establish better trained
 quality, GPU throughput, or end-to-end latency. Existing research results remain
 historical records and are not regenerated or reinterpreted.
