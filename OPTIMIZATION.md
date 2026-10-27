@@ -112,3 +112,11 @@ OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m unittest discover -s tests -t . -v
 
 Final local and remote results are recorded in the pull request. No GPU training,
 CUDA speed measurements or new quality experiments are performed by this update.
+
+
+## Subsequent bounded extension
+
+See [RUN_CONTRACT.md](RUN_CONTRACT.md) for run-approval/state-count isolation,
+streaming production evaluation and the profiler's complete factorial controls.
+Cache/reference integrity, active deployment and merged-prefix candidates above
+remain intact; no new backend is promoted automatically.

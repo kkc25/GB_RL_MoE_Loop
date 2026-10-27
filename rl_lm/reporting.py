@@ -37,3 +37,20 @@ def stop_metrics(actions: torch.Tensor, stop_allowed: torch.Tensor, *, max_calls
 def reference_metrics(nll: float, reference_nll: float, identity: dict) -> dict:
     return {"identity": identity, "nll": reference_nll,
             "delta_nll": nll - reference_nll, "gain_nll": reference_nll - nll}
+
+
+def evaluation_readout_identity(config) -> dict:
+    """Execution identity, not a change to the numerical head contract.
+
+    Additive to metric schema v2; confirmation report v4 records this identity
+    and its native legacy-head exception. Historical reports are not relabeled.
+    """
+    return {
+        "version": "streaming_fixed_head_fp32_ce8192_v1",
+        "head_chunk": config.get("environment.head_chunk"),
+        "compute_dtype": config.get("environment.frozen_compute_dtype"),
+        "ce_dtype": "float32",
+        "ce_window": 8192,
+        "ignore_index": -100,
+        "materializes_full_logits": False,
+    }

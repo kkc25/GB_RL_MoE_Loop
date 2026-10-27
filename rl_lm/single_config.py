@@ -19,7 +19,7 @@ from pathlib import Path
 
 import torch
 
-from rl_lm.validation import check_schema as _check_schema, validate_numeric_settings
+from rl_lm.validation import check_schema as _check_schema, validate_numeric_settings, validate_split_roles
 
 from rl_lm.single_executor import (
     SINGLE_CANONICAL_BACKEND,
@@ -183,6 +183,7 @@ class _BaseSingleConfig:
     def _validate_common(self, *, runtime=False, backbone_model=None):
         _check_schema(self.data, self.SCHEMA)
         validate_numeric_settings(self)
+        validate_split_roles(self)
         if self.get("spec_version") != SINGLE_SPEC_VERSION:
             raise ValueError("unsupported spec_version for the single branch")
         if self.get("backbone.adaptive_layer") != 11 or not self.get("backbone.freeze_all") or self.get("backbone.prefix_depth") != 1:
@@ -197,8 +198,6 @@ class _BaseSingleConfig:
             raise ValueError("single deployment backend must be sparse_single_v1")
         if self.get("environment.min_calls") != 1 or self.get("environment.max_calls") != 1:
             raise ValueError("S1 first version is R1 only (min_calls == max_calls == 1)")
-        if self.get("data.train_split") == "newtest" or self.get("data.train_split") == self.get("data.confirmation_split"):
-            raise ValueError("training cannot read confirmation data")
         if self.get("data.state_sampling") != "uniform_valid_token_without_replacement":
             raise ValueError("unsupported sampling")
         if backbone_model is not None:

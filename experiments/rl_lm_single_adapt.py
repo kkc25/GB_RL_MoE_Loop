@@ -42,6 +42,8 @@ from rl_lm.actions import make_pair_table
 from rl_lm.selector import canonical_pair
 from rl_lm.cache import CACHE_FORMAT, _require_legacy_prefix, load_cache, seal_cache
 from rl_lm.cli import load_backbone, write_resolved_config
+from rl_lm.run_contract import ROLES, approval_record, load_role_caches, require_role_count, run_contract_identity
+from rl_lm.run_directory import guard_run_directory
 from rl_lm.inference import CanonicalTeacherPolicy, forward_with_last_ffn_policy
 from rl_lm.readout import terminal_ce
 from rl_lm.single_config import (
@@ -58,6 +60,7 @@ from rl_lm.single_executor import (
     make_single_executor,
     SINGLE_SPARSE_BACKEND,
 )
+from rl_lm.reporting import evaluation_readout_identity
 from rl_lm.single_readout import adapt_ce_loss, adapt_kl_loss, differentiable_logits, relative_update_error
 from train.recovery_common import atomic_json, sha256_file
 
@@ -89,8 +92,7 @@ def preflight_adaptation_output(config, *, resume_path=None, stop_after=None):
     """Reject incompatible runs before writing config, references or caches."""
     output_dir = Path(config.get("output_dir"))
     if resume_path is None:
-        if output_dir.exists() and any(output_dir.iterdir()):
-            raise FileExistsError("adaptation output directory is not empty; use a new run directory or --resume")
+        guard_run_directory(output_dir)
         return
     payload = torch.load(Path(resume_path), map_location="cpu", weights_only=False)
     validate_adaptation_resume(payload, config)
@@ -148,6 +150,10 @@ def derive_single_cache(config, model, split: str, device) -> Path:
     pair_dir = Path(config.get("data.pair_cache_root")) / split
     output_dir = Path(config.get("data.cache_root")) / split
     pair_cache = load_cache(pair_dir, {})
+    role = next((role for role, split_key, _ in ROLES if config.get(f"data.{split_key}") == split), None)
+    if role is None:
+        raise ValueError(f"cannot derive cache for unconfigured training role: {split}")
+    require_role_count(config, role, pair_cache)
     pair_manifest = pair_cache["manifest"]
     if pair_manifest.get("cache_format") != CACHE_FORMAT:
         raise ValueError(f"{pair_dir} is unverified; rebuild pair and derived caches into new directories")
@@ -163,7 +169,7 @@ def derive_single_cache(config, model, split: str, device) -> Path:
         pair_manifest=pair_manifest,
     )
     if output_dir.exists():
-        load_cache(output_dir, identity)  # validates the existing manifest
+        require_role_count(config, role, load_cache(output_dir, identity))
         return output_dir
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=output_dir.name + ".staging-", dir=output_dir.parent))
@@ -276,7 +282,8 @@ def pair_selection_reference_identity(config, input_ids, segment_ids, labels, *,
                 "sha256": hashlib.sha256(array.tobytes()).hexdigest()}
 
     return {
-        "version": "pair-selection-reference-v2",
+        "version": "pair-selection-reference-v3",
+        "evaluation_readout": evaluation_readout_identity(config),
         "checkpoint_sha256": checkpoint_sha256,
         "backbone_config_sha256": backbone_config_sha256,
         "resolved_config_sha256": config.sha256,
@@ -294,7 +301,7 @@ def pair_selection_reference_identity(config, input_ids, segment_ids, labels, *,
     }
 
 
-def pair_teacher_selection_nll(teacher, input_ids, segment_ids, labels, *, compute_dtype, chunk, head_chunk, seq_batch=8) -> float:
+def pair_teacher_selection_nll(teacher, input_ids, segment_ids, labels, *, compute_dtype, chunk, head_chunk, seq_batch=8, full_logits_reference=False) -> float:
     """Full-selection NLL of the original pair teacher (canonical pair, top-2 weights)."""
     total = 0.0
     tokens = 0
@@ -312,21 +319,28 @@ def pair_teacher_selection_nll(teacher, input_ids, segment_ids, labels, *, compu
             compute_dtype=compute_dtype,
             chunk=chunk,
             head_chunk=head_chunk,
+            output_mode="logits" if full_logits_reference else "token_ce",
+            labels=None if full_logits_reference else lab,
         )
-        flat_logits = output.logits.reshape(-1, output.logits.shape[-1])
-        flat_labels = lab.reshape(-1)
-        rows = 8192
-        for r in range(0, flat_labels.shape[0], rows):
-            total += float(
-                torch.nn.functional.cross_entropy(
-                    flat_logits[r:r + rows].float(), flat_labels[r:r + rows], reduction="none", ignore_index=-100
-                ).sum()
-            )
+        # Keep sequence batches and device-side 8192-row reduction unchanged.
+        if full_logits_reference:
+            logits = output.logits
+            flat_logits = logits.reshape(-1, logits.shape[-1])
+            flat_labels = lab.reshape(-1)
+            for r in range(0, flat_labels.numel(), 8192):
+                total += float(torch.nn.functional.cross_entropy(
+                    flat_logits[r:r + 8192].float(), flat_labels[r:r + 8192],
+                    reduction="none", ignore_index=-100,
+                ).sum())
+        else:
+            flat_ce = output.token_ce.reshape(-1)
+            for r in range(0, flat_ce.numel(), 8192):
+                total += float(flat_ce[r:r + 8192].to(lab.device).sum())
         tokens += int((lab != -100).sum())
     return total / tokens
 
 
-def single_selection_nll(student, input_ids, segment_ids, labels, *, compute_dtype, chunk, head_chunk, seq_batch=8) -> float:
+def single_selection_nll(student, input_ids, segment_ids, labels, *, compute_dtype, chunk, head_chunk, seq_batch=8, full_logits_reference=False) -> float:
     """Full-selection NLL of the fixed argmax single-expert rule (amplitude 1)."""
     total = 0.0
     tokens = 0
@@ -334,7 +348,7 @@ def single_selection_nll(student, input_ids, segment_ids, labels, *, compute_dty
         ids = input_ids[start:start + seq_batch]
         seg = segment_ids[start:start + seq_batch]
         lab = labels[start:start + seq_batch]
-        logits, _rounds = single_online_forward(
+        readout, _rounds = single_online_forward(
             student,
             ArgmaxSingleTeacherPolicy(),
             ids,
@@ -344,16 +358,23 @@ def single_selection_nll(student, input_ids, segment_ids, labels, *, compute_dty
             compute_dtype=compute_dtype,
             chunk=chunk,
             head_chunk=head_chunk,
+            output_mode="logits" if full_logits_reference else "token_ce",
+            labels=None if full_logits_reference else lab,
         )
-        flat_logits = logits.reshape(-1, logits.shape[-1])
-        flat_labels = lab.reshape(-1)
-        rows = 8192
-        for r in range(0, flat_labels.shape[0], rows):
-            total += float(
-                torch.nn.functional.cross_entropy(
-                    flat_logits[r:r + rows].float(), flat_labels[r:r + rows], reduction="none", ignore_index=-100
-                ).sum()
-            )
+        # Keep sequence batches and device-side 8192-row reduction unchanged.
+        if full_logits_reference:
+            logits = readout
+            flat_logits = logits.reshape(-1, logits.shape[-1])
+            flat_labels = lab.reshape(-1)
+            for r in range(0, flat_labels.numel(), 8192):
+                total += float(torch.nn.functional.cross_entropy(
+                    flat_logits[r:r + 8192].float(), flat_labels[r:r + 8192],
+                    reduction="none", ignore_index=-100,
+                ).sum())
+        else:
+            flat_ce = readout.reshape(-1)
+            for r in range(0, flat_ce.numel(), 8192):
+                total += float(flat_ce[r:r + 8192].to(lab.device).sum())
         tokens += int((lab != -100).sum())
     return total / tokens
 
@@ -459,7 +480,7 @@ def measure_executor_improvement(teacher, student, device, *, h0, rows: int = 81
 
 
 class AdaptTrainer:
-    def __init__(self, config, teacher, *, train_cache, device, run_dir, resume_path=None, stop_after=None) -> None:
+    def __init__(self, config, teacher, *, train_cache, device, run_dir, resume_path=None, stop_after=None, run_contract_identity=None) -> None:
         self.config = config
         self.teacher = teacher
         self.device = device
@@ -482,6 +503,7 @@ class AdaptTrainer:
         if self.stop_after < 1:
             raise ValueError("--stop-after must be a positive absolute cap")
 
+        self.run_contract_identity = copy.deepcopy(run_contract_identity)
         self.verified_train_cache = copy.deepcopy(train_cache.get("verified_identity"))
         if "manifest" in train_cache and self.verified_train_cache is None:
             raise ValueError("adaptation requires a verified cache; rebuild legacy caches")
@@ -659,6 +681,7 @@ class AdaptTrainer:
             "format_version": ADAPT_CHECKPOINT_FORMAT,
             "objective_version": ADAPT_OBJECTIVE_VERSION,
             "verified_train_cache": self.verified_train_cache,
+            "run_contract_identity": self.run_contract_identity,
             "spec_version": "RL-LM-Single-v1.0",
             "saved_at_update": self.successful_updates,
             "resolved_config": self.config.to_dict(),
@@ -694,6 +717,8 @@ class AdaptTrainer:
     def _restore(self, path: Path) -> None:
         payload = torch.load(path, map_location="cpu", weights_only=False)
         validate_adaptation_resume(payload, self.config)
+        if payload.get("run_contract_identity") != self.run_contract_identity:
+            raise ValueError("adaptation run contract mismatch; use a fresh run directory for legacy or changed role contracts")
         if "verified_train_cache" not in payload or payload["verified_train_cache"] != self.verified_train_cache:
             raise ValueError("adaptation verified_train_cache mismatch; unverified legacy checkpoints cannot exactly resume")
         self.student = build_student(self.teacher, self.whitelist).to(self.device)
@@ -769,38 +794,31 @@ def main() -> None:
     preflight_adaptation_output(config, resume_path=args.resume, stop_after=args.stop_after)
     output_dir = Path(config.get("output_dir"))
     output_dir.mkdir(parents=True, exist_ok=True)
-    write_resolved_config(config, output_dir / "resolved_config.json")
-    device = torch.device(config.get("runtime.device"))
-    teacher, _ = load_backbone(config, device)
-    config.validate(backbone_model=teacher.config, runtime=True)
-
-    caches = {}
-    for split in (config.get("data.train_split"), config.get("data.selection_split"), config.get("data.calibration_split")):
-        cache_dir = derive_single_cache(config, teacher, split, device)
-        pair_manifest = json.loads((Path(config.get("data.pair_cache_root")) / split / "manifest.json").read_text())
-        identity = single_cache_identity(
-            teacher,
-            checkpoint_path=config.get("backbone.checkpoint_path"),
-            config_path=config.get("backbone.config_path"),
-            tokenizer_path=config.get("data.tokenizer_path"),
-            data_dir=config.get("data.corpus_dir"),
-            split=split,
-            sampling_seed=config.get("data.sampling_seed"),
-            expert_chunk=config.get("environment.expert_chunk"),
-            pair_manifest=pair_manifest,
+    atomic_json(output_dir / "preflight.json", {"status": "checking", "stage": "adapt"})
+    try:
+        write_resolved_config(config, output_dir / "resolved_config.json")
+        device = torch.device(config.get("runtime.device"))
+        teacher, _ = load_backbone(config, device)
+        config.validate(backbone_model=teacher.config, runtime=True)
+        for _, split_key, _ in ROLES:
+            derive_single_cache(config, teacher, config.get(f"data.{split_key}"), device)
+        role_caches, contract = load_role_caches(config, teacher, single=True)
+        caches = {config.get(f"data.{split_key}"): role_caches[role] for role, split_key, _ in ROLES}
+        # Reject incompatible resumes before approving or touching references.
+        trainer = AdaptTrainer(
+            config, teacher,
+            train_cache=caches[config.get("data.train_split")],
+            device=device,
+            run_dir=output_dir,
+            resume_path=args.resume,
+            stop_after=args.stop_after,
+            run_contract_identity=run_contract_identity(contract),
         )
-        caches[split] = load_cache(cache_dir, identity)
-    atomic_json(
-        output_dir / "preflight.json",
-        {
-            "status": "ready",
-            "spec_version": "RL-LM-Single-v1.0",
-            "stage": "adapt",
-            "checkpoint_sha256": sha256_file(config.get("backbone.checkpoint_path")),
-            "caches": {split: {"states": int(caches[split]["manifest"]["n"])} for split in caches},
-            "created_utc": datetime.now(timezone.utc).isoformat(),
-        },
-    )
+        atomic_json(output_dir / "preflight.json", approval_record(contract) | {"stage": "adapt"})
+    except Exception as exc:
+        atomic_json(output_dir / "preflight.json", {"status": "failed", "stage": "adapt",
+                    "exception_type": type(exc).__name__, "message": str(exc)})
+        raise
 
     input_ids, segment_ids, labels = _selection_tensors(config, device)
     reference_path = output_dir / "pair_teacher_selection.json"
@@ -852,14 +870,6 @@ def main() -> None:
         print(json.dumps(record))
         return record
 
-    trainer = AdaptTrainer(
-        config, teacher,
-        train_cache=caches[config.get("data.train_split")],
-        device=device,
-        run_dir=output_dir,
-        resume_path=args.resume,
-        stop_after=args.stop_after,
-    )
     started = time.perf_counter()
     result = trainer.run(evaluate)
     trainer.ledger.record_wall_time(time.perf_counter() - started)

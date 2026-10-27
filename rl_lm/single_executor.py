@@ -464,6 +464,8 @@ def single_online_forward(
     chunk: int = 64,
     head_chunk: int = 64,
     ledger: SingleLedger | None = None,
+    output_mode: str = "logits",
+    labels: torch.Tensor | None = None,
 ):
     """Greedy joint-9 closed-loop forward with a single-expert terminal FFN.
 
@@ -471,9 +473,14 @@ def single_online_forward(
     every position, executing the chosen expert with amplitude 1 through the
     requested backend, and finishes with the production head readout.  The
     first 11 layers always run their original backbone function.
+
+    Default returns (logits [B,S,V], rounds [B,S]) unchanged. Explicit
+    output_mode="token_ce" requires labels [B,S] and instead returns
+    (CPU FP32 per-token CE [B,S], rounds [B,S]), with bounded 8192-row
+    evaluation CE windows. Labels never alter the closed-loop execution.
     """
     from eval.counterfactual import cache_last_ffn_input
-    from rl_lm.readout import production_logits
+    from rl_lm.readout import production_logits, production_token_ce
 
     if input_ids.ndim != 2:
         raise ValueError("input_ids must be [batch, sequence]")
@@ -481,6 +488,15 @@ def single_online_forward(
         raise ValueError("segment_ids must match input_ids")
     if max_calls < 1:
         raise ValueError("max_calls must be >= 1")
+    if output_mode not in ("logits", "token_ce"):
+        raise ValueError("output_mode must be logits or token_ce")
+    if output_mode == "token_ce":
+        if labels is None or labels.shape != input_ids.shape:
+            raise ValueError("token_ce requires labels matching input_ids")
+        if labels.dtype != torch.int64 or labels.device != input_ids.device:
+            raise ValueError("labels must be int64 on the input device")
+    elif labels is not None:
+        raise ValueError("labels are only accepted in token_ce output mode")
     batch, length = input_ids.shape
     device = input_ids.device
     with _frozen_compute(device, compute_dtype):
@@ -527,10 +543,14 @@ def single_online_forward(
 
     if not bool(done.all()):
         raise RuntimeError("single online forward ended with unfinished positions")
-    logits = production_logits(model, h, chunk=head_chunk, compute_dtype=compute_dtype, ledger=ledger)
     if ledger is not None:
         ledger.prefix_input_tokens += int(input_ids.numel())
-    return logits.reshape(batch, length, -1), rounds.reshape(batch, length)
+    if output_mode == "token_ce":
+        ce = production_token_ce(model, h, labels.reshape(-1), chunk=head_chunk,
+                                 compute_dtype=compute_dtype, ledger=ledger)
+        return ce.reshape(batch, length), rounds.reshape(batch, length)
+    logits = production_logits(model, h, chunk=head_chunk, compute_dtype=compute_dtype, ledger=ledger)
+    return logits.reshape(batch, length, model.embedding.weight.shape[0]), rounds.reshape(batch, length)
 
 
 class CudaWallTimer:

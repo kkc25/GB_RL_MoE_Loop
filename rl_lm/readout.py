@@ -9,7 +9,9 @@ differences from head-precision differences; its results must be reported
 under a separate name, never mixed with production rewards.
 
 ``production_logits`` materializes full-vocabulary logits for every position
-(used by the online forward); it follows the same BF16-head contract.
+(the default online forward); ``production_token_ce`` instead streams the
+same head chunks through bounded evaluation CE windows. Both preserve the
+BF16-head contract; evaluation CE windows remain distinct from reward CE.
 """
 
 from __future__ import annotations
@@ -136,3 +138,70 @@ def production_logits(
     if ledger is not None:
         ledger.physical_head_rows += chunks * chunk
     return output
+
+
+@torch.no_grad()
+def production_token_ce(
+    model,
+    h: torch.Tensor,
+    targets: torch.Tensor,
+    *,
+    chunk: int = 64,
+    compute_dtype: str = "bfloat16",
+    ce_window: int = 8192,
+    ledger: RLLedger | None = None,
+) -> torch.Tensor:
+    """Bounded head -> CE, returning CPU FP32 per-token losses [N].
+
+    Head GEMMs, autocast and tail padding match ``production_logits``.
+    A reusable head-dtype buffer holds at most ``ce_window`` rows; FP32 CE
+    uses the same position windows as the full-logits evaluation path (8192
+    by default), including ignored labels. No valid-token compaction occurs.
+    Head chunks may cross CE boundaries without changing their GEMM shape.
+    This is evaluation-only, not the chunk-64 ``terminal_ce`` reward API.
+    """
+    _validate_rows(h, targets, chunk)
+    if compute_dtype not in ("bfloat16", "float32"):
+        raise ValueError("compute_dtype must be bfloat16 or float32")
+    if ce_window <= 0 or chunk > ce_window:
+        raise ValueError("ce_window must be positive and at least head chunk")
+    vocab = model.embedding.weight.shape[0]
+    if targets.numel() and not bool(((targets == -100) | ((targets >= 0) & (targets < vocab))).all()):
+        raise ValueError("targets must be vocabulary ids or ignore_index=-100")
+    count = h.shape[0]
+    result = torch.empty((count,), dtype=torch.float32, device="cpu")
+    if count == 0:
+        return result
+    buffer = None
+    filled = 0
+    window_start = 0
+    for start in range(0, count, chunk):
+        valid = min(chunk, count - start)
+        hc = h[start:start + valid]
+        if valid < chunk:
+            hc = torch.cat((hc, h.new_zeros((chunk - valid, h.shape[1]))))
+        with torch.autocast(device_type=h.device.type, dtype=torch.bfloat16,
+                            enabled=compute_dtype == "bfloat16"):
+            logits = F.linear(model.final_norm(hc), model.embedding.weight)
+        if ledger is not None:
+            ledger.physical_head_rows += chunk
+        if buffer is None:
+            buffer = logits.new_empty((min(count, ce_window), vocab))
+        consumed = 0
+        while consumed < valid:
+            take = min(valid - consumed, buffer.shape[0] - filled)
+            buffer[filled:filled + take].copy_(logits[consumed:consumed + take])
+            filled += take
+            consumed += take
+            if filled == buffer.shape[0] or start + consumed == count:
+                with torch.autocast(device_type=h.device.type, enabled=False):
+                    losses = F.cross_entropy(
+                        buffer[:filled].float(), targets[window_start:window_start + filled],
+                        reduction="none", ignore_index=-100,
+                    )
+                result[window_start:window_start + filled].copy_(losses.cpu())
+                del losses
+                window_start += filled
+                filled = 0
+        del logits
+    return result

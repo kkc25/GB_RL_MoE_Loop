@@ -14,16 +14,16 @@ import json
 from pathlib import Path
 
 from rl_lm.run_directory import guard_run_directory
+from rl_lm.run_contract import load_role_caches, require_approval
 
 import numpy as np
 import torch
 from torch.nn import functional as F
 
 from data.packed_lm import PackedLMDataset
-from rl_lm.cache import cache_identity, load_cache
 from rl_lm.cli import load_backbone, resolve_config
 from rl_lm.inference import CanonicalTeacherPolicy, forward_with_last_ffn_policy
-from rl_lm.reporting import METRIC_SCHEMA_VERSION, reference_metrics
+from rl_lm.reporting import METRIC_SCHEMA_VERSION, reference_metrics, evaluation_readout_identity
 from rl_lm.trainer import CacheContextProvider, Trainer
 from train.recovery_common import sha256_file
 
@@ -69,7 +69,7 @@ class OnlineSelectionEvaluator:
             self.r1_identity = {"name": "selected_r1_greedy", "checkpoint": str(path),
                                 "checkpoint_sha256": sha256_file(path), "max_calls": 1}
 
-    def _forward_nll(self, policy, *, max_calls=None) -> tuple[float, float]:
+    def _forward_nll(self, policy, *, max_calls=None, full_logits_reference=False) -> tuple[float, float]:
         output = forward_with_last_ffn_policy(
             self._model,
             policy,
@@ -80,22 +80,24 @@ class OnlineSelectionEvaluator:
             compute_dtype=self.config.get("environment.frozen_compute_dtype"),
             chunk=int(self.config.get("environment.expert_chunk")),
             head_chunk=int(self.config.get("environment.head_chunk")),
+            output_mode="logits" if full_logits_reference else "token_ce",
+            labels=None if full_logits_reference else self.labels,
         )
-        # Chunk over positions: the full [B*S,V] FP32 CE buffer would not fit
-        # next to the BF16 logits tensor (observed OOM at the real 100M scale).
-        flat_logits = output.logits.reshape(-1, output.logits.shape[-1])
-        flat_labels = self.labels.reshape(-1)
-        ce_sum = 0.0
-        rows = 8192
-        for start in range(0, flat_labels.shape[0], rows):
-            ce_sum += float(
-                F.cross_entropy(
-                    flat_logits[start : start + rows].float(),
-                    flat_labels[start : start + rows],
-                    reduction="none",
-                    ignore_index=-100,
-                ).sum()
-            )
+        # Retain the old full-logits readout only as an explicit parity oracle.
+        # Production streams head tiles into the same 8192-position CE windows.
+        if full_logits_reference:
+            flat_logits = output.logits.reshape(-1, output.logits.shape[-1])
+            flat_labels = self.labels.reshape(-1)
+            ce_sum = sum(float(F.cross_entropy(
+                flat_logits[start : start + 8192].float(),
+                flat_labels[start : start + 8192], reduction="none", ignore_index=-100,
+            ).sum()) for start in range(0, flat_labels.numel(), 8192))
+        else:
+            flat_ce = output.token_ce.reshape(-1)
+            # Preserve the original per-window device reduction (CPU/GPU
+            # reduction trees need not be bitwise identical).
+            ce_sum = sum(float(flat_ce[start : start + 8192].to(self.labels.device).sum())
+                         for start in range(0, flat_ce.numel(), 8192))
         nll = ce_sum / int(self.valid.sum())
         mean_rounds = float(output.rounds.reshape(-1)[self.valid.reshape(-1)].float().mean())
         return nll, mean_rounds
@@ -111,6 +113,7 @@ class OnlineSelectionEvaluator:
             self.selected_r1_nll, _ = self._forward_nll(self.r1_actor, max_calls=1)
         return {
             "metric_schema_version": METRIC_SCHEMA_VERSION,
+            "evaluation_readout": evaluation_readout_identity(self.config),
             "legacy_gain_reference": {"name": "canonical_pair_forced_depth", "max_calls": int(self.config.get("environment.max_calls"))},
             "vs_canonical_r1": reference_metrics(greedy_nll, self.r1_reference_nll, {"name": "canonical_pair_r1", "max_calls": 1}),
             "vs_selected_r1": reference_metrics(greedy_nll, self.selected_r1_nll, self.r1_identity) if self.r1_identity else None,
@@ -156,8 +159,7 @@ def main() -> None:
     if not preflight_path.exists():
         raise RuntimeError("preflight.json missing; run experiments.rl_lm_preflight until it passes")
     preflight = json.loads(preflight_path.read_text())
-    if preflight.get("status") != "ready":
-        raise RuntimeError(f"preflight status is {preflight.get('status')!r}; trainer requires 'ready'")
+    require_approval(preflight)
 
     device = torch.device(config.get("runtime.device"))
     model, _ = load_backbone(config, device)
@@ -169,28 +171,9 @@ def main() -> None:
         "config_sha256": sha256_file(config.get("backbone.config_path")),
         "tokenizer_sha256": sha256_file(config.get("data.tokenizer_path")),
     }
-    data_identity = {}
-    caches = {}
-    for role, split in (
-        ("controller_train", config.get("data.train_split")),
-        ("selection", config.get("data.selection_split")),
-        ("calibration", config.get("data.calibration_split")),
-    ):
-        expected = cache_identity(
-            model,
-            model.config,
-            checkpoint_path=config.get("backbone.checkpoint_path"),
-            config_path=config.get("backbone.config_path"),
-            tokenizer_path=config.get("data.tokenizer_path"),
-            data_dir=config.get("data.corpus_dir"),
-            split=split,
-            sampling_seed=config.get("data.sampling_seed"),
-            backend_version=config.get("environment.training_backend"),
-            head_contract=config.get("environment.head_contract"),
-            expert_chunk=config.get("environment.expert_chunk"),
-        )
-        caches[role] = load_cache(Path(config.get("data.cache_root")) / split, expected)
-        data_identity[role] = caches[role]["verified_identity"]
+    caches, contract = load_role_caches(config, model)
+    require_approval(preflight, contract)
+    data_identity = {role: cache["verified_identity"] for role, cache in caches.items()}
 
     trainer = Trainer(
         config,

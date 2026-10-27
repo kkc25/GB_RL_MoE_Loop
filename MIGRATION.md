@@ -94,7 +94,7 @@ rule 外，还必须包含 `confirmation_scope`。用
 先固定候选与范围，再执行确认；不能看过结果后缩小样本或换分组。传入的序列数
 必须与固定范围一致。R1 参照如被固定，CLI 也必须提供匹配的 checkpoint。
 
-新报告默认 `evaluate_<split>_metrics_v3.json`；旧文件已存在时会拒绝覆盖。
+新报告默认 `evaluate_<split>_metrics_v4.json`；旧文件已存在时会拒绝覆盖。
 `--overwrite-output` 只用于操作者明确决定的替换，常规迁移应选择新输出路径。
 它不会允许绕过输入身份或确认范围检查。
 
@@ -123,5 +123,35 @@ rule 外，还必须包含 `confirmation_scope`。用
 - [ ] 公平比较同一工作负载的 selector、executor、full-model，保留重复测量与显存口径。
 - [ ] 在规定的数据角色和预算内重新验证质量；不把逻辑省算量写成实际端到端提速。
 
-本轮实现的本地验证为 834 项测试：826 通过、8 项 CUDA 跳过。最终 GitHub CI
-结果见 PR #2。尚无本轮 GPU 速度、显存实测或重新训练质量结论。
+本轮追加实现的本地验证为 871 项测试：863 通过、8 项 CUDA 跳过。最终 GitHub CI
+结果见对应 PR。尚无本轮 GPU 速度、显存实测或重新训练质量结论。
+
+
+## 9. 本轮追加：统一运行契约、流式评估与完整对照
+
+- 训练、选择、校准、确认必须使用四个不同的非空 split 名称；前三者不能使用
+  `newtest` 或配置中的确认集。默认配置已满足要求；不要通过改名掩盖数据重叠。
+  文件/文档级隔离仍需由 corpus 构建流程保证，名称不同不是独立性的充分证据。
+- Pair preflight 升级为 `rl-lm-run-contract-v1`，成功记录绑定完整解析配置以及
+  三个开发角色的请求样本数、实际样本数和已验证缓存身份。`runtime.device` 是
+  唯一规范化的配置例外；数值精度、后端、chunk 和 CUDA 要求仍然绑定。
+- preflight 在数据检查前原子写入 `checking`，成功后才写 `ready`；失败记录
+  `failed`。训练入口独立重建契约，不能仅凭旧 `ready` 标记启动。
+- Single/adaptation 共用角色和样本数检查，并把运行契约绑定到 checkpoint 身份。
+  Single-RL 会在恢复校验成功后保存 `run_contract.json`。需提供匹配的 calibration
+  cache，不再只凭 train/selection 缓存启动。
+- 旧批准/旧 checkpoint 缺少新契约时使用**新的输出目录和新 run**；已经有训练
+  记录的目录不能通过重新 preflight 就地认证。不要删除 guard 所保护的证据。
+- 缓存 payload 格式仍是 pair/single v2，但源码/配置/内容身份必须实际匹配；
+  更新代码后如来源身份不匹配，按提示重新生成，不能只改 manifest。
+- 生产评估默认流式 head→CE：保持原 prefix/terminal、sequence batch、head分块和
+  8192 行 CE 窗口。配置 `head_chunk` 必须在 1..8192。可微适配训练损失不变。
+  确认报告 schema/default filename 为 v4；适配 pair-reference 缓存身份升级为 v3。
+- 原生 legacy Top-2 对照仍保留原单次大 GEMM 的完整 logits，避免暗中改变其数值
+  基准；只移除未使用的重复 loss 计算。因此不能声称整个确认入口都不分配大 logits。
+- 新 profiler 使用 `--factorial-end-to-end`，在同一交错实验中比较旧/新 prefix ×
+  v1/v3 terminal。另保留完全 legacy 的原生 MoE 对照；切换/身份检查在计时外。
+  profiler 输出为 v4，各 cell 有独立实际身份，不能只看顶层请求参数。
+
+详细契约和后续验证示例见 [RUN_CONTRACT.md](RUN_CONTRACT.md)。运行中的旧实验应保持
+原 commit，不要中途更新依赖或代码再尝试强行续跑。本轮没有执行服务器/GPU实验。

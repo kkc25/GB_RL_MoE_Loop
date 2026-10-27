@@ -99,7 +99,7 @@ class CacheIntegrityTests(unittest.TestCase):
         from tests.rl_lm.test_single_adapt import _toy_config
         config = _toy_config(self.root / 'adapt')
         config.data['backbone'].update(checkpoint_path=str(self.root / 'model.pt'), config_path=str(self.root / 'config.json'))
-        config.data['data'].update(corpus_dir=str(self.root), tokenizer_path=str(self.root / 'tokenizer.json'), pair_cache_root=str(self.root / 'pair'), cache_root=str(self.root / 'single'), sampling_seed=4)
+        config.data['data'].update(corpus_dir=str(self.root), tokenizer_path=str(self.root / 'tokenizer.json'), pair_cache_root=str(self.root / 'pair'), cache_root=str(self.root / 'single'), sampling_seed=4, train_states=8, train_split='train')
         output = derive_single_cache(config, self.model, 'train', torch.device('cpu'))
         cache = load_cache(output, {})
         self.assertIn('single_teacher_ce', cache['baseline'][0])
