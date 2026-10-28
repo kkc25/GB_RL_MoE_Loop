@@ -1,0 +1,65 @@
+[
+  {
+    "update": 0,
+    "nll": 1.688565260536073,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  },
+  {
+    "update": 8,
+    "nll": 1.688565260536073,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  },
+  {
+    "update": 16,
+    "nll": 1.688565260536073,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  },
+  {
+    "update": 24,
+    "nll": 1.688565260536073,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  },
+  {
+    "update": 32,
+    "nll": 1.688565260536073,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  },
+  {
+    "update": 40,
+    "nll": 1.688565260536073,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  },
+  {
+    "update": 48,
+    "nll": 1.6881147526084392,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  },
+  {
+    "update": 56,
+    "nll": 1.6867131841842757,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  },
+  {
+    "update": 64,
+    "nll": 1.6869189291488436,
+    "tokens": 1927,
+    "sequences": 8,
+    "max_calls": 1
+  }
+]

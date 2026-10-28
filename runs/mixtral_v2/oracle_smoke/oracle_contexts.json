@@ -1,0 +1,78 @@
+{
+  "actual_count": 8,
+  "available_positions": 254,
+  "contexts": [
+    {
+      "content_sha256": "bafb0253773edc3d1bfaabccd1666d19c723d786b947170eb1af70b9107eadda",
+      "document_id": "<urn:uuid:edf94b34-b004-4004-89d4-bddf93d12b2c>",
+      "target": 851,
+      "token_position": 22
+    },
+    {
+      "content_sha256": "bafb0253773edc3d1bfaabccd1666d19c723d786b947170eb1af70b9107eadda",
+      "document_id": "<urn:uuid:edf94b34-b004-4004-89d4-bddf93d12b2c>",
+      "target": 3051,
+      "token_position": 90
+    },
+    {
+      "content_sha256": "7d1e90632d4d6e4b06d0025cae28b62bdbf05bab3b28845e40081621e2fdc6b2",
+      "document_id": "<urn:uuid:705af922-e1c3-4c78-9b60-1bcbd3ab90bf>",
+      "target": 1176,
+      "token_position": 122
+    },
+    {
+      "content_sha256": "7d1e90632d4d6e4b06d0025cae28b62bdbf05bab3b28845e40081621e2fdc6b2",
+      "document_id": "<urn:uuid:705af922-e1c3-4c78-9b60-1bcbd3ab90bf>",
+      "target": 506,
+      "token_position": 46
+    },
+    {
+      "content_sha256": "7d1e90632d4d6e4b06d0025cae28b62bdbf05bab3b28845e40081621e2fdc6b2",
+      "document_id": "<urn:uuid:705af922-e1c3-4c78-9b60-1bcbd3ab90bf>",
+      "target": 28781,
+      "token_position": 38
+    },
+    {
+      "content_sha256": "bafb0253773edc3d1bfaabccd1666d19c723d786b947170eb1af70b9107eadda",
+      "document_id": "<urn:uuid:edf94b34-b004-4004-89d4-bddf93d12b2c>",
+      "target": 297,
+      "token_position": 98
+    },
+    {
+      "content_sha256": "7d1e90632d4d6e4b06d0025cae28b62bdbf05bab3b28845e40081621e2fdc6b2",
+      "document_id": "<urn:uuid:705af922-e1c3-4c78-9b60-1bcbd3ab90bf>",
+      "target": 1791,
+      "token_position": 103
+    },
+    {
+      "content_sha256": "bafb0253773edc3d1bfaabccd1666d19c723d786b947170eb1af70b9107eadda",
+      "document_id": "<urn:uuid:edf94b34-b004-4004-89d4-bddf93d12b2c>",
+      "target": 3567,
+      "token_position": 37
+    }
+  ],
+  "covered_document_count": 2,
+  "document_count": 2,
+  "document_coverage": 1.0,
+  "documents": [
+    {
+      "available_positions": 127,
+      "content_sha256": "7d1e90632d4d6e4b06d0025cae28b62bdbf05bab3b28845e40081621e2fdc6b2",
+      "document_id": "<urn:uuid:705af922-e1c3-4c78-9b60-1bcbd3ab90bf>",
+      "selected_count": 4
+    },
+    {
+      "available_positions": 127,
+      "content_sha256": "bafb0253773edc3d1bfaabccd1666d19c723d786b947170eb1af70b9107eadda",
+      "document_id": "<urn:uuid:edf94b34-b004-4004-89d4-bddf93d12b2c>",
+      "selected_count": 4
+    }
+  ],
+  "eligible_document_count": 2,
+  "requested_count": 8,
+  "role": "calibration",
+  "sampling_sha256": "4395b4535a20e4532c04de2ad1aa14e7e2f3ae8a15b458bc1ead8ae2004bd237",
+  "seed": 17,
+  "strategy": "document_balanced_uniform_positions",
+  "version": 1
+}

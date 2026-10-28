@@ -1,0 +1,222 @@
+{
+  "actual_count": 32,
+  "available_positions": 254,
+  "contexts": [
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 739,
+      "token_position": 117
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 1401,
+      "token_position": 31
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 12427,
+      "token_position": 51
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 1215,
+      "token_position": 49
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 302,
+      "token_position": 14
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 298,
+      "token_position": 53
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 345,
+      "token_position": 103
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 13497,
+      "token_position": 22
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 28809,
+      "token_position": 92
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 28809,
+      "token_position": 32
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 15080,
+      "token_position": 104
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 1019,
+      "token_position": 110
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 304,
+      "token_position": 90
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 456,
+      "token_position": 69
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 28784,
+      "token_position": 38
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 299,
+      "token_position": 3
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 1587,
+      "token_position": 84
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 5203,
+      "token_position": 122
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 594,
+      "token_position": 70
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 378,
+      "token_position": 40
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 1987,
+      "token_position": 35
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 304,
+      "token_position": 120
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 4143,
+      "token_position": 64
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 4986,
+      "token_position": 81
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 1167,
+      "token_position": 95
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 28725,
+      "token_position": 102
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 368,
+      "token_position": 17
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 442,
+      "token_position": 98
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 927,
+      "token_position": 108
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 2608,
+      "token_position": 87
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 28705,
+      "token_position": 37
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 28731,
+      "token_position": 46
+    }
+  ],
+  "covered_document_count": 2,
+  "document_count": 2,
+  "document_coverage": 1.0,
+  "documents": [
+    {
+      "available_positions": 127,
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "selected_count": 16
+    },
+    {
+      "available_positions": 127,
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "selected_count": 16
+    }
+  ],
+  "eligible_document_count": 2,
+  "requested_count": 32,
+  "role": "train",
+  "sampling_sha256": "cbc0eddc44c8353682bb664627de8c6a7f15e7c6c8406899ab93ecf213feeab0",
+  "seed": 17,
+  "strategy": "document_balanced_uniform_positions",
+  "version": 1
+}

@@ -1,0 +1,37 @@
+{
+  "status": "completed",
+  "experiment": "fixed_native_r1_plus_trainable_residual",
+  "config": {
+    "rank": 8,
+    "updates": 4,
+    "batch_contexts": 4,
+    "max_train_contexts": 32,
+    "eval_interval": 2,
+    "learning_rate": 0.001,
+    "gradient_clip": 1.0,
+    "residual_scale": 0.1,
+    "seed": 17
+  },
+  "initial_selection_nll": 1.5314759093986592,
+  "best_selection_nll": 1.5314759093986592,
+  "best_update": 0,
+  "latest_selection_nll": 1.5315929211278672,
+  "selection_improved": false,
+  "practical_gain_established": false,
+  "heldout_gain_established": false,
+  "successful_updates": 4,
+  "train_contexts": 32,
+  "effective_batch_contexts": 4,
+  "trainable_parameters": 65536,
+  "selection_gate_passed": true,
+  "elapsed_seconds": 1.4916769389528781,
+  "arithmetic": "FP32 adapter; cast correction to native FP32/BF16 before residual; frozen differentiable norm/head",
+  "inference_control": "fixed-on correction or explicit bypass/STOP; no learned STOP",
+  "limits": [
+    "selection is not held-out test",
+    "added capacity is not evidence of loop benefit",
+    "parameter-matched one-pass adapter control not implemented",
+    "no second expert call"
+  ],
+  "binding_sha256": "eaa6b60483bfe94ca369aec305a95410b56b0e2a9d2abe078151c3fbca0e7c07"
+}

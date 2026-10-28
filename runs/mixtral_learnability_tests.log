@@ -1,0 +1,65 @@
+test_backend_configuration_is_not_dispatch_proof (tests.test_mixtral_protocol.ProtocolTests.test_backend_configuration_is_not_dispatch_proof) ... ok
+test_cached_hf_snapshot_symlinks (tests.test_mixtral_protocol.ProtocolTests.test_cached_hf_snapshot_symlinks) ... ok
+test_causal_ce_and_padding (tests.test_mixtral_protocol.ProtocolTests.test_causal_ce_and_padding) ... ok
+test_complete_checkpoint_guard (tests.test_mixtral_protocol.ProtocolTests.test_complete_checkpoint_guard) ... Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 428.03it/s]
+Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 3968.30it/s]
+Loading weights:   0%|          | 0/20 [00:00<?, ?it/s]Loading weights: 100%|██████████| 20/20 [00:00<00:00, 4048.56it/s]
+[transformers] [1mMixtralForCausalLM LOAD REPORT[0m from: /tmp/tmp59knrq8v/tiny
+Key            | Status  | 
+---------------+---------+-
+lm_head.weight | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+ok
+test_config_limits (tests.test_mixtral_protocol.ProtocolTests.test_config_limits) ... ok
+test_data_leakage_preflight_failure_preserves_report_before_weights (tests.test_mixtral_protocol.ProtocolTests.test_data_leakage_preflight_failure_preserves_report_before_weights) ... ok
+test_dispatch_observer_restores_and_fails_closed (tests.test_mixtral_protocol.ProtocolTests.test_dispatch_observer_restores_and_fails_closed) ... ok
+test_duplicates_and_tokenization (tests.test_mixtral_protocol.ProtocolTests.test_duplicates_and_tokenization) ... ok
+test_effective_token_overlap_real_fast_tokenizer (tests.test_mixtral_protocol.ProtocolTests.test_effective_token_overlap_real_fast_tokenizer) ... ok
+test_learnability_config_contract (tests.test_mixtral_protocol.ProtocolTests.test_learnability_config_contract) ... ok
+test_local_inputs_are_offline_cheap_and_change_guarded (tests.test_mixtral_protocol.ProtocolTests.test_local_inputs_are_offline_cheap_and_change_guarded) ... ok
+test_oracle_and_adapter_cli_tiny (tests.test_mixtral_protocol.ProtocolTests.test_oracle_and_adapter_cli_tiny) ... ok
+test_output_and_precision_guards (tests.test_mixtral_protocol.ProtocolTests.test_output_and_precision_guards) ... ok
+test_real_grouped_calibration_dispatch_observed (tests.test_mixtral_protocol.ProtocolTests.test_real_grouped_calibration_dispatch_observed) ... ok
+test_required_quota_failure_is_reported_before_weights_or_cuda (tests.test_mixtral_protocol.ProtocolTests.test_required_quota_failure_is_reported_before_weights_or_cuda) ... ok
+test_route_diagnostics_preserves_full_padded_execution_shape (tests.test_mixtral_protocol.ProtocolTests.test_route_diagnostics_preserves_full_padded_execution_shape) ... ok
+test_stage_preflight_uses_only_required_quota_real_tokenizer (tests.test_mixtral_protocol.ProtocolTests.test_stage_preflight_uses_only_required_quota_real_tokenizer) ... ok
+test_tiny_native_screen (tests.test_mixtral_protocol.ProtocolTests.test_tiny_native_screen) ... ok
+test_train_then_profile_new_output (tests.test_mixtral_protocol.ProtocolTests.test_train_then_profile_new_output) ... ok
+test_validate_cli_backward_compatible (tests.test_mixtral_protocol.ProtocolTests.test_validate_cli_backward_compatible) ... ok
+test_weight_identity_change_during_loading_fails_closed (tests.test_mixtral_protocol.ProtocolTests.test_weight_identity_change_during_loading_fails_closed) ... ok
+test_imbalanced_documents_and_unique_positions (tests.test_mixtral_sampling.SamplingTests.test_imbalanced_documents_and_unique_positions) ... ok
+test_invalid_and_shortage_fail_before_capture (tests.test_mixtral_sampling.SamplingTests.test_invalid_and_shortage_fail_before_capture) ... ok
+test_masks_shift_empty_documents_and_small_budget (tests.test_mixtral_sampling.SamplingTests.test_masks_shift_empty_documents_and_small_budget) ... ok
+test_real_hf_capture_once_shift_and_contiguous (tests.test_mixtral_sampling.SamplingTests.test_real_hf_capture_once_shift_and_contiguous) ... ok
+test_seed_local_repeatable_and_content_bound (tests.test_mixtral_sampling.SamplingTests.test_seed_local_repeatable_and_content_bound) ... ok
+test_budget_preflight_and_config (tests.test_mixtral_oracle.OracleTests.test_budget_preflight_and_config) ... ok
+test_invalid_inputs_and_model (tests.test_mixtral_oracle.OracleTests.test_invalid_inputs_and_model) ... ok
+test_known_best_and_counts (tests.test_mixtral_oracle.OracleTests.test_known_best_and_counts) ... ok
+test_no_headroom_stop_wins_ties (tests.test_mixtral_oracle.OracleTests.test_no_headroom_stop_wins_ties) ... ok
+test_nonfinite_and_inconsistent_anchor (tests.test_mixtral_oracle.OracleTests.test_nonfinite_and_inconsistent_anchor) ... ok
+test_provenance_identity_validation (tests.test_mixtral_oracle.OracleTests.test_provenance_identity_validation) ... ok
+test_tiny_real_hf_frozen_and_chunk_independent (tests.test_mixtral_oracle.OracleTests.test_tiny_real_hf_frozen_and_chunk_independent) ... ok
+test_atomic_checkpoint_failure_preserves_previous (tests.test_mixtral_second_round.SecondRoundTests.test_atomic_checkpoint_failure_preserves_previous) ... ok
+test_checkpoint_rejects_mutation_and_nonfinite_gradients (tests.test_mixtral_second_round.SecondRoundTests.test_checkpoint_rejects_mutation_and_nonfinite_gradients) ... ok
+test_initial_identity_gradients_and_rng (tests.test_mixtral_second_round.SecondRoundTests.test_initial_identity_gradients_and_rng) ... ok
+test_train_checkpoint_and_fixed_stop_baseline (tests.test_mixtral_second_round.SecondRoundTests.test_train_checkpoint_and_fixed_stop_baseline) ... ok
+test_update_zero_wins_ties (tests.test_mixtral_second_round.SecondRoundTests.test_update_zero_wins_ties) ... ok
+test_validation (tests.test_mixtral_second_round.SecondRoundTests.test_validation) ... ok
+test_same_role_duplicates_are_visible_without_resampling (tests.test_mixtral_duplicate_statistics.DuplicateStatisticsTests.test_same_role_duplicates_are_visible_without_resampling) ... ok
+
+----------------------------------------------------------------------
+Ran 40 tests in 1.307s
+
+OK
+{"report": "/tmp/tmpdlj59v46/output/report.json", "status": "complete"}
+{"report": "/tmp/tmpdlj59v46/adapter/report.json", "status": "complete"}
+{"report": "/tmp/tmp8qgiwdch/validate_None/report.json", "status": "complete"}
+{"report": "/tmp/tmp8qgiwdch/profile_None/report.json", "status": "complete"}
+{"report": "/tmp/tmp8qgiwdch/oracle_calibration/report.json", "status": "complete"}
+{"report": "/tmp/tmp8qgiwdch/oracle_selection/report.json", "status": "complete"}
+{"report": "/tmp/tmpqq5ymdo1/output/report.json", "status": "complete"}
+{"report": "/tmp/tmpqq5ymdo1/profile/report.json", "status": "complete"}
+{"report": "/tmp/tmpqq5ymdo1/profile_second/report.json", "status": "complete"}
+{"report": "/tmp/tmpcwcpblym/output/report.json", "status": "complete"}
