@@ -44,6 +44,9 @@ class RuntimeReportingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             config = toy_config_dict(tmp)
             trainer = make_trainer(config, stop_after=1)
+            # Keep each mocked segment wholly synthetic: adding an integer to a
+            # real fractional monotonic origin can round across float exponents.
+            trainer._cost_clock = 0.
             with patch('rl_lm.trainer.time.monotonic', return_value=trainer._cost_clock + 12.):
                 trainer._initialize_run()
             checkpoint = Path(tmp) / 'checkpoint_latest.pt'
@@ -53,6 +56,7 @@ class RuntimeReportingTests(unittest.TestCase):
             payload['ledger']['gpu_hours'] = .25
             torch.save(payload, checkpoint)
             resumed = make_trainer(config, resume_path=checkpoint, stop_after=1)
+            resumed._cost_clock = 0.
             with patch('rl_lm.trainer.time.monotonic', return_value=resumed._cost_clock + 6.):
                 resumed._finish('stopped_at_cap')
                 resumed._finish('stopped_at_cap')
@@ -68,6 +72,7 @@ class RuntimeReportingTests(unittest.TestCase):
             # Mock only accounting's device; no CUDA allocation or training involved.
             cuda_resumed = make_trainer(config, resume_path=checkpoint, stop_after=1)
             cuda_resumed.device = torch.device('cuda:3')
+            cuda_resumed._cost_clock = 0.
             with patch('rl_lm.trainer.time.monotonic', return_value=cuda_resumed._cost_clock + 3600.):
                 cuda_resumed._account_runtime(finish=True)
                 cuda_resumed._account_runtime(finish=True)

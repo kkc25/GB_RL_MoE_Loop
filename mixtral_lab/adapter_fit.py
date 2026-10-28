@@ -340,7 +340,10 @@ def train_adapter_fit(adapter, train_h0, train_targets, config, identities, outp
     best_state = copy.deepcopy(module.state_dict())
     best_update = latest_probe_update = successful = completed_epochs = 0
     visits = [0] * len(h1)
-    rows, probes = [], [dict(update=0, **initial_probe, adaptive_decision=initial_decision)]
+    probe_interval_gradients = dict(start_update_exclusive=0, accepted_updates=0,
+                                    nonzero_gradient_updates=0, max_gradient_norm=0.)
+    rows, probes = [], [dict(update=0, **initial_probe, adaptive_decision=initial_decision,
+                            probe_interval_gradients=probe_interval_gradients.copy())]
     for name in ('initial', 'best'):
         _save_checkpoint(output / f'checkpoint_{name}.pt', module, identities, tensor_binding,
                          probe_spec, 0, initial_probe, controller_state=best_controller_state)
@@ -392,7 +395,8 @@ def train_adapter_fit(adapter, train_h0, train_targets, config, identities, outp
             status = 'stopped_nonfinite_correction'
             break
         stop_after_update = False
-        if update % config.eval_interval == 0 or update == config.updates:
+        probe_due = update % config.eval_interval == 0 or update == config.updates
+        if probe_due:
             try:
                 probe = _training_probe(adapter, module, h1, labels, config, work)
             except FloatingPointError:
@@ -401,12 +405,21 @@ def train_adapter_fit(adapter, train_h0, train_targets, config, identities, outp
                 latest_controller_state = copy.deepcopy(best_controller_state)
                 status = 'stopped_nonfinite_probe'
                 break
+        # Count only updates that passed every applicable numerical guard,
+        # including the current full probe. A zero-gradient final minibatch
+        # must not erase evidence from earlier accepted updates in this window.
+        probe_interval_gradients['accepted_updates'] += 1
+        probe_interval_gradients['nonzero_gradient_updates'] += int(row['gradient_norm'] > 0.)
+        probe_interval_gradients['max_gradient_norm'] = max(
+            probe_interval_gradients['max_gradient_norm'], row['gradient_norm'])
+        row['probe_interval_gradients'] = probe_interval_gradients.copy()
+        if probe_due:
             # Full train probe ONLY. A BF16 counterfactual on FP32 cannot justify growth.
             covered_after_update = all(count > 0 or index in indices
                                        for index, count in enumerate(visits))
             ineffective = (h1.dtype == torch.bfloat16
                            and probe['diagnostics']['native_effective_change_rate'] == 0.
-                           and row['gradient_norm'] > 0.)
+                           and probe_interval_gradients['nonzero_gradient_updates'] > 0)
             decision = controller.observe(update, probe['nll'],
                 coverage_complete=covered_after_update, ineffective_update=ineffective)
             for group in optimizer.param_groups:
@@ -416,7 +429,10 @@ def train_adapter_fit(adapter, train_h0, train_targets, config, identities, outp
             stop_after_update = decision['stop']
             latest_probe, latest_probe_update = probe, update
             latest_controller_state = controller.snapshot()
-            probes.append(dict(update=update, **probe, adaptive_decision=decision))
+            probes.append(dict(update=update, **probe, adaptive_decision=decision,
+                               probe_interval_gradients=probe_interval_gradients.copy()))
+            probe_interval_gradients = dict(start_update_exclusive=update, accepted_updates=0,
+                                            nonzero_gradient_updates=0, max_gradient_norm=0.)
             row['train_probe_nll'] = probe['nll']
             if probe['nll'] < best_probe['nll']:
                 best_probe, best_update = probe, update
@@ -441,7 +457,8 @@ def train_adapter_fit(adapter, train_h0, train_targets, config, identities, outp
             latest_probe = _training_probe(adapter, module, h1, labels, config, work)
             latest_probe_update = successful
             latest_controller_state = controller.snapshot()
-            probes.append(dict(update=successful, **latest_probe))
+            probes.append(dict(update=successful, **latest_probe,
+                               probe_interval_gradients=probe_interval_gradients.copy()))
         except FloatingPointError:
             module.load_state_dict(best_state)
             latest_probe, latest_probe_update = best_probe, best_update

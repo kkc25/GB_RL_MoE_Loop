@@ -311,6 +311,11 @@ class AdapterFitTests(unittest.TestCase):
             self.assertEqual(result['latest_update'], 1)
             self.assertEqual(result['best_update'], 1)
             self.assertFalse(result['train_fit_passed'])
+            window = result['train_probe_history'][-1]['probe_interval_gradients']
+            self.assertEqual(window['accepted_updates'], 1)
+            self.assertEqual(window['nonzero_gradient_updates'], 1)
+            self.assertGreater(window['max_gradient_norm'], 0.)
+            self.assertEqual(result['adaptive_controller_state']['observation_count'], 1)
             _, metadata = load_adapter_fit_checkpoint(out / 'checkpoint_latest.pt', {'test': 'late-guard'})
             self.assertEqual(metadata['update'], 1)
             self.assertEqual(metadata['train_probe_nll'], result['latest_train_probe_nll'])
@@ -479,6 +484,169 @@ class AdapterFitTests(unittest.TestCase):
                 self.assertTrue(all(1e-10 <= d['lr'] <= 1e-4 for d in decisions))
                 if expect_growth:
                     self.assertEqual(result['best_correction_diagnostics']['native_effective_change_rate'], 0.)
+
+    def test_adaptive_growth_uses_accepted_probe_interval_not_final_minibatch(self):
+        for dtype, expect_growth in [(torch.bfloat16, True), (torch.float32, False)]:
+            with self.subTest(dtype=dtype), tempfile.TemporaryDirectory() as tmp:
+                adapter = FakeAdapter(dtype)
+                h0 = torch.tensor([[1.] * 4, [0.] * 4], dtype=dtype)
+                targets = torch.ones(2, dtype=torch.long)
+                settings = {'enabled': True, 'eval_interval': 2, 'patience': 1,
+                            'min_lr': 1e-10, 'max_lr': 1e-4}
+                out = Path(tmp) / 'fit'
+                _, result = train_adapter_fit(adapter, h0, targets,
+                    config(updates=2, batch_contexts=1, probe_chunk_contexts=2,
+                           eval_interval=2, learning_rate=1e-8, seed=0, adaptive=settings),
+                    {'test': 'gradient-window'}, out)
+                rows = json.loads((out / 'metrics.json').read_text())
+                self.assertEqual([row['visited_indices'] for row in rows], [[0], [1]])
+                self.assertGreater(rows[0]['gradient_norm'], 0.)
+                self.assertEqual(rows[1]['gradient_norm'], 0.)
+                interval = dict(start_update_exclusive=0, accepted_updates=2,
+                                nonzero_gradient_updates=1,
+                                max_gradient_norm=rows[0]['gradient_norm'])
+                self.assertEqual(rows[1]['probe_interval_gradients'], interval)
+                probe = result['train_probe_history'][-1]
+                self.assertEqual(probe['probe_interval_gradients'], interval)
+                self.assertEqual(probe['diagnostics']['native_effective_change_rate'], 0.)
+                self.assertEqual(probe['diagnostics']['bf16_effective_change_rate'], 0.)
+                decision = result['adaptive_controller_state']['decisions'][-1]
+                self.assertEqual(decision['ineffective_update'], expect_growth)
+                self.assertEqual(decision['action'], 'grow_lr' if expect_growth else 'reduce_lr')
+                self.assertEqual(decision['lr'], 2e-8 if expect_growth else 5e-9)
+                self.assertEqual(result['best_update'], 0)
+                self.assertFalse(result['train_fit_passed'])
+                _, latest = load_adapter_fit_checkpoint(out / 'checkpoint_latest.pt',
+                                                        {'test': 'gradient-window'})
+                self.assertEqual(latest['adaptive_controller_state'], result['adaptive_controller_state'])
+                _, best = load_adapter_fit_checkpoint(out / 'checkpoint_best.pt',
+                                                      {'test': 'gradient-window'})
+                self.assertEqual(best['adaptive_controller_state']['last_update'], 0)
+
+    def test_adaptive_gradient_window_resets_and_all_zero_gradients_do_not_grow(self):
+        for active_first_window, interval in ((True, 2), (False, 2), (True, 3), (False, 3)):
+            with self.subTest(active=active_first_window, interval=interval), tempfile.TemporaryDirectory() as tmp:
+                adapter = FakeAdapter(torch.bfloat16)
+                h0 = torch.zeros(4, 4, dtype=torch.bfloat16)
+                if active_first_window:
+                    h0[0].fill_(1.)
+                settings = {'enabled': True, 'eval_interval': interval, 'patience': 1,
+                            'min_lr': 1e-10, 'max_lr': 1e-4}
+                out = Path(tmp) / 'fit'
+                _, result = train_adapter_fit(adapter, h0, torch.ones(4, dtype=torch.long),
+                    config(updates=4, batch_contexts=1, probe_chunk_contexts=4,
+                           eval_interval=interval, learning_rate=1e-8, seed=0, adaptive=settings),
+                    {'test': 'window-reset'}, out)
+                rows = json.loads((out / 'metrics.json').read_text())
+                self.assertEqual([row['visited_indices'] for row in rows], [[0], [1], [3], [2]])
+                probes = result['train_probe_history'][1:]
+                windows = [probe['probe_interval_gradients'] for probe in probes]
+                self.assertEqual([window['start_update_exclusive'] for window in windows], [0, interval])
+                self.assertEqual([window['accepted_updates'] for window in windows], [interval, 4 - interval])
+                self.assertEqual([window['nonzero_gradient_updates'] for window in windows],
+                                 [int(active_first_window), 0])
+                self.assertEqual(windows[1]['max_gradient_norm'], 0.)
+                self.assertTrue(all(probe['diagnostics']['native_effective_change_rate'] == 0.
+                                    for probe in probes))
+                decisions = result['adaptive_controller_state']['decisions'][1:]
+                self.assertEqual([decision['ineffective_update'] for decision in decisions],
+                                 [active_first_window, False])
+                self.assertEqual([decision['action'] for decision in decisions],
+                                 ['grow_lr' if active_first_window else 'reduce_lr', 'reduce_lr'])
+
+    def test_adaptive_gradient_window_excludes_every_rejected_update(self):
+        for guard in ('loss', 'gradient', 'parameters', 'correction', 'probe'):
+            with self.subTest(guard=guard), tempfile.TemporaryDirectory() as tmp:
+                adapter = FakeAdapter(torch.bfloat16)
+                # The accepted first update has zero gradient. Only the rejected
+                # second update could supply nonzero evidence.
+                h0 = torch.tensor([[0.] * 4, [1.] * 4], dtype=torch.bfloat16)
+                calls = 0
+                if guard in ('loss', 'gradient'):
+                    def poisoned(a, h):
+                        nonlocal calls
+                        if h.requires_grad:
+                            calls += 1
+                            if calls == 2:
+                                if guard == 'loss':
+                                    return differentiable_readout(a, h) * float('nan')
+                                h.register_hook(lambda grad: torch.full_like(grad, float('nan')))
+                        return differentiable_readout(a, h)
+                    patcher = patch('mixtral_lab.adapter_fit.differentiable_readout', side_effect=poisoned)
+                elif guard == 'parameters':
+                    real_step = torch.optim.AdamW.step
+                    def bad_step(optimizer, closure=None):
+                        nonlocal calls
+                        real_step(optimizer, closure)
+                        calls += 1
+                        if calls == 2:
+                            with torch.no_grad():
+                                optimizer.param_groups[0]['params'][0].fill_(float('nan'))
+                    patcher = patch.object(torch.optim.AdamW, 'step', bad_step)
+                elif guard == 'correction':
+                    def bad_correction(*args, **kwargs):
+                        nonlocal calls
+                        calls += 1
+                        if calls == 3:  # initial probe, first update, rejected update
+                            raise FloatingPointError('simulated correction overflow')
+                        return _correction_totals(*args, **kwargs)
+                    patcher = patch('mixtral_lab.adapter_fit._correction_totals', side_effect=bad_correction)
+                else:
+                    def bad_probe(*args):
+                        nonlocal calls
+                        calls += 1
+                        if calls == 2:
+                            raise FloatingPointError('simulated full probe overflow')
+                        return _training_probe(*args)
+                    patcher = patch('mixtral_lab.adapter_fit._training_probe', side_effect=bad_probe)
+                settings = {'enabled': True, 'eval_interval': 2, 'patience': 1,
+                            'min_lr': 1e-10, 'max_lr': 1e-4}
+                out = Path(tmp) / 'fit'
+                with patcher:
+                    module, result = train_adapter_fit(adapter, h0, torch.ones(2, dtype=torch.long),
+                        config(updates=2, batch_contexts=1, probe_chunk_contexts=2,
+                               eval_interval=2, learning_rate=1e-8, seed=0, adaptive=settings),
+                        {'test': 'rejected-gradient-window'}, out)
+                rows = json.loads((out / 'metrics.json').read_text())
+                self.assertEqual(result['status'], 'stopped_nonfinite_' + guard)
+                self.assertEqual(result['successful_updates'], 1)
+                self.assertEqual([row['accepted'] for row in rows], [True, False])
+                self.assertNotIn('probe_interval_gradients', rows[1])
+                if guard not in ('loss', 'gradient'):
+                    self.assertGreater(rows[1]['gradient_norm'], 0.)
+                self.assertEqual(result['adaptive_controller_state']['observation_count'], 1)
+                self.assertEqual(result['adaptive_controller_state']['growths'], 0)
+                self.assertFalse(result['train_fit_passed'])
+                self.assertEqual(result['fit_evidence_status'], 'numerical_guard_stopped')
+                final_probe = result['train_probe_history'][-1]
+                window = final_probe['probe_interval_gradients']
+                self.assertEqual(window['accepted_updates'], 0 if guard == 'probe' else 1)
+                self.assertEqual(window['nonzero_gradient_updates'], 0)
+                self.assertEqual(window['max_gradient_norm'], 0.)
+                latest, metadata = load_adapter_fit_checkpoint(out / 'checkpoint_latest.pt',
+                                                               {'test': 'rejected-gradient-window'})
+                self.assertEqual(metadata['update'], 0 if guard == 'probe' else 1)
+                self.assertEqual(metadata['adaptive_controller_state'], result['adaptive_controller_state'])
+                self.assertTrue(torch.equal(latest(h0), h0))
+                self.assertTrue(torch.equal(module(h0), h0))
+
+    def test_adaptive_gradient_window_allows_recovery_instead_of_floor_stop(self):
+        adapter = FakeAdapter(torch.bfloat16)
+        h0 = torch.tensor([[1.] * 4, [0.] * 4], dtype=torch.bfloat16)
+        settings = {'enabled': True, 'eval_interval': 2, 'patience': 1,
+                    'min_lr': .001, 'max_lr': .01, 'min_updates': 2, 'stop_patience': 1}
+        with tempfile.TemporaryDirectory() as tmp:
+            _, result = train_adapter_fit(adapter, h0, torch.ones(2, dtype=torch.long),
+                config(updates=8, batch_contexts=1, probe_chunk_contexts=2, eval_interval=2,
+                       learning_rate=.001, seed=0, fit_gain_threshold=1e-5, adaptive=settings),
+                {'test': 'window-floor-recovery'}, Path(tmp) / 'fit')
+            first = result['adaptive_controller_state']['decisions'][1]
+            self.assertEqual(first['update'], 2)
+            self.assertTrue(first['ineffective_update'])
+            self.assertEqual(first['action'], 'grow_lr')
+            self.assertGreater(result['successful_updates'], 2)
+            self.assertGreaterEqual(result['train_fit_gain'], 1e-5)
+            self.assertTrue(result['train_fit_passed'])
 
     def test_adaptive_stop_waits_for_coverage_and_keeps_fit_gain_gate(self):
         for improved in (False, True):
