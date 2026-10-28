@@ -240,6 +240,46 @@ MoE 更快，也不能单凭不同预训练模型的一次对比证明“100M �
 本次代码提交与 CPU 测试不代表服务器上的 46.7B GPU 实验已执行，也不构成
 加速保证。历史负结果应保留。
 
+## 完整性修补与 R1 快速路径
+
+- 模型路径的祖先可以包含 `.cache`，包括正常 Hugging Face snapshot；仅过滤
+  模型根目录内部的缓存子目录，符号链接文件仍校验所指向的实际字节。
+- 原始文档 ID/内容去重之外，分词、截断后还检查不同数据角色的**有效 token
+  序列**是否相同，不把文档 ID 或 padding 混入重复判定。被拒绝时重新构建
+  开发集，不能靠改 ID 或增添会被截掉的尾部文字绕过检查。此检查仍不是
+  所有部分重叠、近重复或语义泄漏的证明。
+- 独立 profile 的 `actor_checkpoint` 记录实际载入文件的 SHA、binding SHA、
+  更新步数、epsilon、训练配置和 actor state SHA。文件 hash 与反序列化来自
+  同一个字节快照，不能只用 `best` 或 `latest` 文件名代替身份。
+- R1 默认快速路径复用一次末层 norm/gate；原路由无策略时不构建无用特征和
+  STOP 状态。`adapter.forward(..., reference=True)` 保留通用对照，R2 路径不变。
+  CPU tiny 模型中 FP32/BF16、eager/grouped_mm 及全部专家对已检查精确一致；
+  这不是完整 Mixtral CUDA 加速证明，服务器仍需执行原生一致性门槛。
+- `model.expert_backend_evidence` 只是请求/配置证据。校准的每个 group 中
+  `native_expert_dispatch` 另记录已观察的 HF 分派分支、设备与 dtype；未观察到
+  或不支持的版本明确标为 `unverified`。分支观察不等于底层 CUDA profiler
+  kernel 证据；临时观测在 finally 中恢复，正式计时不带此 instrumentation。
+
+### 评分去重核验候选：不是默认提速模式
+
+默认 `training.score_mode` 仍为 `reference`。新配置
+`configs/mixtral/score_reuse_checked_candidate.json` 显式选择
+`deduplicate_checked_v1`：在单次更新内复用同一 context、同一专家对的评分，
+保留原采样顺序和 RLOO 权重，缓存不会跨更新增长。
+
+该候选改变专家/head 的批形状，因此每步仍计算完整参考分数，对每个分数检查
+`score_atol + score_rtol * abs(reference)`；任一分数失败就回退到参考，并记录
+失败原因。默认容差各为 `1e-5`，不构成普适 GPU 等价标准。
+
+**完整参考校验也消耗计算，所以这个版本是去重的数值核验候选，不声称训练
+总体更快。** `score_work` 明确区分 requested/scored/validation rows、调用数、
+缓存命中、逐项误差及 candidate 是否实际采用；汇总见 `score_work_totals`。
+不要把候选理论减少的行数当成包含校验后的真实速度收益。未经目标 GPU 校准，
+不提供自动关闭核验并推广的模式。
+
+更新代码后继续使用新的输出目录。旧报告、旧 checkpoint 和旧数据保留原样；
+源码身份不匹配时在原 commit 复查旧实验或新建运行，不修改 binding 来强行加载。
+
 ## 参考
 
 - [Mixtral 官方模型卡](https://huggingface.co/mistralai/Mixtral-8x7B-v0.1)

@@ -101,7 +101,7 @@ def directory_identity(directory):
         raise ValueError('model/tokenizer must already exist in a local directory')
     allowed = {'.json', '.safetensors', '.model', '.txt', '.tiktoken'}
     files = {str(p.relative_to(root)): sha256_file(p) for p in sorted(root.rglob('*'))
-             if p.is_file() and p.suffix in allowed and '.cache' not in p.parts}
+             if p.is_file() and p.suffix in allowed and '.cache' not in p.relative_to(root).parts}
     if not files:
         raise ValueError('local artifact directory is empty')
     return {'directory': str(root.resolve()), 'files': files, 'content_sha256': canonical_hash(files)}
@@ -150,7 +150,7 @@ def prepare_data(config, tokenizer):
     pad = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
     if pad is None:
         raise ValueError('tokenizer needs pad or eos token')
-    result = {}
+    result, effective_sequences = {}, {}
     for role, rows in documents.items():
         prepared = []
         for row in rows:
@@ -158,6 +158,14 @@ def prepare_data(config, tokenizer):
                                    truncation=True, max_length=config['sequence_length'])
             if len(ids) < 2:
                 raise ValueError('document has fewer than two tokens after tokenization')
+            # Compare actual non-padding model inputs, not IDs or raw text tails
+            # discarded by truncation. Retain raw-document checks above as well.
+            effective = tuple(ids)
+            previous = effective_sequences.get(effective)
+            if previous is not None and previous[0] != role:
+                raise ValueError('duplicate effective token sequence across development roles: '
+                                 f'{previous[0]}:{previous[1]} and {role}:{row["id"]}')
+            effective_sequences[effective] = (role, row['id'])
             valid = len(ids)
             ids = ids + [pad] * (config['sequence_length'] - valid)
             prepared.append({'id': row['id'], 'input_ids': torch.tensor(ids, dtype=torch.long),

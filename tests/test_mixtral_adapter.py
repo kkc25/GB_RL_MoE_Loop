@@ -1,5 +1,6 @@
 """Real tiny HF models: no Hub access or downloaded pretrained weights."""
 import unittest
+from unittest.mock import patch
 from importlib.util import find_spec
 import torch
 import torch.nn.functional as F
@@ -116,6 +117,66 @@ class TestMixtralAdapter(unittest.TestCase):
                 with self.subTest(dtype=dtype, backend=backend):
                     check_native_r1_exact_parity(dtype, backend)
 
+    def test_r1_reference_parity_all_actions(self):
+        # Cover all 28 unordered pairs, plus native routing, on real HF kernels.
+        ids = torch.arange(28).reshape(4, 7) % 31
+        for dtype in (torch.float32, torch.bfloat16):
+            for backend in ('eager', 'grouped_mm'):
+                with self.subTest(dtype=dtype, backend=backend):
+                    adapter = MixtralAdapter(tiny(dtype, backend))
+                    before = {k: v.clone() for k, v in adapter.model.state_dict().items()}
+                    seen = []
+                    def all_pairs(obs):
+                        seen.append(obs.features.clone())
+                        return torch.arange(1, 29, device=obs.h.device)
+                    for policy in (None, all_pairs, lambda obs: pair_to_action(obs.native_pairs)):
+                        fast = adapter.forward(ids, policy=policy)
+                        reference = adapter.forward(ids, policy=policy, reference=True)
+                        for field in ('logits', 'final_hidden', 'actions', 'rounds'):
+                            torch.testing.assert_close(getattr(fast, field), getattr(reference, field),
+                                                       rtol=0, atol=0)
+                    torch.testing.assert_close(seen[0], seen[1], rtol=0, atol=0)
+                    for k, v in adapter.model.state_dict().items():
+                        self.assertTrue(torch.equal(before[k], v), k)
+                    self.assertFalse(any(p.requires_grad or p.grad is not None
+                                         for p in adapter.model.parameters()))
+
+    def test_r1_norm_gate_counts_and_no_unused_observation(self):
+        adapter = MixtralAdapter(tiny())
+        ids = torch.tensor([[2, 3, 4]])
+        counts = dict(norm=0, gate=0)
+        def increment(key):
+            def hook(*args):
+                counts[key] += 1
+            return hook
+        handles = [adapter.layer.post_attention_layernorm.register_forward_hook(increment('norm')),
+                   adapter.moe.gate.register_forward_hook(increment('gate'))]
+        try:
+            for policy in (None, lambda obs: pair_to_action(obs.native_pairs)):
+                counts.update(norm=0, gate=0)
+                adapter.forward(ids, policy=policy)
+                self.assertEqual(counts, dict(norm=1, gate=1))
+            counts.update(norm=0, gate=0)
+            adapter.forward(ids, reference=True)
+            self.assertEqual(counts, dict(norm=3, gate=2))
+            with patch.object(adapter, '_observation', side_effect=AssertionError('unused features')):
+                adapter.forward(ids)
+        finally:
+            for handle in handles:
+                handle.remove()
+
+    def test_r1_policy_validation(self):
+        adapter = MixtralAdapter(tiny())
+        ids = torch.tensor([[2, 3, 4]])
+        for invalid in (torch.zeros(3, dtype=torch.long), torch.full((3,), 29),
+                        torch.full((3,), -1), torch.ones(3), torch.ones(3, 1, dtype=torch.long), None):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(ValueError):
+                    adapter.forward(ids, policy=lambda obs: invalid)
+        for calls in (True, 0, 3):
+            with self.assertRaises(ValueError):
+                adapter.forward(ids, max_calls=calls)
+
     def test_mixed_stop_compaction(self):
         adapter = MixtralAdapter(tiny())
         ids = torch.tensor([[2, 3, 4, 5]])
@@ -163,7 +224,16 @@ class TestMixtralAdapter(unittest.TestCase):
         mask = ids.ne(0).long()
         with torch.no_grad():
             native = model(ids, attention_mask=mask, use_cache=False).logits.float().cpu()
-            controlled = adapter.forward(ids, mask).logits.float().cpu()
+            fast = adapter.forward(ids, mask)
+            controlled = fast.logits.float().cpu()
+            for policy in (None, lambda obs: pair_to_action(obs.native_pairs),
+                           lambda obs: torch.arange(len(obs.h), device=obs.h.device) % 28 + 1):
+                candidate = adapter.forward(ids, mask, policy=policy)
+                reference = adapter.forward(ids, mask, policy=policy, reference=True)
+                torch.testing.assert_close(candidate.actions, reference.actions, rtol=0, atol=0)
+                torch.testing.assert_close(candidate.rounds, reference.rounds, rtol=0, atol=0)
+                torch.testing.assert_close(candidate.final_hidden, reference.final_hidden, rtol=2e-2, atol=2e-3)
+                torch.testing.assert_close(candidate.logits, reference.logits, rtol=2e-2, atol=2e-3)
         maximum_error = (native - controlled).abs().max().item()
         # Same backend and precision, not a cross-kernel equivalence assertion.
         # BF16 GPU reductions may differ slightly with changed tensor layout.

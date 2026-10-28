@@ -16,7 +16,7 @@ def raises(exc, match=None):
         assert re.search(match, str(caught.exception))
 
 import torch
-from mixtral_lab.protocol import validate_config, read_documents, prepare_data, token_ce, fresh_output
+from mixtral_lab.protocol import validate_config, read_documents, prepare_data, token_ce, fresh_output, directory_identity, sha256_file
 from experiments import mixtral_experiment as runner
 from tests.test_mixtral_adapter import tiny
 from mixtral_lab.adapter import MixtralAdapter
@@ -36,7 +36,8 @@ def config(tmp):
 class Tokenizer:
     pad_token_id=0
     def encode(self,text,**kwargs):
-        return [1,2,3,4,5]
+        # Keep development roles distinct at the effective-token level.
+        return [1,2,3,4,5 + int(text.split()[1])]
 
 
 def test_config_limits(tmp_path):
@@ -55,6 +56,93 @@ def test_duplicates_and_tokenization(tmp_path):
     assert identity['train']['supervised_tokens']==4
     Path(c['data_files']['selection']).write_text(json.dumps({'id':'different','text':'document   0 unique content'}))
     with raises(ValueError,match='duplicate|overlap'):read_documents(c)
+
+
+def test_cached_hf_snapshot_symlinks(tmp_path):
+    hub = tmp_path/'.cache'/'huggingface'/'hub'/'models--local--tiny'
+    blobs = hub/'blobs'; blobs.mkdir(parents=True)
+    snapshot = hub/'snapshots'/('a'*40); snapshot.mkdir(parents=True)
+    blob = blobs/'weight-blob'; blob.write_bytes(b'actual weight bytes')
+    (snapshot/'model.safetensors').symlink_to(blob)
+    (snapshot/'config.json').write_text('{"model_type":"mixtral"}')
+    internal = snapshot/'.cache'; internal.mkdir()
+    (internal/'temporary.json').write_text('{}')
+    identity = directory_identity(snapshot)
+    assert set(identity['files']) == {'model.safetensors', 'config.json'}
+    assert identity['files']['model.safetensors'] == sha256_file(blob)
+    before = identity['content_sha256']
+    blob.write_bytes(b'changed actual weight bytes')
+    assert directory_identity(snapshot)['content_sha256'] != before
+
+
+def test_effective_token_overlap_real_fast_tokenizer(tmp_path):
+    from tokenizers import Tokenizer as BackendTokenizer
+    from tokenizers.models import WordLevel
+    from tokenizers.pre_tokenizers import Whitespace
+    from transformers import PreTrainedTokenizerFast
+    backend = BackendTokenizer(WordLevel({'[UNK]':0, '[PAD]':1, 'shared':2,
+        'token':3, 'train_tail':4, 'selection_tail':5, 'calibration':6}, unk_token='[UNK]'))
+    backend.pre_tokenizer = Whitespace()
+    tokenizer = PreTrainedTokenizerFast(tokenizer_object=backend, unk_token='[UNK]', pad_token='[PAD]')
+    c = config(tmp_path)
+    for role, text in {'train':'shared ' + 'token '*12 + 'train_tail',
+                       'selection':'shared ' + 'token '*12 + 'selection_tail',
+                       'calibration':'calibration token'}.items():
+        Path(c['data_files'][role]).write_text(json.dumps({'id':role, 'text':text}))
+    # The raw documents genuinely differ; only their consumed sequences collide.
+    read_documents(c)
+    with raises(ValueError, match='effective token sequence across'):
+        prepare_data(c, tokenizer)
+    # Also reject tokenization-normalized duplicates even when padding is needed.
+    # Unknown spellings normalize to the same UNK token, independent of IDs.
+    Path(c['data_files']['train']).write_text(json.dumps({'id':'train', 'text':'shared unknown_a'}))
+    Path(c['data_files']['selection']).write_text(json.dumps({'id':'selection', 'text':'shared unknown_b'}))
+    with raises(ValueError, match='effective token sequence across'):
+        prepare_data(c, tokenizer)
+
+
+def test_backend_configuration_is_not_dispatch_proof():
+    evidence = runner.expert_backend_evidence('grouped_mm', ['grouped_mm']*2)
+    assert evidence['configuration_matches_request']
+    assert evidence['actual_dispatch'] is None
+    assert evidence['dispatch_verification_status'] == 'not_instrumented'
+
+
+
+def test_dispatch_observer_restores_and_fails_closed():
+    from transformers.integrations import moe
+    original = moe._can_use_grouped_mm
+    tensor = torch.zeros(2, 2); weights = torch.zeros(1, 2, 2); offsets = torch.tensor([2], dtype=torch.int32)
+    with patch.object(runner, 'version', return_value='5.15.1'):
+        with runner.observe_native_expert_dispatch() as evidence:
+            moe._can_use_grouped_mm(tensor, weights, offsets)
+        assert evidence['status'] == 'dispatch_branch_observed'
+        assert evidence['observations'][0]['calls'] == 1
+        assert evidence['observations'][0]['device'] == 'cpu'
+        assert moe._can_use_grouped_mm is original
+        with raises(RuntimeError):
+            with runner.observe_native_expert_dispatch():
+                raise RuntimeError('failed calibration')
+        assert moe._can_use_grouped_mm is original
+    with patch.object(runner, 'version', return_value='unknown'):
+        with runner.observe_native_expert_dispatch() as evidence:
+            assert moe._can_use_grouped_mm is original
+        assert evidence['status'] == 'unverified'
+        assert not evidence['observations']
+
+
+
+def test_real_grouped_calibration_dispatch_observed(tmp_path):
+    from transformers.integrations import moe
+    original = moe._can_use_grouped_mm
+    c = config(tmp_path); c['experts_implementation'] = 'grouped_mm'
+    data, _ = prepare_data(c, Tokenizer())
+    result = runner.validate_native(MixtralAdapter(tiny(backend='grouped_mm')), data['calibration'], c)
+    evidence = result['groups'][0]['native_expert_dispatch']
+    assert evidence['status'] == 'dispatch_branch_observed'
+    assert sum(row['calls'] for row in evidence['observations']) > 0
+    assert all(row['device'] == 'cpu' for row in evidence['observations'])
+    assert moe._can_use_grouped_mm is original
 
 
 def test_causal_ce_and_padding():
@@ -98,6 +186,28 @@ def test_train_then_profile_new_output(tmp_path):
         profile=json.loads((Path(c['output_dir'])/'report.json').read_text())
         assert profile['status']=='complete'
         assert 'learned_route_r1' in profile['timing']['variants']
+        provenance = profile['actor_checkpoint']
+        assert provenance['path'] == str(checkpoint.resolve())
+        assert provenance['checkpoint_sha256'] == sha256_file(checkpoint)
+        payload = torch.load(checkpoint, weights_only=True, map_location='cpu')
+        assert provenance['binding_sha256'] == payload['binding']['sha256']
+        assert provenance['update'] == payload['update']
+        assert provenance['epsilon'] == payload['epsilon']
+        assert provenance['training_config'] == payload['binding']['config']
+        assert len(provenance['actor_state_sha256']) == 64
+        # A second valid checkpoint under the same experiment binding is traceable.
+        payload['update'] = 1 - provenance['update']
+        first = next(iter(payload['actor_state_dict']))
+        payload['actor_state_dict'][first] = payload['actor_state_dict'][first] + .001
+        second = tmp_path/'second_actor.pt'; torch.save(payload, second)
+        c['output_dir'] = str(tmp_path/'profile_second'); path.write_text(json.dumps(c))
+        runner.main(['--config',str(path),'--stage','profile','--actor-checkpoint',str(second)])
+        other = json.loads((Path(c['output_dir'])/'report.json').read_text())['actor_checkpoint']
+        assert other['checkpoint_sha256'] == sha256_file(second)
+        assert other['checkpoint_sha256'] != provenance['checkpoint_sha256']
+        assert other['actor_state_sha256'] != provenance['actor_state_sha256']
+        assert other['binding_sha256'] == provenance['binding_sha256']
+        assert other['update'] != provenance['update']
 
 
 def test_complete_checkpoint_guard(tmp_path):

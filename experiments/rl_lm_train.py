@@ -175,6 +175,8 @@ def main() -> None:
     require_approval(preflight, contract)
     data_identity = {role: cache["verified_identity"] for role, cache in caches.items()}
 
+    from experiments.r1_closed_loop import source_identity
+
     trainer = Trainer(
         config,
         model,
@@ -186,6 +188,7 @@ def main() -> None:
         stop_after=args.stop_after,
         backbone_identity=backbone_identity,
         data_identity=data_identity,
+        source_identity=source_identity(entrypoint=__file__),
     )
     summary = trainer.run()
     print(json.dumps(summary, indent=2))

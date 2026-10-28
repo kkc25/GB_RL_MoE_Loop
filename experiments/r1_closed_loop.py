@@ -33,7 +33,8 @@ def tensor_sha256(value: torch.Tensor) -> str:
     return hashlib.sha256(value.detach().float().cpu().numpy().tobytes()).hexdigest()
 
 
-def source_identity() -> dict:
+def source_identity(*, entrypoint=None) -> dict:
+    """Identify this checkout and an explicit caller entrypoint (legacy default: this module)."""
     root = Path(__file__).resolve().parents[1]
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
     tree = subprocess.check_output(["git", "rev-parse", "HEAD^{tree}"], cwd=root, text=True).strip()
@@ -46,7 +47,7 @@ def source_identity() -> dict:
         path = root / name
         if path.is_file():
             untracked_py[name] = sha256_file(path)
-    entrypoint = Path(__file__).resolve()
+    entrypoint = Path(__file__ if entrypoint is None else entrypoint).resolve()
     return {
         "commit": commit,
         "tree": tree,

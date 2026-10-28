@@ -111,7 +111,59 @@ def load_local_model(config):
         'declared_upstream_revision': config['model_revision'],
         'revision_status': 'operator-declared; actual local artifact bytes independently hashed',
         'device_map': {k: str(v) for k, v in placement.items()}, 'cuda_devices': devices,
-        'checkpoint_loading_info': loading_info, 'model_config': metadata.to_dict(), 'experts_implementation_by_layer': backends}
+        'checkpoint_loading_info': loading_info, 'model_config': metadata.to_dict(),
+        'experts_implementation_by_layer': backends,
+        'expert_backend_evidence': expert_backend_evidence(config['experts_implementation'], backends)}
+
+
+
+def expert_backend_evidence(requested, configured_by_layer):
+    """Configuration is not kernel evidence: HF may dispatch a fallback."""
+    return {'requested': requested, 'configured_by_layer': list(configured_by_layer),
+            'configuration_matches_request': all(value == requested for value in configured_by_layer),
+            'actual_dispatch': None, 'dispatch_verification_status': 'not_instrumented',
+            'scope': 'HF expert configuration only; no runtime kernel execution verified',
+            'performance_claim_limit': 'do not attribute timings to grouped_mm kernels without a separate runtime trace'}
+
+
+
+@contextmanager
+def observe_native_expert_dispatch():
+    """Temporary single-threaded CLI calibration hook, never used for timing.
+
+    Observe the pinned HF dispatcher branch decision, not CUDA kernel traces.
+    Unknown implementations remain explicitly unverified instead of inferred.
+    """
+    evidence = {'status': 'unverified', 'observations': [],
+                'scope': 'native calibration only; HF dispatch branch decisions, not low-level CUDA traces'}
+    if version('transformers') != '5.15.1':
+        evidence['reason'] = 'unsupported transformers version for dispatch instrumentation'
+        yield evidence
+        return
+    from transformers.integrations import moe
+    original = getattr(moe, '_can_use_grouped_mm', None)
+    if not callable(original):
+        evidence['reason'] = 'supported HF dispatch predicate unavailable'
+        yield evidence
+        return
+    counts = {}
+    def observe(input, weight, offs):
+        selected = original(input, weight, offs)
+        branch = ('torch.nn.functional.grouped_mm' if hasattr(torch.nn.functional, 'grouped_mm')
+                  else 'torch._grouped_mm') if selected else 'transformers.grouped_mm_fallback'
+        key = (branch, str(input.device), str(input.dtype), str(weight.dtype))
+        counts[key] = counts.get(key, 0) + 1
+        return selected
+    moe._can_use_grouped_mm = observe
+    try:
+        yield evidence
+    finally:
+        moe._can_use_grouped_mm = original
+        evidence['observations'] = [dict(branch=key[0], device=key[1], input_dtype=key[2],
+                                         weight_dtype=key[3], calls=count) for key, count in sorted(counts.items())]
+        evidence['status'] = 'dispatch_branch_observed' if counts else 'unverified'
+        if not counts:
+            evidence['reason'] = 'no grouped dispatcher observed; eager configuration is not kernel proof'
 
 
 def input_device(model):
@@ -139,7 +191,8 @@ def validate_native(adapter, rows, config):
         native_pairs = []
         hook = adapter.moe.gate.register_forward_hook(lambda module, inputs, result: native_pairs.append(result[2].detach().cpu()))
         try:
-            native = adapter.model(**batch, use_cache=False, output_router_logits=False).logits
+            with observe_native_expert_dispatch() as dispatch_evidence:
+                native = adapter.model(**batch, use_cache=False, output_router_logits=False).logits
         finally:
             hook.remove()
         if len(native_pairs) != 1:
@@ -163,7 +216,7 @@ def validate_native(adapter, rows, config):
         rounds_ok = bool((controlled.rounds == 1).all())
         actions_ok = bool(((controlled.actions >= 1) & (controlled.actions <= 28)).all())
         trace_equal = torch.equal(pair_to_action(native_pairs[0]), controlled.actions.reshape(-1).cpu())
-        record = {'document_id': row['id'], 'tokens': len(a), 'native_nll': float(a.double().mean()),
+        record = {'native_expert_dispatch': dispatch_evidence, 'document_id': row['id'], 'tokens': len(a), 'native_nll': float(a.double().mean()),
                   'controlled_nll': float(b.double().mean()), 'delta_nll': float(delta.mean()),
                   'ce_mean_abs': float(delta.abs().mean()), 'ce_max_abs': float(delta.abs().max()),
                   'logit_max_abs': max_abs, 'exact_logits': exact,
@@ -276,8 +329,8 @@ def main(argv=None):
                     return adapter.forward(**batch_row(row, input_device(model)), max_calls=1).logits.to(input_device(model))
                 functions = {'native': native, 'controlled_original_route_r1': controlled}
                 if args.actor_checkpoint:
-                    from mixtral_lab.training import load_actor_checkpoint
-                    actor = load_actor_checkpoint(args.actor_checkpoint, identity, adapter.device)
+                    from mixtral_lab.training import load_actor_checkpoint_with_metadata
+                    actor, report['actor_checkpoint'] = load_actor_checkpoint_with_metadata(args.actor_checkpoint, identity, adapter.device)
                     report['learned_selection'] = evaluate(adapter, data['selection'], actor)
                     functions['learned_route_r1'] = lambda row: adapter.forward(**batch_row(row, input_device(model)), policy=actor, max_calls=1).logits.to(input_device(model))
                 report['timing'] = measure_calls(functions, data['selection'], model_info['cuda_devices'], config)

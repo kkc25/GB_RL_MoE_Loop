@@ -356,7 +356,10 @@ class Trainer:
         self.selection_state = {"best": None, "candidates": [], "evaluations": [],
                                 "policy": copy.deepcopy(self.selection_policy)}
         self.warmstart_from = None
-        self.start_time = time.time()
+        self.start_time = time.time()  # legacy timestamp; durations use monotonic time
+        self._cost_clock = time.monotonic()
+        self._wall_time_seconds = 0.0
+        self._cost_finished = False
         self.resumed = resume_path is not None
 
         if self.resumed:
@@ -411,7 +414,7 @@ class Trainer:
         if self.source_identity is None:
             from experiments.r1_closed_loop import source_identity
 
-            self.source_identity = source_identity()
+            self.source_identity = source_identity(entrypoint=__file__)
         self.run_id = "rl-lm-{}-{}".format(
             self.config.sha256[:12], datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
         )
@@ -438,6 +441,10 @@ class Trainer:
         self.epoch_cursor = int(training["next_batch_cursor"])
         self._visited = set(training["visited_contexts"])
         self.ledger = RLLedger.from_dict(payload["ledger"])
+        # Older checkpoints have no measured cumulative duration; never invent it.
+        self._wall_time_seconds = float(payload.get("runtime_accounting", {}).get("wall_time_seconds", 0.0))
+        if not math.isfinite(self._wall_time_seconds) or self._wall_time_seconds < 0:
+            raise ValueError("checkpoint runtime wall time must be finite and nonnegative")
         self.executor.ledger = self.ledger
         self.environment.ledger = self.ledger
         self.selection_state = copy.deepcopy(payload["selection_state"])
@@ -472,7 +479,7 @@ class Trainer:
         if self.source_identity is None:
             from experiments.r1_closed_loop import source_identity
 
-            self.source_identity = source_identity()
+            self.source_identity = source_identity(entrypoint=__file__)
         expected = {
             "backbone_identity": self.backbone_identity | {"frozen_parameters_sha256": self.frozen_hash_at_start},
             "data_identity": self.data_identity,
@@ -735,7 +742,7 @@ class Trainer:
             "finiteness_check": "ok",
             "environment_seconds": info.env_seconds,
             "actor_seconds": info.actor_seconds,
-            "wall_time_seconds_cumulative": time.time() - self.start_time,
+            "wall_time_seconds_cumulative": self._account_runtime(),
             "ledger": self.ledger.to_dict(),
         }
         return entry
@@ -826,8 +833,37 @@ class Trainer:
 
     # -------------------------------------------------------------- checkpoint
 
-    def _checkpoint_payload(self) -> dict:
+    def _account_runtime(self, *, finish: bool = False) -> float:
+        """Charge each monotonic interval once; CUDA hours are reserved-device wall hours.
+
+        This single-device trainer does not measure utilization. CPU intervals do
+        not add GPU hours, and resume carries only costs saved in its checkpoint.
+        """
+        if not self._cost_finished:
+            now = time.monotonic()
+            elapsed = max(0.0, now - self._cost_clock)
+            self._cost_clock = now
+            self._wall_time_seconds += elapsed
+            if self.device.type == "cuda":
+                self.ledger.record_wall_time(elapsed, gpus=1)
+            self._cost_finished = finish
+        return self._wall_time_seconds
+
+    def _runtime_accounting(self) -> dict:
         return {
+            "wall_time_seconds": self._wall_time_seconds,
+            "clock": "monotonic",
+            "interval_scope": "trainer_initialization_to_finish_excluding_final_artifact_io",
+            "gpu_hours_semantics": "cumulative_reserved_device_wall_hours_not_utilization",
+            "current_segment_device": str(self.device),
+            "current_segment_reserved_cuda_devices": int(self.device.type == "cuda"),
+            "history_scope": "checkpoint_recorded_intervals_only",
+        }
+
+    def _checkpoint_payload(self) -> dict:
+        self._account_runtime()
+        return {
+            "runtime_accounting": self._runtime_accounting(),
             "format_version": CHECKPOINT_FORMAT,
             "spec_version": SPEC_VERSION,
             "run_id": self.run_id,
@@ -922,8 +958,10 @@ class Trainer:
         if frozen_now != self.frozen_hash_at_start:
             raise RuntimeError("frozen backbone parameter hash changed during training")
         self.ledger.merge_peak(self.device)
-        wall = time.time() - self.start_time
-        atomic_json(self.run_dir / "cost_ledger.json", self.ledger.to_dict() | {"wall_time_seconds": wall})
+        self._account_runtime(finish=True)
+        # Persist final measured costs for exact resume, without changing model state.
+        self._save_checkpoint("latest")
+        atomic_json(self.run_dir / "cost_ledger.json", self.ledger.to_dict() | self._runtime_accounting())
         atomic_json(
             self.run_dir / "selection_manifest.json",
             {
@@ -976,8 +1014,11 @@ class Trainer:
             "## 已验证",
             "- CPU toy 契约测试见 tests/rl_lm/test_resume.py (T19) 与 test_update_transaction.py (T20)。",
             "",
-            "## 尚未运行",
-            "- 真实 100M checkpoint 上的 GPU 训练(任务卡 E)不在本交付内。",
+            "## 本次运行证据",
+            f"- device: `{self.device}`; model parameters: {sum(p.numel() for p in self.model.parameters())}",
+            f"- 完成更新数: {summary['successful_updates']}; 状态: {summary['status']}。",
+            "- GPU-hours 是已记录区间的 CUDA 单设备墙钟估算，不是 GPU 利用率或 kernel 时间。",
+            "- 此报告不推断其他运行是否完成，也不证明完整规模 GPU 性能实验已验证。",
             "",
             "## 未通过",
             "- 无(若本 run 以 failure 结束,见 failure.json / update_rejected.json)。",
@@ -997,6 +1038,9 @@ class Trainer:
             },
         )
         try:
+            self._account_runtime(finish=True)
+            self.ledger.merge_peak(self.device)
+            atomic_json(self.run_dir / "cost_ledger.json", self.ledger.to_dict() | self._runtime_accounting())
             (self.run_dir / "final_summary.md").write_text(
                 self._summary_markdown(
                     {
