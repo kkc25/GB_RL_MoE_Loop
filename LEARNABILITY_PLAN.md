@@ -1,5 +1,7 @@
 # Mixtral：可改善空间、可学习性与可选残差适配
 
+后续独立四角色 recovery 协议见 [RECOVERY_EXPERIMENTS.md](RECOVERY_EXPERIMENTS.md)：先做历史 cache/在线桥接，再由独立 development 选 checkpoint；本文原 baseline 与命令保持不变。
+
 后续实验优先使用 [FIT_FIRST_EXPERIMENTS.md](FIT_FIRST_EXPERIMENTS.md) 的独立
 fit→generalize→profile 路线。它新增 train-only 全28动作期望CE拟合与固定train
 probe适配器，不把4步smoke未改善当作方法否定。本文保留旧入口与原始方案边界，

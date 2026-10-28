@@ -242,3 +242,39 @@ rule 外，还必须包含 `confirmation_scope`。用
   实际 BF16 零有效修正、训练损失未恶化、增长次数及学习率上界等条件不变。
 - 固定学习率模式、R1 全动作训练和质量门槛不变。checkpoint 格式不变，
   跨源码版本的身份检查仍然生效；不要改写旧报告绑定来复用历史结果。
+
+
+## 15. 隔离的四角色 generalization recovery 协议
+
+- 新 `experiments.mixtral_recovery --stage tune|evaluate|profile` 使用
+  `mixtral-generalization-recovery-v1`，不改变旧 fit-first 的 train-best 基线。
+  旧配置不能直接交给新入口；新配置不含旧 `fit/training/oracle/second_round`。
+- 新增独立 `development` 角色；train 监督，development 选择 checkpoint/早停，
+  selection 只做一个冻结候选的外层开发筛选，calibration 做数值检查。四者不是
+  最终测试；不支持 newtest。step 0 native 参选，持平保留最早，无改善可回退 native。
+- 四角色完整来源 manifest 的原文/ID 与有效 token 跨角色重复都拒绝，包括未选中
+  的行。将旧 train 未采样文档划给 dev 时必须从新的 train 文件中移除；不能只复制
+  到 dev 却继续配置完整旧 train。历史文件不改写，重新创建有界且互不重叠的来源。
+- `experiments.mixtral_bridge` 独立检查历史 fit checkpoint 的同文档同位置 cache/
+  在线数值，区分历史来源与当前诊断源码；不是把旧权重导入新训练器。此末层
+  pointwise FFN 之后没有跨 token attention，不引入虚构的跨 token 反馈解释。
+- 新 tune 在训练前执行当前身份校准/桥接，容差显式声明，失败关闭；真实 GPU
+  批形状差异可以使训练尚未开始就停止，不自动放宽。历史桥接不替代新运行前置关。
+  learned bridge 失败保留 transfer/equivalence 未建立标记；dev 质量通过后仍允许
+  冻结候选的完整在线外层诊断，但 profile 必须数值 screen 和外层质量同时通过。
+- 新 router 使用紧凑 R1 特征和 `1/sqrt(width)` 残差 logits 缩放；提供匹配预算
+  的 expected CE / cost-soft-target CE 对照及全支持 native-prior KL 消融。
+  gold/cost 只做训练监督，不进入推理。Adapter 为 CE + detached native 全词表
+  输出 KL + 可选相对修正惩罚，零初始化等价 native；它不是再次调用原专家的 loop。
+- 新 checkpoint/report/freeze format 绑定实际模型、四角色来源、数值、源码及候选
+  身份。被评估 checkpoint 留档；外层只接受固定 development-best，不提供 exact
+  resume，也不允许修改历史 binding。evaluate/profile 使用相匹配的证据与新输出。
+- 64-position 诊断与 512-position 扩展、smoke、可选 KL 消融及多 seed 均为
+  有界且人工启动的独立运行。成本表、KL teacher readout、训练 probe、完整 dev
+  评估与 profile 成本分开，不用相同步数制造预算匹配。默认值未验证最优/保证有效。
+- `bdca6a3` 是结果上传版本，历史报告实际执行 `fb7ecd6`；router 过早饱和和
+  集中/不完整训练收益、adapter 少量位置记忆均不构成对整类方法的否定。本轮没有
+  自动启动 GPU 或执行最终 held-out，CPU 测试不能替代真实 BF16/质量/性能验收。
+
+完整可执行命令、数据拆分、8 个有界模板、数值与质量关见
+[RECOVERY_EXPERIMENTS.md](RECOVERY_EXPERIMENTS.md)。

@@ -1,0 +1,76 @@
+{
+  "schema": "mixtral-generalization-recovery-v1",
+  "model_path": "/models/Mixtral-8x7B-v0.1",
+  "tokenizer_path": "/models/Mixtral-8x7B-v0.1",
+  "model_revision": "fc7ac94680e38d7348cfa806e51218e6273104b0",
+  "output_dir": "runs/mixtral-recovery-router-soft-target-ce-512-seed17-tune-001",
+  "dtype": "bfloat16",
+  "experts_implementation": "eager",
+  "device_map": "balanced",
+  "max_memory": {
+    "0": "44GiB",
+    "1": "44GiB",
+    "2": "44GiB",
+    "3": "44GiB"
+  },
+  "sequence_length": 256,
+  "max_documents_per_split": 64,
+  "max_text_characters": 100000,
+  "max_train_contexts": 512,
+  "warmup": 3,
+  "repeats": 3,
+  "measurements": 32,
+  "sequences": {
+    "train": 24,
+    "development": 8,
+    "selection": 16,
+    "calibration": 8
+  },
+  "data_files": {
+    "train": "/data/mixtral/recovery-v1/train.jsonl",
+    "development": "/data/mixtral/recovery-v1/development.jsonl",
+    "selection": "/data/mixtral/recovery-v1/selection.jsonl",
+    "calibration": "/data/mixtral/recovery-v1/calibration.jsonl"
+  },
+  "nll_tolerance": 0.0001,
+  "ce_mean_abs_tolerance": 0.0001,
+  "logit_max_abs_tolerance": 0.001,
+  "allow_tf32": false,
+  "seed": 17,
+  "context_sampling": {
+    "version": 1,
+    "strategy": "document_balanced_uniform_positions"
+  },
+  "recovery": {
+    "kind": "router",
+    "training": {
+      "updates": 256,
+      "batch_contexts": 8,
+      "learning_rate": 0.001,
+      "epsilon": 0.8,
+      "temperature": 0.1,
+      "reference_kl_weight": 0.01,
+      "objective": "soft_target_ce",
+      "max_train_contexts": 512,
+      "max_score_calls": 15360,
+      "eval_interval": 16,
+      "development_patience": 4,
+      "min_updates": 32,
+      "development_min_delta": 0.0001,
+      "gradient_clip": 1.0,
+      "anchor_atol": 1e-06,
+      "fit_gain_threshold": 0.005,
+      "fit_min_positive_fraction": 0.5,
+      "fit_min_positive_contexts": 3,
+      "seed": 17,
+      "adaptive": null
+    },
+    "development_min_gain": 0.001,
+    "selection_min_gain": 0.001,
+    "bridge_tolerances": {
+      "hidden_max_abs": 1e-06,
+      "feature_max_abs": 1e-06,
+      "ce_max_abs": 0.0001
+    }
+  }
+}

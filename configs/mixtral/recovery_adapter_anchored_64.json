@@ -1,0 +1,72 @@
+{
+  "schema": "mixtral-generalization-recovery-v1",
+  "model_path": "/models/Mixtral-8x7B-v0.1",
+  "tokenizer_path": "/models/Mixtral-8x7B-v0.1",
+  "model_revision": "fc7ac94680e38d7348cfa806e51218e6273104b0",
+  "output_dir": "runs/mixtral-recovery-adapter-anchored-64-seed17-tune-001",
+  "dtype": "bfloat16",
+  "experts_implementation": "eager",
+  "device_map": "balanced",
+  "max_memory": {
+    "0": "44GiB",
+    "1": "44GiB",
+    "2": "44GiB",
+    "3": "44GiB"
+  },
+  "sequence_length": 256,
+  "max_documents_per_split": 64,
+  "max_text_characters": 100000,
+  "max_train_contexts": 64,
+  "warmup": 3,
+  "repeats": 3,
+  "measurements": 32,
+  "sequences": {
+    "train": 8,
+    "development": 8,
+    "selection": 16,
+    "calibration": 8
+  },
+  "data_files": {
+    "train": "/data/mixtral/recovery-v1/train.jsonl",
+    "development": "/data/mixtral/recovery-v1/development.jsonl",
+    "selection": "/data/mixtral/recovery-v1/selection.jsonl",
+    "calibration": "/data/mixtral/recovery-v1/calibration.jsonl"
+  },
+  "nll_tolerance": 0.0001,
+  "ce_mean_abs_tolerance": 0.0001,
+  "logit_max_abs_tolerance": 0.001,
+  "allow_tf32": false,
+  "seed": 17,
+  "context_sampling": {
+    "version": 1,
+    "strategy": "document_balanced_uniform_positions"
+  },
+  "recovery": {
+    "kind": "adapter",
+    "training": {
+      "rank": 8,
+      "updates": 256,
+      "batch_contexts": 8,
+      "max_train_contexts": 64,
+      "probe_chunk_contexts": 8,
+      "eval_interval": 16,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "residual_scale": 0.1,
+      "native_kl_beta": 0.1,
+      "relative_correction_l2": 0.0,
+      "development_patience": 4,
+      "min_updates": 32,
+      "development_min_delta": 0.0001,
+      "seed": 17,
+      "adaptive": null
+    },
+    "development_min_gain": 0.001,
+    "selection_min_gain": 0.001,
+    "bridge_tolerances": {
+      "hidden_max_abs": 1e-06,
+      "feature_max_abs": 1e-06,
+      "ce_max_abs": 0.0001
+    }
+  }
+}
