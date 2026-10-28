@@ -1,0 +1,241 @@
+{
+  "status": "ready",
+  "contract_schema": "rl-lm-run-contract-v1",
+  "contract_sha256": "11bbf3a233b456f498aa6497ab1f8bc153a83dcf51959334f6f52b509815ef62",
+  "contract": {
+    "schema": "rl-lm-run-contract-v1",
+    "resolved_config": {
+      "spec_version": "RL-LM-Pair-v1.0",
+      "stage": "r1",
+      "actor_seed": 17,
+      "backbone": {
+        "config_path": "runs/next_2026_10_26/baseline_100m/loop_r1.json",
+        "checkpoint_path": "runs/next_2026_10_26/baseline_100m/loop_r1/latest.pt",
+        "expected_checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+        "adaptive_layer": 11,
+        "freeze_all": true,
+        "prefix_depth": 1
+      },
+      "data": {
+        "corpus_dir": "data/rl_lm_pair_v1/corpus",
+        "tokenizer_path": "runs/data/fineweb_edu_100m/tokenizer.json",
+        "cache_root": "data/rl_lm_pair_v2/cache",
+        "train_split": "controller_train",
+        "selection_split": "selection",
+        "calibration_split": "calibration",
+        "confirmation_split": "newtest",
+        "train_states": 65536,
+        "selection_states": 8192,
+        "calibration_states": 2048,
+        "state_sampling": "uniform_valid_token_without_replacement",
+        "sampling_seed": 20261026,
+        "prefix_sequence_batch": 2
+      },
+      "policy": {
+        "action_space": "pair28_stop_v1",
+        "feature_schema": "h_h0_gate_previouspair_scalars_v1",
+        "hidden_width": 128,
+        "reference_epsilon": 0.1,
+        "initial_stop_hazard": 0.5,
+        "distribution": "factorized_joint29",
+        "greedy_rule": "joint_argmax_lowest_id",
+        "dropout": 0.0,
+        "price_as_input": false
+      },
+      "environment": {
+        "min_calls": 1,
+        "max_calls": 1,
+        "gamma_source": "backbone_config",
+        "training_backend": "canonical_all_experts_v1",
+        "deployment_backend": "sparse_merged_v1",
+        "expert_chunk": 64,
+        "head_chunk": 64,
+        "frozen_compute_dtype": "bfloat16",
+        "residual_dtype": "float32",
+        "head_contract": "bf16_linear_fp32_ce_v1"
+      },
+      "optimization": {
+        "algorithm": "on_policy_rloo",
+        "groups": 4,
+        "batch_contexts": 128,
+        "replay_microbatch_contexts": 32,
+        "updates": 2000,
+        "learning_rate": 0.0001,
+        "betas": [
+          0.9,
+          0.95
+        ],
+        "epsilon": 1e-08,
+        "weight_decay": 0.0,
+        "warmup_updates": 50,
+        "final_lr_ratio": 0.1,
+        "gradient_clip": 1.0,
+        "entropy_coefficient": 0.0,
+        "reference_kl_coefficient": 0.0,
+        "advantage_normalization": "none",
+        "updates_per_rollout": 1,
+        "max_update_kl_mean": 0.02,
+        "max_update_kl_state": 0.2,
+        "max_retries_per_update": 1,
+        "max_lr_backoffs_per_run": 4
+      },
+      "cost": {
+        "lambda": 0.0,
+        "unit": "extra_pair_round"
+      },
+      "evaluation": {
+        "interval_updates": 100,
+        "stochastic_samples_per_context": 16,
+        "online_selection_sequences": 128,
+        "bootstrap_repetitions": 2000,
+        "bootstrap_confidence": 0.95,
+        "minimum_practical_nll_gain": 0.005,
+        "r2_quality_tolerance_nll": 0.005,
+        "selection_tie_tolerance": 1e-06
+      },
+      "runtime": {
+        "device": "<device-agnostic>",
+        "require_cuda": true,
+        "allow_tf32": false
+      },
+      "logging": {
+        "interval_updates": 10
+      },
+      "output_dir": "runs/integrity_v2/pair_r1_seed17"
+    },
+    "roles": {
+      "controller_train": {
+        "split": "controller_train",
+        "requested_states": 65536,
+        "actual_states": 65536,
+        "verified_identity": {
+          "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+          "config_sha256": "1aca88ecb1d20f838e8e40c5f4a65134ad5e616fb4e95f416d853d4e51d73f98",
+          "tokenizer_sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+          "packed_sha256": {
+            "input_ids_sha256": "b24411400005342c86912c0a7d7e8f66366e6f495b38859bbf8eab4a59ff36e3",
+            "segment_ids_sha256": "1fd8288be77b6d15a741630712b1a88b9926268710a64c60e9f8f129a57af95d",
+            "doc_map_sha256": "7172337de0fd2e2f8b1cccb86d17ab785d2cc710fb3202cee61330ff3b07fc8c"
+          },
+          "document_manifest_sha256": "4c8317f73928cda502767812d676144bbe91d6a3e69e87505faa9f9e4bb0babb",
+          "layer_index": 11,
+          "gamma": 0.5,
+          "prefix_depth": 1,
+          "prefix_dtype": "bfloat16",
+          "backend_version": "canonical_all_experts_v1",
+          "expert_chunk": 64,
+          "head_contract": "bf16_linear_fp32_ce_v1",
+          "cache_format": "rl-lm-cache-v2",
+          "split": "controller_train",
+          "sampling_seed": 20261026,
+          "source": {
+            "commit": "9ad08253bfb1088025f8b4edac440a917fe8ac70",
+            "tree": "81698c1ae5d46ee09c4ba95e1ebe2fad161f644d",
+            "uncommitted_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "has_uncommitted_diff": false,
+            "untracked_python_sha256": {},
+            "entrypoint": "experiments/r1_closed_loop.py",
+            "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+          },
+          "content_sha256": "889584cd49db89b18180bd7ce83215bafb22b2aa61b91a5ca9a6f0ae73bbf1d8"
+        }
+      },
+      "selection": {
+        "split": "selection",
+        "requested_states": 8192,
+        "actual_states": 8192,
+        "verified_identity": {
+          "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+          "config_sha256": "1aca88ecb1d20f838e8e40c5f4a65134ad5e616fb4e95f416d853d4e51d73f98",
+          "tokenizer_sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+          "packed_sha256": {
+            "input_ids_sha256": "75f150e01be452777e1fa6f44d9c5d928ea63924ee68b4b28c1935ab8e36c800",
+            "segment_ids_sha256": "ea868154ca498c63609f7cd8d036aa8e0d146b005c580282a3fa0ee68c022e40",
+            "doc_map_sha256": "eb1a873c8378d669ef2a475b7c0fd3434bcc3cd685c830fcc73be01b487bb0dc"
+          },
+          "document_manifest_sha256": "4c8317f73928cda502767812d676144bbe91d6a3e69e87505faa9f9e4bb0babb",
+          "layer_index": 11,
+          "gamma": 0.5,
+          "prefix_depth": 1,
+          "prefix_dtype": "bfloat16",
+          "backend_version": "canonical_all_experts_v1",
+          "expert_chunk": 64,
+          "head_contract": "bf16_linear_fp32_ce_v1",
+          "cache_format": "rl-lm-cache-v2",
+          "split": "selection",
+          "sampling_seed": 20261026,
+          "source": {
+            "commit": "9ad08253bfb1088025f8b4edac440a917fe8ac70",
+            "tree": "81698c1ae5d46ee09c4ba95e1ebe2fad161f644d",
+            "uncommitted_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "has_uncommitted_diff": false,
+            "untracked_python_sha256": {},
+            "entrypoint": "experiments/r1_closed_loop.py",
+            "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+          },
+          "content_sha256": "b3a45f8dd64cdead5d0cb08877d39d0fe35ce669918c0f2cf13b49e2b9265649"
+        }
+      },
+      "calibration": {
+        "split": "calibration",
+        "requested_states": 2048,
+        "actual_states": 2048,
+        "verified_identity": {
+          "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+          "config_sha256": "1aca88ecb1d20f838e8e40c5f4a65134ad5e616fb4e95f416d853d4e51d73f98",
+          "tokenizer_sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+          "packed_sha256": {
+            "input_ids_sha256": "44cc71f762e3cfa300b1a24473eb3012251b5d4b6f233df0ff590554bd253c55",
+            "segment_ids_sha256": "d17a0ed965aee846fa87bb04c01b4626a6257edeba9391b374eab18cbe6e02a6",
+            "doc_map_sha256": "f461285c73394a1d5fb9630e032c80857e1dd76232d8a517c0bbaeffa96e2bb7"
+          },
+          "document_manifest_sha256": "4c8317f73928cda502767812d676144bbe91d6a3e69e87505faa9f9e4bb0babb",
+          "layer_index": 11,
+          "gamma": 0.5,
+          "prefix_depth": 1,
+          "prefix_dtype": "bfloat16",
+          "backend_version": "canonical_all_experts_v1",
+          "expert_chunk": 64,
+          "head_contract": "bf16_linear_fp32_ce_v1",
+          "cache_format": "rl-lm-cache-v2",
+          "split": "calibration",
+          "sampling_seed": 20261026,
+          "source": {
+            "commit": "9ad08253bfb1088025f8b4edac440a917fe8ac70",
+            "tree": "81698c1ae5d46ee09c4ba95e1ebe2fad161f644d",
+            "uncommitted_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "has_uncommitted_diff": false,
+            "untracked_python_sha256": {},
+            "entrypoint": "experiments/r1_closed_loop.py",
+            "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+          },
+          "content_sha256": "cb3510a4a5cc142dac2261e42ca382f3f35d4001c82af3b4ab5d3bd16e498e35"
+        }
+      }
+    }
+  },
+  "model_and_raw_data": "verified",
+  "environment": {
+    "python": "3.12.15",
+    "torch": "2.12.1+cu130",
+    "cuda": "13.0",
+    "device": "NVIDIA RTX A6000"
+  },
+  "caches": {
+    "controller_train": {
+      "status": "ready",
+      "states": 65536,
+      "expected_states": 65536
+    },
+    "selection": {
+      "status": "ready",
+      "states": 8192,
+      "expected_states": 8192
+    },
+    "calibration": {
+      "status": "ready",
+      "states": 2048,
+      "expected_states": 2048
+    }
+  }
+}

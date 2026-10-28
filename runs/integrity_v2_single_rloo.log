@@ -1,0 +1,86 @@
+/nvme-1/zhoukegu/GB_RL_MoE_Loop/experiments/rl_lm_single_train.py:310: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:213.)
+  h = torch.from_numpy(np.ascontiguousarray(h0[start:start + chunk])).to(device)
+{"update": 10, "actor_loss": -0.04161991644650698, "greedy_nll_best": 4.18144454508145, "lr": 2e-05}
+{"update": 20, "actor_loss": -0.015364211052656174, "greedy_nll_best": 4.18144454508145, "lr": 4e-05}
+{"update": 30, "actor_loss": -0.09451590944081545, "greedy_nll_best": 4.18144454508145, "lr": 6e-05}
+{"update": 40, "actor_loss": -0.08804064057767391, "greedy_nll_best": 4.18144454508145, "lr": 8e-05}
+{"update": 50, "actor_loss": -0.03614321048371494, "greedy_nll_best": 4.18144454508145, "lr": 0.0001}
+{"update": 60, "actor_loss": -0.04532178398221731, "greedy_nll_best": 4.18144454508145, "lr": 9.989038226169209e-05}
+{"update": 70, "actor_loss": -0.033079151064157486, "greedy_nll_best": 4.18144454508145, "lr": 9.956206309337068e-05}
+{"update": 80, "actor_loss": -0.1138736940920353, "greedy_nll_best": 4.18144454508145, "lr": 9.901664203302126e-05}
+{"update": 90, "actor_loss": -0.058008388383314013, "greedy_nll_best": 4.18144454508145, "lr": 9.825677631722435e-05}
+{"update": 100, "actor_loss": -0.019934472162276506, "greedy_nll_best": 4.18144454508145, "lr": 9.728616793536588e-05}
+{"update": 110, "actor_loss": -0.0373793700709939, "greedy_nll_best": 4.18144454508145, "lr": 9.610954559391703e-05}
+{"update": 120, "actor_loss": -0.1056304438970983, "greedy_nll_best": 4.18144454508145, "lr": 9.473264167865173e-05}
+{"update": 130, "actor_loss": -0.10591329261660576, "greedy_nll_best": 4.18144454508145, "lr": 9.316216432703917e-05}
+{"update": 140, "actor_loss": -0.06004835828207433, "greedy_nll_best": 4.18144454508145, "lr": 9.140576474687264e-05}
+{"update": 150, "actor_loss": -0.0583620248362422, "greedy_nll_best": 4.18144454508145, "lr": 8.947199994035401e-05}
+{"update": 160, "actor_loss": -0.014706275891512632, "greedy_nll_best": 4.18144454508145, "lr": 8.73702910152393e-05}
+{"update": 170, "actor_loss": -0.06520807929337025, "greedy_nll_best": 4.18144454508145, "lr": 8.511087728614862e-05}
+{"update": 180, "actor_loss": 0.01800493011251092, "greedy_nll_best": 4.18144454508145, "lr": 8.270476638965462e-05}
+{"update": 190, "actor_loss": -0.03265070682391524, "greedy_nll_best": 4.18144454508145, "lr": 8.016368065618361e-05}
+{"update": 200, "actor_loss": -0.04858958814293146, "greedy_nll_best": 4.18144454508145, "lr": 7.75e-05}
+{"update": 210, "actor_loss": -0.0780299345497042, "greedy_nll_best": 4.18144454508145, "lr": 7.472670160550849e-05}
+{"update": 220, "actor_loss": -0.045677794609218836, "greedy_nll_best": 4.18144454508145, "lr": 7.185729670371605e-05}
+{"update": 230, "actor_loss": -0.062371568754315376, "greedy_nll_best": 4.18144454508145, "lr": 6.890576474687263e-05}
+{"update": 240, "actor_loss": -0.04697644314728677, "greedy_nll_best": 4.18144454508145, "lr": 6.588648530198504e-05}
+{"update": 250, "actor_loss": -0.010997229255735874, "greedy_nll_best": 4.18144454508145, "lr": 6.281416799501188e-05}
+{"update": 260, "actor_loss": -0.01960750948637724, "greedy_nll_best": 4.18144454508145, "lr": 5.970378084704441e-05}
+{"update": 270, "actor_loss": -0.040876893792301416, "greedy_nll_best": 4.18144454508145, "lr": 5.657047735161256e-05}
+{"update": 280, "actor_loss": -0.07672834862023592, "greedy_nll_best": 4.18144454508145, "lr": 5.342952264838747e-05}
+{"update": 290, "actor_loss": -0.07467896258458495, "greedy_nll_best": 4.18144454508145, "lr": 5.0296219152955604e-05}
+{"update": 300, "actor_loss": -0.020375998690724373, "greedy_nll_best": 4.18144454508145, "lr": 4.718583200498814e-05}
+{"update": 310, "actor_loss": -0.031553972396068275, "greedy_nll_best": 4.18144454508145, "lr": 4.411351469801496e-05}
+{"update": 320, "actor_loss": -0.05425648810341954, "greedy_nll_best": 4.18144454508145, "lr": 4.109423525312738e-05}
+{"update": 330, "actor_loss": -0.0172325293533504, "greedy_nll_best": 4.18144454508145, "lr": 3.814270329628396e-05}
+{"update": 340, "actor_loss": -0.037118049105629325, "greedy_nll_best": 4.18144454508145, "lr": 3.5273298394491515e-05}
+{"update": 350, "actor_loss": -0.04459640895947814, "greedy_nll_best": 4.18144454508145, "lr": 3.250000000000001e-05}
+{"update": 360, "actor_loss": -0.039279490476474166, "greedy_nll_best": 4.18144454508145, "lr": 2.98363193438164e-05}
+{"update": 370, "actor_loss": 0.009861818281933665, "greedy_nll_best": 4.18144454508145, "lr": 2.729523361034538e-05}
+{"update": 380, "actor_loss": -0.02263134578242898, "greedy_nll_best": 4.18144454508145, "lr": 2.4889122713851394e-05}
+{"update": 390, "actor_loss": -0.07862474769353867, "greedy_nll_best": 4.18144454508145, "lr": 2.2629708984760708e-05}
+{"update": 400, "actor_loss": -0.034468726662453264, "greedy_nll_best": 4.18144454508145, "lr": 2.0528000059645997e-05}
+{"update": 410, "actor_loss": -0.03246829501586035, "greedy_nll_best": 4.18144454508145, "lr": 1.8594235253127375e-05}
+{"update": 420, "actor_loss": -0.05052050668746233, "greedy_nll_best": 4.18144454508145, "lr": 1.6837835672960835e-05}
+{"update": 430, "actor_loss": -0.01084088534116745, "greedy_nll_best": 4.18144454508145, "lr": 1.526735832134829e-05}
+{"update": 440, "actor_loss": -0.04592728801071644, "greedy_nll_best": 4.18144454508145, "lr": 1.389045440608296e-05}
+{"update": 450, "actor_loss": -3.861292498186231e-06, "greedy_nll_best": 4.18144454508145, "lr": 1.2713832064634126e-05}
+{"update": 460, "actor_loss": -0.07685895450413227, "greedy_nll_best": 4.18144454508145, "lr": 1.174322368277565e-05}
+{"update": 470, "actor_loss": -0.02147317654453218, "greedy_nll_best": 4.18144454508145, "lr": 1.0983357966978745e-05}
+{"update": 480, "actor_loss": -0.009099398273974657, "greedy_nll_best": 4.18144454508145, "lr": 1.0437936906629336e-05}
+{"update": 490, "actor_loss": -0.03615253808675334, "greedy_nll_best": 4.18144454508145, "lr": 1.0109617738307912e-05}
+{"update": 500, "actor_loss": -0.055508789140731096, "greedy_nll_best": 4.18144454508145, "lr": 1e-05}
+{
+  "status": "completed",
+  "run_id": "rl-lm-single-f24cc4f46dc2-20261027T194410",
+  "successful_updates": 500,
+  "planned_updates": 500,
+  "stop_after": 500,
+  "lr_scale": 1.0,
+  "lr_backoffs": 0,
+  "best": {
+    "update": 0,
+    "greedy_nll": 4.18144454508145,
+    "mean_rounds": 1.0,
+    "path": "checkpoint_best.pt"
+  },
+  "ledger": {
+    "prefix_input_tokens": 0,
+    "unique_train_contexts": 64000,
+    "context_visits": 64000,
+    "rollout_episodes": 256000,
+    "logical_single_rounds": 256000,
+    "logical_expert_rows": 256000,
+    "physical_expert_rows": 2048000,
+    "physical_head_rows": 256000,
+    "actor_decision_rows": 256000,
+    "actor_padding_rows": 0,
+    "successful_updates": 500,
+    "optimizer_attempts": 500,
+    "gpu_hours": 0.010537228385607401,
+    "peak_allocated_bytes": 7976531968,
+    "peak_reserved_bytes": 9462349824
+  },
+  "frozen_lm_hash_stable": true,
+  "run_dir": "runs/integrity_v2/single_rloo_seed17"
+}

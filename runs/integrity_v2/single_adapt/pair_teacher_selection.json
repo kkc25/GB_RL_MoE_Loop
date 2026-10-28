@@ -1,0 +1,54 @@
+{
+  "nll": 4.179893713666263,
+  "identity": {
+    "version": "pair-selection-reference-v3",
+    "evaluation_readout": {
+      "version": "streaming_fixed_head_fp32_ce8192_v1",
+      "head_chunk": 64,
+      "compute_dtype": "bfloat16",
+      "ce_dtype": "float32",
+      "ce_window": 8192,
+      "ignore_index": -100,
+      "materializes_full_logits": false
+    },
+    "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+    "backbone_config_sha256": "1aca88ecb1d20f838e8e40c5f4a65134ad5e616fb4e95f416d853d4e51d73f98",
+    "resolved_config_sha256": "794e018c4d01efe2fbe0196f771d190d4490b2e707f5983a2ad3fe7c5810d26a",
+    "selection_split": "selection",
+    "input_ids": {
+      "shape": [
+        256,
+        1024
+      ],
+      "dtype": "int64",
+      "sha256": "c3eb23557ff6f7d1503445620a3820429efac6785a2fde3f169e924cefc078f7"
+    },
+    "segment_ids": {
+      "shape": [
+        256,
+        1024
+      ],
+      "dtype": "int32",
+      "sha256": "ea868154ca498c63609f7cd8d036aa8e0d146b005c580282a3fa0ee68c022e40"
+    },
+    "labels": {
+      "shape": [
+        256,
+        1024
+      ],
+      "dtype": "int64",
+      "sha256": "fb85ffd977ebb8d3ae91c8a5b08aafccfe7bc064246707164e73faa8cf5409cd"
+    },
+    "backend": "sparse_merged_v1",
+    "pair_rule": "canonical_pair",
+    "max_calls": 1,
+    "sequence_batch": 8,
+    "compute_dtype": "bfloat16",
+    "expert_chunk": 64,
+    "head_chunk": 64
+  },
+  "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+  "sequences": 256,
+  "tokens": 261637,
+  "rule": "canonical pair teacher, sparse_merged_v1, full selection split"
+}

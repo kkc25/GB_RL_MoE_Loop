@@ -1,0 +1,22 @@
+{
+  "prefix_input_tokens": 0,
+  "unique_train_contexts": 65536,
+  "context_visits": 256000,
+  "rollout_episodes": 0,
+  "logical_single_rounds": 0,
+  "logical_expert_rows": 0,
+  "physical_expert_rows": 768000,
+  "physical_head_rows": 512000,
+  "actor_decision_rows": 0,
+  "actor_padding_rows": 0,
+  "successful_updates": 1000,
+  "optimizer_attempts": 1000,
+  "gpu_hours": 0.2806433881014042,
+  "peak_allocated_bytes": 3803787776,
+  "peak_reserved_bytes": 5605687296,
+  "cost_scope": "adaptation_training_forward_only_plus_run_wall_time",
+  "expert_row_unit": "one selected expert on one context, forward only",
+  "physical_backward_work": null,
+  "selection_and_prefix_physical_work": null,
+  "complete_compute_comparison_supported": false
+}

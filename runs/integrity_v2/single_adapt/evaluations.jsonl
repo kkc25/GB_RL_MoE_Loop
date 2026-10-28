@@ -1,0 +1,11 @@
+{"update": 0, "student_single_nll": 4.191048638297049, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.011154924630786489, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 100, "student_single_nll": 4.189715669694558, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.009821956028295276, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 200, "student_single_nll": 4.188995594026744, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.009101880360480763, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 300, "student_single_nll": 4.18862706100198, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.008733347335716957, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 400, "student_single_nll": 4.18835524475466, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.008461531088396868, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 500, "student_single_nll": 4.188210266633733, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.008316552967469804, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 600, "student_single_nll": 4.188120253442747, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.008226539776484465, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 700, "student_single_nll": 4.187983479376961, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.008089765710698416, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 800, "student_single_nll": 4.187985763672569, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.008092050006306195, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 900, "student_single_nll": 4.187952708571418, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.008058994905154826, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}
+{"update": 1000, "student_single_nll": 4.187930485211859, "pair_teacher_nll": 4.179893713666263, "degradation_nll": 0.008036771545596011, "gate_tolerance_nll": 0.02, "eval_sequences": 256, "eval_tokens": 261637}

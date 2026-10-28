@@ -1,0 +1,73 @@
+{
+  "spec_version": "RL-LM-Single-v1.0",
+  "stage": "adapt",
+  "backbone": {
+    "config_path": "runs/next_2026_10_26/baseline_100m/loop_r1.json",
+    "checkpoint_path": "runs/next_2026_10_26/baseline_100m/loop_r1/latest.pt",
+    "expected_checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+    "adaptive_layer": 11,
+    "freeze_all": true,
+    "prefix_depth": 1
+  },
+  "data": {
+    "corpus_dir": "data/rl_lm_pair_v1/corpus",
+    "tokenizer_path": "runs/data/fineweb_edu_100m/tokenizer.json",
+    "pair_cache_root": "data/rl_lm_pair_v2/cache",
+    "cache_root": "data/rl_lm_single_v2/cache",
+    "train_split": "controller_train",
+    "selection_split": "selection",
+    "calibration_split": "calibration",
+    "confirmation_split": "newtest",
+    "train_states": 65536,
+    "selection_states": 8192,
+    "calibration_states": 2048,
+    "state_sampling": "uniform_valid_token_without_replacement",
+    "sampling_seed": 20261026,
+    "prefix_sequence_batch": 2
+  },
+  "adaptation": {
+    "learning_rate": 1e-05,
+    "final_learning_rate": 1e-06,
+    "betas": [
+      0.9,
+      0.95
+    ],
+    "epsilon": 1e-08,
+    "weight_decay": 0.01,
+    "gradient_clip": 1.0,
+    "batch_contexts": 256,
+    "max_updates": 1000,
+    "warmup_updates": 50,
+    "kl_coefficient": 1.0,
+    "update_error_coefficient": 0.1,
+    "update_error_epsilon": 1e-08,
+    "eval_interval_updates": 100,
+    "selection_gate_tolerance_nll": 0.02,
+    "trainable_whitelist": [
+      "blocks.11.moe.pool.w1",
+      "blocks.11.moe.pool.w2",
+      "blocks.11.moe.pool.w3"
+    ]
+  },
+  "environment": {
+    "min_calls": 1,
+    "max_calls": 1,
+    "gamma_source": "backbone_config",
+    "training_backend": "canonical_all_experts_single_v1",
+    "deployment_backend": "sparse_single_v1",
+    "expert_chunk": 64,
+    "head_chunk": 64,
+    "frozen_compute_dtype": "bfloat16",
+    "residual_dtype": "float32",
+    "head_contract": "bf16_linear_fp32_ce_v1"
+  },
+  "runtime": {
+    "device": "cuda:1",
+    "require_cuda": true,
+    "allow_tf32": false
+  },
+  "logging": {
+    "interval_updates": 10
+  },
+  "output_dir": "runs/integrity_v2/single_adapt"
+}

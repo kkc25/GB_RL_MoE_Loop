@@ -39,3 +39,5 @@ runs/followup_*/full_tests.log
 # RL LM experiment raw data + caches (large; not for git)
 data/rl_lm_pair_v1/
 data/rl_lm_single_v1/
+data/rl_lm_pair_v2/
+data/rl_lm_single_v2/

@@ -1,0 +1,121 @@
+{
+  "selection_status": "selected",
+  "policy": {
+    "version": "legacy_greedy_nll_v1"
+  },
+  "r1_reference_nll": null,
+  "rule": "legacy lowest greedy_nll on selection; ties within 1e-06 prefer fewer rounds then earlier update",
+  "best": {
+    "update": 1900,
+    "greedy_nll": 4.173301637056055,
+    "mean_rounds": 1.0,
+    "path": "checkpoint_best.pt"
+  },
+  "candidates": [
+    {
+      "update": 0,
+      "greedy_nll": 4.173303085297288,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 100,
+      "greedy_nll": 4.173303085297288,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 200,
+      "greedy_nll": 4.173303085297288,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 300,
+      "greedy_nll": 4.173303085297288,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 400,
+      "greedy_nll": 4.173303085297288,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 500,
+      "greedy_nll": 4.173302726969561,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 600,
+      "greedy_nll": 4.173307280717764,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 700,
+      "greedy_nll": 4.173305563730736,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 800,
+      "greedy_nll": 4.173302756830204,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 900,
+      "greedy_nll": 4.173307056762934,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1000,
+      "greedy_nll": 4.173306086292006,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1100,
+      "greedy_nll": 4.173307280717764,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1200,
+      "greedy_nll": 4.173305996710074,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1300,
+      "greedy_nll": 4.173304832144959,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1400,
+      "greedy_nll": 4.173302353711511,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1500,
+      "greedy_nll": 4.173304891866247,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1600,
+      "greedy_nll": 4.173302622457307,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1700,
+      "greedy_nll": 4.173302383572155,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1800,
+      "greedy_nll": 4.17330423493208,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 1900,
+      "greedy_nll": 4.173301637056055,
+      "mean_rounds": 1.0
+    },
+    {
+      "update": 2000,
+      "greedy_nll": 4.1733032495308295,
+      "mean_rounds": 1.0
+    }
+  ]
+}

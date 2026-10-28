@@ -1,0 +1,103 @@
+{
+  "format": "reference-ce-artifact-v3",
+  "identity": {
+    "version": "adapted_single_reference_ce_v2",
+    "adapted_checkpoint_sha256": "22a51e90ce5e5185a5e4fdf4e4da3dce81acc039874a2f2a7f1e7644254709f9",
+    "cache_payload_sha256": "053ef260e799f1146cc14a08dc1ad67bc43e46f954f99fee84f3de2c16c4fee4",
+    "cache_manifest": {
+      "checkpoint_sha256": "0ccb04fe0a98f9147d252f526a360ef9a3e780c01dccb569caf77163457b6202",
+      "config_sha256": "1aca88ecb1d20f838e8e40c5f4a65134ad5e616fb4e95f416d853d4e51d73f98",
+      "tokenizer_sha256": "06dc710375f85ccec688c5983653ab2202720a4d161e819141178eebef3d6628",
+      "packed_sha256": {
+        "input_ids_sha256": "b24411400005342c86912c0a7d7e8f66366e6f495b38859bbf8eab4a59ff36e3",
+        "segment_ids_sha256": "1fd8288be77b6d15a741630712b1a88b9926268710a64c60e9f8f129a57af95d",
+        "doc_map_sha256": "7172337de0fd2e2f8b1cccb86d17ab785d2cc710fb3202cee61330ff3b07fc8c"
+      },
+      "document_manifest_sha256": "4c8317f73928cda502767812d676144bbe91d6a3e69e87505faa9f9e4bb0babb",
+      "layer_index": 11,
+      "gamma": 0.5,
+      "prefix_depth": 1,
+      "prefix_dtype": "bfloat16",
+      "backend_version": "canonical_all_experts_single_v1",
+      "expert_chunk": 64,
+      "head_contract": "bf16_linear_fp32_ce_v1",
+      "cache_format": "rl-lm-single-cache-v2",
+      "environment_version": "single8_stop_v1",
+      "split": "controller_train",
+      "sampling_seed": 20261026,
+      "derived_from_pair_cache_sha256": "f76ecf6b80ec54612e30493f19c355c2b2ac165039391f0e87854b243b7ccff7",
+      "n": 65536,
+      "d": 512,
+      "payload": {
+        "format": "rl-lm-cache-payload-v2",
+        "n": 65536,
+        "d": 512,
+        "files": {
+          "h0.npy": {
+            "sha256": "410479cd547e0dce615be93483dcfe23cc877a97efda41636f7da3c44644c87d",
+            "bytes": 134217856,
+            "dtype": "float32",
+            "shape": [
+              65536,
+              512
+            ]
+          },
+          "targets.npy": {
+            "sha256": "defbcece21f4744ddff3eff5d9fb06cd806cb019759e19669223d4751ff7ac1f",
+            "bytes": 524416,
+            "dtype": "int64",
+            "shape": [
+              65536
+            ]
+          },
+          "positions.npy": {
+            "sha256": "9025b94c4a3435250b0541fee6d57462c6968cc2d57e76366b4ed6592398e374",
+            "bytes": 524416,
+            "dtype": "int64",
+            "shape": [
+              65536
+            ]
+          },
+          "sequence_indices.npy": {
+            "sha256": "c3c65293ea61d30761229fc67479b9c3e658a3aa132d3a08260b5117acdad955",
+            "bytes": 524416,
+            "dtype": "int64",
+            "shape": [
+              65536
+            ]
+          },
+          "episode_ids.jsonl": {
+            "sha256": "38cf2fb40c5ddbe8970c397b24ecf2ffc09984a7a0419ae3ffcd1f91b39d1060",
+            "bytes": 25987586
+          },
+          "baseline.jsonl": {
+            "sha256": "52bad034432c1000206a4f2abf3e9ec6b888867f0d4b04fa1e9057f24b31d926",
+            "bytes": 8400820
+          },
+          "sampling_report.json": {
+            "sha256": "2ca03507e0ae6ccf676b62bf4e0063eff517c432f482966b2970db7a99f5a276",
+            "bytes": 335
+          }
+        }
+      },
+      "content_sha256": "3d602e8bdca268a95d74c1aa181d3bef3bf94f2b2ad4d8d4551068048a63ad32"
+    },
+    "compute_dtype": "bfloat16",
+    "head_contract": "production_bf16_head_v1",
+    "expert_rows_per_chunk": 2048,
+    "head_chunk": 2048
+  },
+  "payload": {
+    "version": "reference-ce-payload-v3",
+    "dtype": "float64",
+    "shape": [
+      65536
+    ],
+    "content_sha256": "e58edbe10b918404efd551254d474f27d32970781374a157b162995cf5881518"
+  },
+  "file_sha256": "62e0bd0c11fe26c75e8ae1a1a2b98fcce2c7f1efea14e6e982ae1ee2f39a8b3b",
+  "adapted_checkpoint_sha256": "22a51e90ce5e5185a5e4fdf4e4da3dce81acc039874a2f2a7f1e7644254709f9",
+  "rule": "adapted student, fixed argmax single expert, amplitude 1, R1",
+  "states": 65536,
+  "mean_ce": 4.277682046430414
+}

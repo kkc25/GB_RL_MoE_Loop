@@ -1,0 +1,14 @@
+{
+  "best": {
+    "file": "checkpoint_best.pt",
+    "sha256": "23db34e1e83df1d4dd60a5afb13f23d8ba7e755e1b326afd3872ee75fa11de26"
+  },
+  "initial": {
+    "file": "checkpoint_initial.pt",
+    "sha256": "23db34e1e83df1d4dd60a5afb13f23d8ba7e755e1b326afd3872ee75fa11de26"
+  },
+  "latest": {
+    "file": "checkpoint_latest.pt",
+    "sha256": "bdbec206143ab5928fc41fd117e343c5adc790ea4c0c4961a8d9cfd89ef6b422"
+  }
+}

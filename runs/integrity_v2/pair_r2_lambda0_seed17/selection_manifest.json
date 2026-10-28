@@ -1,0 +1,70 @@
+{
+  "selection_status": "selected",
+  "policy": {
+    "version": "r2_selected_r1_bound_v1",
+    "lambda": 0.0,
+    "quality_tolerance_nll": 0.005,
+    "r1_checkpoint_sha256": "ffb1fb175040da117c9ac571776b150244c627004beef45a4ea6110504f301dd"
+  },
+  "r1_reference_nll": 4.173301637056055,
+  "rule": "lowest NLL + lambda*(mean_rounds-1), subject to pinned R1 NLL + 0.005; ties within 1e-06 prefer fewer rounds then earlier update",
+  "best": {
+    "update": 0,
+    "greedy_nll": 4.173301637056055,
+    "mean_rounds": 1.0,
+    "selection_score": 4.173301637056055,
+    "quality_bound_nll": 4.178301637056055,
+    "eligible": true,
+    "path": "checkpoint_best.pt"
+  },
+  "candidates": [
+    {
+      "update": 0,
+      "greedy_nll": 4.173301637056055,
+      "mean_rounds": 1.0,
+      "selection_score": 4.173301637056055,
+      "quality_bound_nll": 4.178301637056055,
+      "eligible": true
+    },
+    {
+      "update": 100,
+      "greedy_nll": 4.173460212005795,
+      "mean_rounds": 1.0018117427825928,
+      "selection_score": 4.173460212005795,
+      "quality_bound_nll": 4.178301637056055,
+      "eligible": true
+    },
+    {
+      "update": 200,
+      "greedy_nll": 4.175149637659002,
+      "mean_rounds": 1.0420438051223755,
+      "selection_score": 4.175149637659002,
+      "quality_bound_nll": 4.178301637056055,
+      "eligible": true
+    },
+    {
+      "update": 300,
+      "greedy_nll": 4.175415233156686,
+      "mean_rounds": 1.0495810508728027,
+      "selection_score": 4.175415233156686,
+      "quality_bound_nll": 4.178301637056055,
+      "eligible": true
+    },
+    {
+      "update": 400,
+      "greedy_nll": 4.175487884103435,
+      "mean_rounds": 1.051736831665039,
+      "selection_score": 4.175487884103435,
+      "quality_bound_nll": 4.178301637056055,
+      "eligible": true
+    },
+    {
+      "update": 500,
+      "greedy_nll": 4.175500664459049,
+      "mean_rounds": 1.0523483753204346,
+      "selection_score": 4.175500664459049,
+      "quality_bound_nll": 4.178301637056055,
+      "eligible": true
+    }
+  ]
+}

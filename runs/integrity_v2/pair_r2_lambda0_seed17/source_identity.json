@@ -1,0 +1,9 @@
+{
+  "commit": "9ad08253bfb1088025f8b4edac440a917fe8ac70",
+  "tree": "81698c1ae5d46ee09c4ba95e1ebe2fad161f644d",
+  "uncommitted_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "has_uncommitted_diff": false,
+  "untracked_python_sha256": {},
+  "entrypoint": "experiments/r1_closed_loop.py",
+  "entrypoint_sha256": "20d6ce1997299afe084b942e7b433860c6ca765def18ad07c7bf41c24162281f"
+}
