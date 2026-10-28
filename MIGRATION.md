@@ -193,3 +193,43 @@ rule 外，还必须包含 `confirmation_scope`。用
 - 同角色的有效输入重复率作为附加身份/统计记录，不改变采样；跨角色重复仍拒绝。
   新源码/数据身份可能使旧 checkpoint 不匹配，按固定旧 commit 复核历史或新建运行。
 - 本轮不改变 R1 的 epsilon、group size 或有放回采样，探索机制升级仍是独立研究工作。
+
+## 13. Fit-first：训练拟合、开发泛化与质量门控成本评估
+
+- 新入口 `python -m experiments.mixtral_fit_experiment` 使用显式
+  `--stage fit|generalize|profile`。旧 `mixtral_experiment`、默认 RLOO、oracle
+  与 selection-best 适配器保持兼容；新模板应交给新入口，不将两个实验混称。
+- 配置仍保留基础 schema，新增 `fit.kind`、`fit.training`、
+  `fit.generalization_min_gain`。训练实际使用 `fit.training`；顶层与新训练的
+  seed/context预算必须匹配。只有 `output_dir` 可以在三个阶段之间变化。
+- R1 新路线在 train 上固定singleton评分形状，缓存全28动作CE及2次native
+  anchor，使用期望CE优化。默认显式较弱先验 `epsilon=0.8`；旧RLOO先验与
+  采样规则未被暗改。训练动作标签不能传给部署策略，也不能跨BF16形状复用表
+  来声称在线质量一致。
+- 适配器新路线在固定完整train probe上选择best，并记录实际访问覆盖与
+  BF16 cast/相加后的有效修正。它是单次native R1后的新增容量，不是重复专家
+  或learned STOP；拟合通过不证明loop本身有收益。
+- 新checkpoint使用各自独立格式、来源/数据/数值/缓存/状态绑定，不加载旧
+  router/second-round checkpoint，不提供resume。使用新run、新输出目录；
+  不得修改binding让历史权重“通过迁移”。
+- Fit只能用train选择best。Generalize要求fit关通过且best_update>0，只评估
+  同一个冻结best的selection开发文档，保留native/controlled/candidate逐文档
+  配对结果。Profile还要求匹配的generalize报告与独立配置的最小质量改善，
+  无绕过开关；完成状态本身不表示质量关通过。
+- 模板将训练门槛设为0.01、开发筛选门槛设为0.001 nat/token，后者只是允许
+  profile的预声明筛选值，不是统计显著性或部署验收，也不继承oracle阈值。
+  smoke与64-context/256-update拟合预设明确分开；这些值不保证充分收敛，
+  plateau需要覆盖/特征/优化/精度诊断，不能自动否定方法。
+- 非smoke在`fit.training.adaptive`显式启用train-only的有界学习率/plateau
+  控制；smoke保持关闭。每16步观察固定train目标，耐心3次后降学习率；
+  adapter只在持续实际BF16零有效修正、梯度非零且train未恶化时允许有限增长。
+  rank/scale/epsilon/G不自调；全部28动作已消除该训练器的动作抽样问题。
+  至少64步及完整访问覆盖只是plateau停止的必要条件，256步硬上限保留，
+  默认设置不保证达到学习率下界或提前停止。所有决策与边界进入产物绑定，
+  generalize/profile不允许selection或耗时反馈调参；不声称全局最优搜索。
+- 三阶段均保留calibration一致性检查；不接受最终held-out/newtest。
+  多seed 17/29/43、扩大到256context与GPU阶段均由操作者分别手动执行。
+  本轮没有自动启动GPU作业或给出正式泛化、速度、成本收益结论。
+
+配置、完整操作命令、预期产物与公平预算解释见
+[FIT_FIRST_EXPERIMENTS.md](FIT_FIRST_EXPERIMENTS.md)。

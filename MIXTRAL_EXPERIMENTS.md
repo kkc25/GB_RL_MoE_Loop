@@ -1,5 +1,9 @@
 # Mixtral 冻结主干路由实验
 
+新的实验顺序与独立入口见 [FIT_FIRST_EXPERIMENTS.md](FIT_FIRST_EXPERIMENTS.md)：
+先 train-only 拟合，再用同一冻结 checkpoint 做开发泛化检查，质量通过后才测成本。
+下文旧入口、selection-best 训练及历史 smoke 协议仍保留，不与新 checkpoint 混用。
+
 最新的分层采样、R1/R2+STOP oracle 与默认关闭的残差适配器方案见
 [LEARNABILITY_PLAN.md](LEARNABILITY_PLAN.md)。下文保留原始基础协议与运行边界；
 适配器是新增修正容量的独立实验，不代表已训练的循环专家或 learned STOP。
