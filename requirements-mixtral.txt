@@ -1,0 +1,8 @@
+# Mixtral experiment dependencies, matching ENVIRONMENT.md/requirements.txt.
+# Install the appropriate official torch==2.12.1 wheel separately.
+# This file does not download pretrained model weights or launch experiments.
+-r requirements-test.txt
+transformers==5.15.1
+accelerate==1.15.0
+safetensors==0.8.0
+huggingface_hub==1.33.0

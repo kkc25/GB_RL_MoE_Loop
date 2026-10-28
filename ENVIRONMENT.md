@@ -1,5 +1,8 @@
 # 运行环境（Environment）
 
+Mixtral 冻结主干实验的独立依赖、数据准备和运行边界见
+[MIXTRAL_EXPERIMENTS.md](MIXTRAL_EXPERIMENTS.md)。它不复用旧 100M token cache。
+
 ## 硬件与驱动
 
 - GPU：NVIDIA RTX A6000（实验使用多卡，`CUDA_VISIBLE_DEVICES` 指定卡号）
