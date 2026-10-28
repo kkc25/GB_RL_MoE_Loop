@@ -1,5 +1,12 @@
 # Mixtral：可改善空间、可学习性与可选残差适配
 
+后续实验优先使用 [FIT_FIRST_EXPERIMENTS.md](FIT_FIRST_EXPERIMENTS.md) 的独立
+fit→generalize→profile 路线。它新增 train-only 全28动作期望CE拟合与固定train
+probe适配器，不把4步smoke未改善当作方法否定。本文保留旧入口与原始方案边界，
+其中selection-best适配器不等同于新train-best checkpoint协议。
+新非smoke模板还提供train-only的有界学习率/plateau控制，不自动调rank、scale、
+epsilon或全部超参数；开发泛化和性能阶段仍只接收冻结候选。
+
 同一角色内截断后的重复输入现在写入数据身份的 `effective_input_statistics`：
 包含文档数、唯一有效序列数、冗余文档比例和重复组。该统计不改变采样权重，
 不自动删除文档，也不证明语义独立性；跨角色重复仍直接拒绝。
