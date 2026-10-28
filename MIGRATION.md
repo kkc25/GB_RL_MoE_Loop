@@ -170,3 +170,15 @@ rule 外，还必须包含 `confirmation_scope`。用
   这不是 GPU 利用率测量，也不回填历史零值或旧 checkpoint 未记录的区间。
 - 新摘要记录本次实际设备、模型规模和运行状态；CLI 来源指向实际入口，而不是
   辅助模块。历史报告不被改写；旧 run 仍应使用固定旧 commit 复核。
+
+## 11. 分层 context、oracle 与可选残差适配器
+
+- Mixtral 从顺序 first-N 改为 seed 固定的文档平衡/位置随机采样，缓存身份
+  绑定实际文档/位置与 sampling hash。旧 checkpoint 不可改 binding 强行复用；
+  使用新 run、新输出，历史结果保持原样。
+- 新 `oracle` 阶段默认 calibration，单行评分口径及 label-aware 上限单独报告，
+  不能当成生产 NLL、策略收益或联合两步最优。
+- 新 `adapter` 阶段默认关闭；独立 checkpoint 格式，只训练新增低秩残差，
+  初始 R1 等价、原骨干冻结。它不重跑原专家，也不训练 STOP，不提供续训接口。
+- 所有新阶段重新绑定当前实际模型、数据、数值与源码身份；原始临时 loop
+  探针只作历史证据。具体配置、预算和解释规则见 [LEARNABILITY_PLAN.md](LEARNABILITY_PLAN.md)。

@@ -21,7 +21,7 @@ from mixtral_lab.protocol import (load_config, directory_identity, prepare_data,
 def parser():
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument('--config', required=True)
-    p.add_argument('--stage', choices=('validate', 'profile', 'train'), default='validate')
+    p.add_argument('--stage', choices=('validate', 'profile', 'train', 'oracle', 'adapter'), default='validate')
     p.add_argument('--actor-checkpoint', help='optional bound actor checkpoint for profile; no resume')
     return p
 
@@ -265,21 +265,68 @@ def measure_calls(functions, rows, devices, config):
             'exclusive_gpu_status': 'operator must ensure no competing jobs; not enforced by this runner'}
 
 
+def collect_train_contexts(adapter, rows, count, seed=17):
+    """Compatibility wrapper; the sampling contract is now stratified, not first-N."""
+    from mixtral_lab.sampling import collect_stratified_contexts
+    h0, targets, _ = collect_stratified_contexts(adapter, rows, count, seed, 'train')
+    return h0, targets
+
+
 @torch.no_grad()
-def collect_train_contexts(adapter, rows, count):
-    hidden, targets, left = [], [], count
+def route_diagnostics(adapter, rows, actor):
+    from mixtral_lab.adapter import pair_to_action
+    agreement = count = 0
+    margins = []
+    for row in rows:
+        batch = batch_row(row, input_device(adapter.model))
+        observed = []
+        def diagnostic_policy(observation):
+            # Preserve the exact full padded row shape used by deployed R1.
+            # Filtering first can change BF16 GEMM rounding and greedy actions.
+            logp = actor.log_probs(observation.features, observation.native_pairs)
+            native_ids = pair_to_action(observation.native_pairs).long() - 1
+            actions = logp.argmax(-1) + 1
+            observed.append((logp, native_ids, actions))
+            return actions
+        result = adapter.forward(**batch, policy=diagnostic_policy, max_calls=1)
+        if len(observed) != 1:
+            raise ValueError('expected one full-shaped R1 actor observation')
+        logp, native_ids, actions = observed[0]
+        if not torch.equal(result.actions.reshape(-1), actions):
+            raise ValueError('diagnostic policy actions differ from executed action trace')
+        valid = torch.zeros_like(batch['attention_mask'], dtype=torch.bool)
+        valid[:, :-1] = batch['attention_mask'][:, :-1].bool() & batch['attention_mask'][:, 1:].bool()
+        valid = valid.reshape(-1).to(logp.device)
+        # Mask only after gate/features/actor execution, including final/pad rows.
+        logp, native_ids, actions = logp[valid], native_ids[valid], actions[valid]
+        agreement += int((actions - 1 == native_ids).sum()); count += len(actions)
+        competing = logp.clone().scatter_(1, native_ids[:, None], -float('inf')).max(-1).values
+        margins.extend((logp.gather(1, native_ids[:, None]).squeeze(1) - competing).cpu().tolist())
+    return {'supervised_tokens': count, 'greedy_native_agreement': agreement/count,
+            'native_minus_best_alternative_log_probability_margin_mean': sum(margins)/count,
+            'native_minus_best_alternative_log_probability_margin_min': min(margins)}
+
+
+@torch.no_grad()
+def evaluate_second_round(adapter, rows, residual=None, *, repeat=False):
+    total = 0.; tokens = 0
     for row in rows:
         batch = batch_row(row, input_device(adapter.model))
         h0 = adapter.capture(**batch)
-        valid = (batch['attention_mask'][:, :-1].bool() & batch['attention_mask'][:, 1:].bool()).reshape(-1)
-        h = h0[:, :-1].reshape(-1, h0.shape[-1])[valid.to(h0.device)][:left]
-        y = batch['input_ids'][:, 1:].reshape(-1)[valid][:left].to(h0.device)
-        hidden.append(h.detach()); targets.append(y.detach()); left -= len(y)
-        if left == 0:
-            break
-    if left:
-        raise ValueError('not enough supervised train positions for max_train_contexts')
-    return torch.cat(hidden), torch.cat(targets)
+        shape = h0.shape
+        h = h0.reshape(-1, shape[-1])
+        h1 = adapter.step_pairs(h, adapter.native_pair(h))
+        if repeat:
+            h1 = adapter.step_pairs(h1, adapter.native_pair(h1))
+        elif residual is not None:
+            h1 = residual(h1)
+        logits = adapter.readout(h1).reshape(*shape[:-1], -1)
+        values = token_ce(logits, batch['input_ids'], batch['attention_mask'])
+        total += float(values.double().sum()); tokens += len(values)
+    return {'nll': total/tokens, 'tokens': tokens, 'sequences': len(rows),
+            'scope': 'development only; fixed native R1 plus optional residual; no learned STOP',
+            'terminal_expert_calls': 2 if repeat else 1,
+            'numerical_scope': 'full padded document shape; oracle scores use single-row shape and are not numerically interchangeable'}
 
 
 def main(argv=None):
@@ -289,6 +336,8 @@ def main(argv=None):
         raise FileExistsError('choose a new output_dir; historical outputs are protected')
     if args.actor_checkpoint and args.stage != 'profile':
         raise ValueError('--actor-checkpoint is only for profile, never resume')
+    if args.stage == 'adapter' and not config.get('second_round', {}).get('enabled', False):
+        raise ValueError('adapter is default off; explicitly set second_round.enabled=true')
     if not torch.cuda.is_available():
         raise RuntimeError('real Mixtral experiments require CUDA; use CPU tiny-model unit tests for code checks')
     # Reject split leakage/oversized source files before allocating model weights.
@@ -300,11 +349,15 @@ def main(argv=None):
         load_seconds = time.perf_counter() - load_started
         stage_started = time.perf_counter()
         data, data_identity = prepare_data(config, tokenizer)
+        from mixtral_lab.sampling import plan_stratified_contexts, collect_stratified_contexts
+        train_manifest = plan_stratified_contexts(data['train'], config['max_train_contexts'], config['seed'], 'train')
         output = fresh_output(config['output_dir'])
+        atomic_json(output/'train_contexts.json', train_manifest)
         identity = {'model': model_info['model'], 'tokenizer': model_info['tokenizer'],
                     'train': data_identity['train'], 'selection': data_identity['selection'],
                     'calibration': data_identity['calibration'], 'code': code_identity(),
-                    'numerical_contract': {**{key: config[key] for key in ('dtype', 'allow_tf32', 'experts_implementation', 'sequence_length', 'sequences', 'max_train_contexts')}, 'attention': 'sdpa', 'head_chunk': 128, 'runtime_versions': {name: version(name) for name in ('torch', 'transformers', 'accelerate', 'safetensors')}}}
+                    'context_sampling': train_manifest,
+                    'numerical_contract': {'sampler': config['context_sampling'], **{key: config[key] for key in ('dtype', 'allow_tf32', 'experts_implementation', 'sequence_length', 'sequences', 'max_train_contexts')}, 'attention': 'sdpa', 'head_chunk': 128, 'runtime_versions': {name: version(name) for name in ('torch', 'transformers', 'accelerate', 'safetensors')}}}
         report = {'schema': 'mixtral-experiment-report-v1', 'stage': args.stage, 'status': 'running',
                   'model_load_wall_seconds': load_seconds, 'config': config, 'config_sha256': canonical_hash(config), 'identity': identity,
                   'model': model_info, 'environment': {'torch': torch.__version__, 'cuda': torch.version.cuda,
@@ -319,8 +372,9 @@ def main(argv=None):
             atomic_json(output/'report.json', report)
             if not report['native_equivalence']['eligible']:
                 raise RuntimeError('native equivalence screen failed; stop before profiling/training')
-            report['native_selection'] = evaluate(adapter, data['selection'], native=True)
-            report['controlled_original_selection'] = evaluate(adapter, data['selection'])
+            if args.stage != 'oracle':
+                report['native_selection'] = evaluate(adapter, data['selection'], native=True)
+                report['controlled_original_selection'] = evaluate(adapter, data['selection'])
             if args.stage == 'profile':
                 def native(row):
                     batch = batch_row(row, input_device(model))
@@ -337,13 +391,51 @@ def main(argv=None):
                 report['timing']['output_device'] = str(input_device(model))
             elif args.stage == 'train':
                 from mixtral_lab.training import RouterTrainingConfig, train_router
-                h0, targets = collect_train_contexts(adapter, data['train'], config['max_train_contexts'])
+                h0, targets, report['training_contexts'] = collect_stratified_contexts(adapter, data['train'], config['max_train_contexts'], config['seed'], 'train')
                 training_config = RouterTrainingConfig(**config['training'])
                 _, report['training'] = train_router(adapter, h0, targets, lambda actor: evaluate(adapter, data['selection'], actor),
                     training_config, identity, output/'router')
                 from mixtral_lab.training import load_actor_checkpoint
                 best = load_actor_checkpoint(output/'router'/'checkpoint_best.pt', identity, adapter.device)
                 report['selected_best_development'] = evaluate(adapter, data['selection'], best)
+                report['selected_best_development']['routing'] = route_diagnostics(adapter, data['selection'], best)
+                latest = load_actor_checkpoint(output/'router'/'checkpoint_latest.pt', identity, adapter.device)
+                report['latest_development'] = evaluate(adapter, data['selection'], latest)
+                report['latest_development']['routing'] = route_diagnostics(adapter, data['selection'], latest)
+            elif args.stage == 'oracle':
+                from mixtral_lab.oracle import OracleConfig, run_oracle
+                oracle_settings = dict(config.get('oracle', {}))
+                role = oracle_settings.pop('role', 'calibration')
+                oracle_config = OracleConfig(**oracle_settings)
+                h0, targets, manifest = collect_stratified_contexts(adapter, data[role], oracle_config.max_contexts, config['seed'], role)
+                atomic_json(output/'oracle_contexts.json', manifest)
+                oracle_identity = {**identity, 'oracle_context_sampling': manifest}
+                report['oracle'] = run_oracle(adapter, h0, targets, manifest['contexts'], oracle_identity, role=role, config=oracle_config)
+                report['oracle_contexts'] = manifest
+            elif args.stage == 'adapter':
+                from mixtral_lab.second_round import SecondRoundConfig, train_second_round
+                settings = dict(config['second_round']); settings.pop('enabled')
+                adapter_config = SecondRoundConfig(**settings)
+                h0, targets, report['training_contexts'] = collect_stratified_contexts(adapter, data['train'], config['max_train_contexts'], config['seed'], 'train')
+                report['adapter_controls'] = {
+                    'fixed_native_r1_stop': evaluate_second_round(adapter, data['selection']),
+                    'untrained_native_r2_repeat': evaluate_second_round(adapter, data['selection'], repeat=True)}
+                best, report['adapter_training'] = train_second_round(adapter, h0, targets,
+                    lambda residual: evaluate_second_round(adapter, data['selection'], residual),
+                    adapter_config, identity, output/'second_round')
+                from mixtral_lab.second_round import load_second_round_checkpoint
+                from mixtral_lab.protocol import sha256_file
+                checkpoints = {}
+                for name in ('best', 'latest'):
+                    checkpoint = output/'second_round'/f'checkpoint_{name}.pt'
+                    module = load_second_round_checkpoint(checkpoint, identity, adapter.device,
+                        expected_config=adapter_config, expected_hidden_size=h0.shape[-1])
+                    checkpoints[name] = {'path': str(checkpoint.resolve()), 'sha256': sha256_file(checkpoint),
+                        'selection': evaluate_second_round(adapter, data['selection'], module)}
+                report['adapter_checkpoints'] = checkpoints
+                report['selected_adapter_development'] = checkpoints['best']['selection']
+                report['latest_adapter_development'] = checkpoints['latest']['selection']
+                report['limitations'].append('adapter adds residual capacity; not evidence for repeated-MoE usefulness')
             report['status'] = 'complete'
             report['stage_wall_seconds_excluding_model_load'] = time.perf_counter() - stage_started
             atomic_json(output/'report.json', report)
