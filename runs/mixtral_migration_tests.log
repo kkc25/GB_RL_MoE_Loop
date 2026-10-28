@@ -1,0 +1,51 @@
+test_actions (tests.test_mixtral_adapter.TestMixtralAdapter.test_actions) ... ok
+test_capture_cleanup (tests.test_mixtral_adapter.TestMixtralAdapter.test_capture_cleanup) ... ok
+test_cuda_bf16_native_controlled_backends (tests.test_mixtral_adapter.TestMixtralAdapter.test_cuda_bf16_native_controlled_backends) ... ok
+test_mixed_stop_compaction (tests.test_mixtral_adapter.TestMixtralAdapter.test_mixed_stop_compaction) ... ok
+test_native_parity_matrix (tests.test_mixtral_adapter.TestMixtralAdapter.test_native_parity_matrix) ... ok
+test_nested_offload_rejected (tests.test_mixtral_adapter.TestMixtralAdapter.test_nested_offload_rejected) ... ok
+test_nonnative_extreme_logits_still_finite (tests.test_mixtral_adapter.TestMixtralAdapter.test_nonnative_extreme_logits_still_finite) ... ok
+test_r1_norm_gate_counts_and_no_unused_observation (tests.test_mixtral_adapter.TestMixtralAdapter.test_r1_norm_gate_counts_and_no_unused_observation) ... ok
+test_r1_policy_validation (tests.test_mixtral_adapter.TestMixtralAdapter.test_r1_policy_validation) ... ok
+test_r1_reference_parity_all_actions (tests.test_mixtral_adapter.TestMixtralAdapter.test_r1_reference_parity_all_actions) ... ok
+test_rejections (tests.test_mixtral_adapter.TestMixtralAdapter.test_rejections) ... ok
+test_stop (tests.test_mixtral_adapter.TestMixtralAdapter.test_stop) ... ok
+test_two_gpu_dispatched_prefix_and_readout (tests.test_mixtral_adapter.TestMixtralAdapter.test_two_gpu_dispatched_prefix_and_readout) ... ok
+test_backend_configuration_is_not_dispatch_proof (tests.test_mixtral_protocol.ProtocolTests.test_backend_configuration_is_not_dispatch_proof) ... ok
+test_cached_hf_snapshot_symlinks (tests.test_mixtral_protocol.ProtocolTests.test_cached_hf_snapshot_symlinks) ... ok
+test_causal_ce_and_padding (tests.test_mixtral_protocol.ProtocolTests.test_causal_ce_and_padding) ... ok
+test_complete_checkpoint_guard (tests.test_mixtral_protocol.ProtocolTests.test_complete_checkpoint_guard) ... Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 369.77it/s]
+Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 4216.79it/s]
+Loading weights:   0%|          | 0/20 [00:00<?, ?it/s]Loading weights: 100%|██████████| 20/20 [00:00<00:00, 4195.56it/s]
+[transformers] [1mMixtralForCausalLM LOAD REPORT[0m from: /tmp/tmpgmjlyjk1/tiny
+Key            | Status  | 
+---------------+---------+-
+lm_head.weight | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+ok
+test_config_limits (tests.test_mixtral_protocol.ProtocolTests.test_config_limits) ... ok
+test_dispatch_observer_restores_and_fails_closed (tests.test_mixtral_protocol.ProtocolTests.test_dispatch_observer_restores_and_fails_closed) ... ok
+test_duplicates_and_tokenization (tests.test_mixtral_protocol.ProtocolTests.test_duplicates_and_tokenization) ... ok
+test_effective_token_overlap_real_fast_tokenizer (tests.test_mixtral_protocol.ProtocolTests.test_effective_token_overlap_real_fast_tokenizer) ... ok
+test_output_and_precision_guards (tests.test_mixtral_protocol.ProtocolTests.test_output_and_precision_guards) ... ok
+test_real_grouped_calibration_dispatch_observed (tests.test_mixtral_protocol.ProtocolTests.test_real_grouped_calibration_dispatch_observed) ... ok
+test_tiny_native_screen (tests.test_mixtral_protocol.ProtocolTests.test_tiny_native_screen) ... ok
+test_train_then_profile_new_output (tests.test_mixtral_protocol.ProtocolTests.test_train_then_profile_new_output) ... ok
+test_checked_reuse_counts_order_and_fail_closed (tests.test_mixtral_training.TrainingTests.test_checked_reuse_counts_order_and_fail_closed) ... ok
+test_checked_reuse_preserves_toy_updates_and_rng (tests.test_mixtral_training.TrainingTests.test_checked_reuse_preserves_toy_updates_and_rng) ... ok
+test_config_rejects_invalid (tests.test_mixtral_training.TrainingTests.test_config_rejects_invalid) ... ok
+test_kl_rollback (tests.test_mixtral_training.TrainingTests.test_kl_rollback) ... ok
+test_pair_mapping_and_native_initialization (tests.test_mixtral_training.TrainingTests.test_pair_mapping_and_native_initialization) ... ok
+test_real_tiny_hf_adapter_training_integration (tests.test_mixtral_training.TrainingTests.test_real_tiny_hf_adapter_training_integration) ... ok
+test_updates_isolation_best_zero_and_checkpoint_identity (tests.test_mixtral_training.TrainingTests.test_updates_isolation_best_zero_and_checkpoint_identity) ... ok
+test_within_context_rloo_and_stop_gradient (tests.test_mixtral_training.TrainingTests.test_within_context_rloo_and_stop_gradient) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 2.788s
+
+OK
+{"report": "/tmp/tmpemt7t20i/output/report.json", "status": "complete"}
+{"report": "/tmp/tmpemt7t20i/profile/report.json", "status": "complete"}
+{"report": "/tmp/tmpemt7t20i/profile_second/report.json", "status": "complete"}

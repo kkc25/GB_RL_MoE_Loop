@@ -1,0 +1,27 @@
+{
+  "status": "complete",
+  "successful_updates": 4,
+  "best_update": 0,
+  "best_selection_nll": 1.52973584451299,
+  "wall_seconds": 1.5712064959807321,
+  "reserved_device_hours_estimate": 0.0017457849955341469,
+  "cuda_devices": [
+    "cuda:0",
+    "cuda:1",
+    "cuda:2",
+    "cuda:3"
+  ],
+  "binding_sha256": "842538d259997a96b3be87ca5cd344406a7b6c0e6851b069f9b49f2f6571c1ac",
+  "score_mode": "reference",
+  "score_candidate_used_updates": 0,
+  "score_candidate_fallback_updates": 0,
+  "score_work_totals": {
+    "requested_rows": 80,
+    "scored_rows": 80,
+    "score_calls": 8,
+    "cache_hits": 0,
+    "validation_rows": 0
+  },
+  "score_reuse_note": "checked candidate includes full reference validation cost; not a production speedup claim",
+  "scope": "R1 frozen-backbone routing only; no resume, R2 training or held-out confirmation"
+}

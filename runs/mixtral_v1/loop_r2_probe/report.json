@@ -1,0 +1,114 @@
+{
+  "status": "complete",
+  "scope": "bounded R1 actor reused in terminal R2 loop; not R2 training",
+  "newtest_used": false,
+  "native_equivalence_eligible": true,
+  "actor_checkpoint": {
+    "path": "/nvme-1/zhoukegu/GB_RL_MoE_Loop/runs/mixtral_v1/train_grouped_r1_u64/router/checkpoint_best.pt",
+    "checkpoint_sha256": "1163b236c55141d13b29dcd6de057cb23caef785172e21464c562a90630a987f",
+    "binding_sha256": "ae7b21df685f94ff3789bc74d68f70f96f7bdd2906738ee7db537d7e4424db37",
+    "update": 0,
+    "epsilon": 0.2,
+    "training_config": {
+      "updates": 64,
+      "batch_contexts": 4,
+      "group_size": 4,
+      "learning_rate": 0.0001,
+      "epsilon": 0.2,
+      "eval_interval": 8,
+      "max_train_contexts": 32,
+      "gradient_clip": 1.0,
+      "max_step_kl": 0.02,
+      "seed": 17,
+      "score_mode": "reference",
+      "score_atol": 1e-05,
+      "score_rtol": 1e-05
+    },
+    "actor_state_sha256": "4e0dc76533cc161aedebd599b080b09e15015a58a78249c26fc6db47805455dc"
+  },
+  "variants": {
+    "controlled_original_r1": {
+      "nll": 1.5314759093986592,
+      "tokens": 254,
+      "mean_rounds": 1.0,
+      "min_rounds": 1,
+      "max_rounds": 1
+    },
+    "controlled_original_two_loops": {
+      "nll": 7.3935911919826305,
+      "tokens": 254,
+      "mean_rounds": 2.0,
+      "min_rounds": 2,
+      "max_rounds": 2
+    },
+    "best_actor_r1": {
+      "nll": 1.5314759093986592,
+      "tokens": 254,
+      "mean_rounds": 1.0,
+      "min_rounds": 1,
+      "max_rounds": 1
+    },
+    "best_actor_two_loops_no_stop_training": {
+      "nll": 7.3935911919826305,
+      "tokens": 254,
+      "mean_rounds": 2.0,
+      "min_rounds": 2,
+      "max_rounds": 2
+    },
+    "native_first_then_stop": {
+      "nll": 1.5314759093986592,
+      "tokens": 254,
+      "mean_rounds": 1.0,
+      "min_rounds": 1,
+      "max_rounds": 1
+    }
+  },
+  "code": {
+    "commit": "d33efa800d5fb67a5937fca7ddb56d5122244bc3",
+    "sources": {
+      "experiments/mixtral_experiment.py": "c1a6f6236385b7ffb863a9e55735564e5df0266e00b1ffd6b9f19057ee00498d",
+      "mixtral_lab/__init__.py": "2d7330c8720d7be60797d4b6e81bebfc692d6692ef874646708744172a1b20f3",
+      "mixtral_lab/adapter.py": "06230b9b4f6d632a19ab1be1d2e094baba4e042602b03ba2ad0339ba1fe2c7bc",
+      "mixtral_lab/protocol.py": "e8b91d0d61ae7ad1623a13de65b2cedbd1737580b63983947c0fd51cf7447e3e",
+      "mixtral_lab/training.py": "a0a7a8fe70f344469f54ed792ccd3b8a17cd74bb2a77b16417f1190dc3c2d0c4"
+    }
+  },
+  "device_map": {
+    "model.embed_tokens": "0",
+    "model.layers.0": "0",
+    "model.layers.1": "0",
+    "model.layers.2": "0",
+    "model.layers.3": "0",
+    "model.layers.4": "0",
+    "model.layers.5": "0",
+    "model.layers.6": "0",
+    "model.layers.7": "0",
+    "model.layers.8": "1",
+    "model.layers.9": "1",
+    "model.layers.10": "1",
+    "model.layers.11": "1",
+    "model.layers.12": "1",
+    "model.layers.13": "1",
+    "model.layers.14": "1",
+    "model.layers.15": "1",
+    "model.layers.16": "1",
+    "model.layers.17": "2",
+    "model.layers.18": "2",
+    "model.layers.19": "2",
+    "model.layers.20": "2",
+    "model.layers.21": "2",
+    "model.layers.22": "2",
+    "model.layers.23": "2",
+    "model.layers.24": "2",
+    "model.layers.25": "2",
+    "model.layers.26": "3",
+    "model.layers.27": "3",
+    "model.layers.28": "3",
+    "model.layers.29": "3",
+    "model.layers.30": "3",
+    "model.layers.31": "3",
+    "model.norm": "3",
+    "model.rotary_emb": "3",
+    "lm_head": "3"
+  }
+}

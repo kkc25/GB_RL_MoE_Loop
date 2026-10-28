@@ -1,0 +1,238 @@
+[
+  {
+    "score_work": {
+      "mode": "deduplicate_checked_v1",
+      "version": 1,
+      "requested_rows": 20,
+      "scored_rows": 23,
+      "score_calls": 3,
+      "cache_hits": 13,
+      "validation_rows": 16,
+      "candidate_scored_rows": 7,
+      "candidate_eligible": false,
+      "candidate_used": false,
+      "native_cache_hits": 13,
+      "fallback_reason": "score_tolerance_or_nonfinite",
+      "atol": 1e-05,
+      "rtol": 1e-05,
+      "absolute_errors": [
+        [
+          0.00012040138244628906,
+          0.00012040138244628906,
+          0.00012040138244628906,
+          0.00012040138244628906
+        ],
+        [
+          0.0013949871063232422,
+          0.0,
+          0.0013949871063232422,
+          0.00048065185546875
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          4.1484832763671875e-05,
+          4.1484832763671875e-05,
+          4.1484832763671875e-05,
+          4.1484832763671875e-05
+        ]
+      ],
+      "nonfinite_score_count": 0,
+      "max_absolute_error": 0.0013949871063232422
+    },
+    "attempt": 1,
+    "accepted": true,
+    "successful_updates": 1,
+    "loss": 0.05802531540393829,
+    "reward_mean": 0.00738978385925293,
+    "teacher_agreement": 0.8125,
+    "zero_advantage_fraction": 0.5,
+    "entropy": 1.1259651184082031,
+    "gradient_norm": 3.2458276748657227,
+    "step_kl_max": 0.016474775969982147,
+    "distinct_sampled_actions_mean": 1.75,
+    "context_visits": 4,
+    "sampled_episodes": 16
+  },
+  {
+    "score_work": {
+      "mode": "deduplicate_checked_v1",
+      "version": 1,
+      "requested_rows": 20,
+      "scored_rows": 23,
+      "score_calls": 3,
+      "cache_hits": 13,
+      "validation_rows": 16,
+      "candidate_scored_rows": 7,
+      "candidate_eligible": false,
+      "candidate_used": false,
+      "native_cache_hits": 13,
+      "fallback_reason": "score_tolerance_or_nonfinite",
+      "atol": 1e-05,
+      "rtol": 1e-05,
+      "absolute_errors": [
+        [
+          0.0029458999633789062,
+          0.0029458999633789062,
+          0.0029458999633789062,
+          0.0029458999633789062
+        ],
+        [
+          0.024422645568847656,
+          0.002988576889038086,
+          0.002988576889038086,
+          0.002988576889038086
+        ],
+        [
+          0.0005055088549852371,
+          0.0005055088549852371,
+          0.0005055088549852371,
+          0.0005055088549852371
+        ],
+        [
+          0.017563343048095703,
+          0.0036890506744384766,
+          0.0036890506744384766,
+          0.028504610061645508
+        ]
+      ],
+      "nonfinite_score_count": 0,
+      "max_absolute_error": 0.028504610061645508
+    },
+    "attempt": 2,
+    "accepted": true,
+    "successful_updates": 2,
+    "loss": -0.14071112871170044,
+    "reward_mean": -0.05113331973552704,
+    "teacher_agreement": 0.8125,
+    "zero_advantage_fraction": 0.5,
+    "entropy": 1.1302094459533691,
+    "gradient_norm": 6.7717156410217285,
+    "step_kl_max": 0.012115657329559326,
+    "distinct_sampled_actions_mean": 1.75,
+    "context_visits": 8,
+    "sampled_episodes": 32
+  },
+  {
+    "score_work": {
+      "mode": "deduplicate_checked_v1",
+      "version": 1,
+      "requested_rows": 20,
+      "scored_rows": 22,
+      "score_calls": 3,
+      "cache_hits": 14,
+      "validation_rows": 16,
+      "candidate_scored_rows": 6,
+      "candidate_eligible": false,
+      "candidate_used": false,
+      "native_cache_hits": 14,
+      "fallback_reason": "score_tolerance_or_nonfinite",
+      "atol": 1e-05,
+      "rtol": 1e-05,
+      "absolute_errors": [
+        [
+          0.004153251647949219,
+          0.0014698505401611328,
+          0.004153251647949219,
+          0.004153251647949219
+        ],
+        [
+          0.008432388305664062,
+          0.008432388305664062,
+          0.008432388305664062,
+          0.008432388305664062
+        ],
+        [
+          0.00020116567611694336,
+          0.00020116567611694336,
+          0.00022399425506591797,
+          0.00020116567611694336
+        ],
+        [
+          0.05305767059326172,
+          0.05305767059326172,
+          0.05305767059326172,
+          0.05305767059326172
+        ]
+      ],
+      "nonfinite_score_count": 0,
+      "max_absolute_error": 0.05305767059326172
+    },
+    "attempt": 3,
+    "accepted": true,
+    "successful_updates": 3,
+    "loss": -0.04231973737478256,
+    "reward_mean": -0.023287877440452576,
+    "teacher_agreement": 0.875,
+    "zero_advantage_fraction": 0.5,
+    "entropy": 1.1310961246490479,
+    "gradient_norm": 0.8164002299308777,
+    "step_kl_max": 0.005304466933012009,
+    "distinct_sampled_actions_mean": 1.5,
+    "context_visits": 12,
+    "sampled_episodes": 48
+  },
+  {
+    "score_work": {
+      "mode": "deduplicate_checked_v1",
+      "version": 1,
+      "requested_rows": 20,
+      "scored_rows": 25,
+      "score_calls": 3,
+      "cache_hits": 11,
+      "validation_rows": 16,
+      "candidate_scored_rows": 9,
+      "candidate_eligible": true,
+      "candidate_used": true,
+      "native_cache_hits": 11,
+      "fallback_reason": null,
+      "atol": 1e-05,
+      "rtol": 1e-05,
+      "absolute_errors": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          2.4884939193725586e-06,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "nonfinite_score_count": 0,
+      "max_absolute_error": 2.4884939193725586e-06
+    },
+    "attempt": 4,
+    "accepted": true,
+    "successful_updates": 4,
+    "loss": -0.10769137740135193,
+    "reward_mean": -0.02273835986852646,
+    "teacher_agreement": 0.6875,
+    "zero_advantage_fraction": 0.25,
+    "entropy": 1.1378072500228882,
+    "gradient_norm": 2.9266343116760254,
+    "step_kl_max": 0.008352316915988922,
+    "distinct_sampled_actions_mean": 2.25,
+    "context_visits": 16,
+    "sampled_episodes": 64
+  }
+]
