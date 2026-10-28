@@ -91,6 +91,30 @@ def validate_config(c):
     training.validate()
     if training.max_train_contexts != c['max_train_contexts']:
         raise ValueError('training and runner max_train_contexts must match')
+    sampler = c.setdefault('context_sampling', {'version': 1, 'strategy': 'document_balanced_uniform_positions'})
+    if sampler != {'version': 1, 'strategy': 'document_balanced_uniform_positions'} or type(sampler.get('version')) is not int:
+        raise ValueError('unsupported context_sampling contract; legacy first-N checkpoint reuse is forbidden')
+    from mixtral_lab.oracle import OracleConfig
+    oracle = c.setdefault('oracle', {'role': 'calibration', 'max_contexts': 8, 'max_score_calls': 464})
+    if not isinstance(oracle, dict):
+        raise ValueError('oracle must be an object')
+    settings = dict(oracle)
+    role = settings.pop('role', 'calibration')
+    if role not in ('calibration', 'selection'):
+        raise ValueError('oracle role must be calibration or selection, never held-out')
+    oc = OracleConfig(**settings); oc.validate()
+    integer(oc.max_contexts, 'oracle.max_contexts', 1, 4096)
+    integer(oc.max_score_calls, 'oracle.max_score_calls', 1, 237568)
+    if oc.max_score_calls < 58 * oc.max_contexts:
+        raise ValueError('oracle score budget must cover 58 score calls per context')
+    second = c.setdefault('second_round', {'enabled': False})
+    if not isinstance(second, dict) or not isinstance(second.get('enabled'), bool):
+        raise ValueError('second_round.enabled must be explicitly boolean')
+    from mixtral_lab.second_round import SecondRoundConfig
+    settings = dict(second); settings.pop('enabled')
+    sc = SecondRoundConfig(**settings); sc.validate()
+    if second['enabled'] and sc.max_train_contexts != c['max_train_contexts']:
+        raise ValueError('second_round and runner max_train_contexts must match')
     return c
 
 

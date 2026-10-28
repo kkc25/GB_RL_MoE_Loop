@@ -1,5 +1,9 @@
 # Mixtral 冻结主干路由实验
 
+最新的分层采样、R1/R2+STOP oracle 与默认关闭的残差适配器方案见
+[LEARNABILITY_PLAN.md](LEARNABILITY_PLAN.md)。下文保留原始基础协议与运行边界；
+适配器是新增修正容量的独立实验，不代表已训练的循环专家或 learned STOP。
+
 ## 本轮要回答什么
 
 采用 `mistralai/Mixtral-8x7B-v0.1` **预训练 Base**，而不是 Instruct 版本。

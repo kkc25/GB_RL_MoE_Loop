@@ -179,6 +179,9 @@ def test_train_then_profile_new_output(tmp_path):
         runner.main(['--config',str(path),'--stage','train'])
         report=json.loads((Path(c['output_dir'])/'report.json').read_text())
         assert report['status']=='complete'
+        assert 'routing' in report['latest_development']
+        assert 0 <= report['latest_development']['routing']['greedy_native_agreement'] <= 1
+        assert 'routing' in report['selected_best_development']
         checkpoint=Path(c['output_dir'])/'router'/'checkpoint_best.pt'
         assert checkpoint.exists()
         c['output_dir']=str(tmp_path/'profile'); path.write_text(json.dumps(c))
@@ -231,6 +234,103 @@ def test_complete_checkpoint_guard(tmp_path):
     _, incomplete = AutoModelForCausalLM.from_pretrained(str(tmp_path/'tiny'), local_files_only=True,
         trust_remote_code=False, use_safetensors=True, output_loading_info=True)
     with raises(ValueError, match='incomplete'):runner.require_complete_checkpoint(incomplete)
+
+
+def test_learnability_config_contract(tmp_path):
+    c=config(tmp_path); validate_config(c)
+    assert c['context_sampling']['version'] == 1
+    assert c['oracle']['role'] == 'calibration'
+    assert c['second_round']['enabled'] is False
+    for changes in ({'context_sampling': {'version': 0}},
+                    {'oracle': {'role': 'train'}},
+                    {'oracle': {'max_contexts': 2, 'max_score_calls': 1}},
+                    {'second_round': {'enabled': 'yes'}},
+                    {'second_round': {'enabled': True, 'max_train_contexts': 6}}):
+        bad=copy.deepcopy(c); bad.update(changes)
+        with raises(ValueError): validate_config(bad)
+
+
+def test_oracle_and_adapter_cli_tiny(tmp_path):
+    c=config(tmp_path); path=tmp_path/'config.json'
+    model=tiny(); adapter=MixtralAdapter(model)
+    before={k:v.clone() for k,v in model.state_dict().items()}
+    info={'model':{'hash':'same'},'tokenizer':{'hash':'same'},'cuda_devices':[]}
+    c['oracle']={'role':'calibration','max_contexts':2,'max_score_calls':116}
+    with patch.object(torch.cuda,'is_available',return_value=True), patch.object(torch.cuda,'is_current_stream_capturing',return_value=False), patch.object(runner,'load_local_model',return_value=(model,Tokenizer(),adapter,info)):
+        path.write_text(json.dumps(c))
+        runner.main(['--config',str(path),'--stage','oracle'])
+        report=json.loads((Path(c['output_dir'])/'report.json').read_text())
+        assert report['status']=='complete'
+        assert report['oracle_contexts']['actual_count']==2
+        assert len(report['oracle']['contexts'])==2
+        assert 'native_selection' not in report
+        assert 'controlled_original_selection' not in report
+        assert report['identity']['context_sampling']['actual_count']==4
+        c['output_dir']=str(tmp_path/'disabled'); path.write_text(json.dumps(c))
+        with raises(ValueError,match='default off'):
+            runner.main(['--config',str(path),'--stage','adapter'])
+        assert not Path(c['output_dir']).exists()
+        c['output_dir']=str(tmp_path/'adapter')
+        c['second_round']={'enabled':True,'rank':2,'updates':1,'batch_contexts':2,
+                           'max_train_contexts':4,'eval_interval':1}
+        path.write_text(json.dumps(c))
+        runner.main(['--config',str(path),'--stage','adapter'])
+        report=json.loads((Path(c['output_dir'])/'report.json').read_text())
+        assert report['status']=='complete'
+        assert 'fixed_native_r1_stop' in report['adapter_controls']
+        assert 'untrained_native_r2_repeat' in report['adapter_controls']
+        assert (Path(c['output_dir'])/'second_round'/'checkpoint_best.pt').exists()
+        assert report['selected_adapter_development']['terminal_expert_calls']==1
+    for k,v in model.state_dict().items(): assert torch.equal(v,before[k])
+
+
+def test_validate_cli_backward_compatible(tmp_path):
+    c=config(tmp_path); path=tmp_path/'config.json'; path.write_text(json.dumps(c))
+    model=tiny(); adapter=MixtralAdapter(model)
+    info={'model':{'hash':'same'},'tokenizer':{'hash':'same'},'cuda_devices':[]}
+    with patch.object(torch.cuda,'is_available',return_value=True), patch.object(runner,'load_local_model',return_value=(model,Tokenizer(),adapter,info)):
+        runner.main(['--config',str(path)])
+    report=json.loads((Path(c['output_dir'])/'report.json').read_text())
+    assert report['stage']=='validate' and report['status']=='complete'
+    assert report['config']['context_sampling']['strategy']=='document_balanced_uniform_positions'
+
+
+def test_route_diagnostics_preserves_full_padded_execution_shape(tmp_path):
+    from mixtral_lab.adapter import pair_to_action
+    c=config(tmp_path); data,_=prepare_data(c,Tokenizer())
+    adapter=MixtralAdapter(tiny())
+    row=data['selection'][0]
+    gate_shapes=[]; actor_shapes=[]; actual=[]
+    class ShapeSensitiveActor:
+        def log_probs(self, features, native_pairs):
+            actor_shapes.append(len(features))
+            scores=torch.zeros(len(features),28,device=features.device)
+            native=pair_to_action(native_pairs)-1
+            # Correct full-shaped execution selects native on even positions;
+            # an erroneously filtered four-row call selects no native actions.
+            chosen=(native+1)%28
+            if len(features)==6:
+                chosen[::2]=native[::2]
+            scores.scatter_(1,chosen[:,None],2.)
+            return scores.log_softmax(-1)
+        def __call__(self, obs):
+            result=self.log_probs(obs.features,obs.native_pairs).argmax(-1)+1
+            actual.append((result.clone(),pair_to_action(obs.native_pairs)))
+            return result
+    actor=ShapeSensitiveActor()
+    hook=adapter.moe.gate.register_forward_pre_hook(lambda module,args:gate_shapes.append(len(args[0])))
+    try:
+        batch=runner.batch_row(row,runner.input_device(adapter.model))
+        result=adapter.forward(**batch,policy=actor,max_calls=1)
+        diagnostic=runner.route_diagnostics(adapter,[row],actor)
+    finally:
+        hook.remove()
+    assert actor_shapes==[6,6]
+    assert gate_shapes and all(shape==6 for shape in gate_shapes)
+    assert diagnostic['supervised_tokens']==4
+    assert diagnostic['greedy_native_agreement']==.5
+    assert torch.equal(result.actions.reshape(-1),actual[0][0])
+    assert diagnostic['greedy_native_agreement']==float((actual[0][0][:4]==actual[0][1][:4]).float().mean())
 
 
 class ProtocolTests(unittest.TestCase):
