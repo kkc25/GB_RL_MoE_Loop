@@ -1,0 +1,1296 @@
+{
+  "status": "completed",
+  "stop_reason": "update_budget_exhausted",
+  "adaptive_stopped": false,
+  "adaptive_controller_state": {
+    "schema": "mixtral-train-only-adaptive-fit-v1",
+    "config": {
+      "enabled": true,
+      "eval_interval": 16,
+      "patience": 3,
+      "min_delta": 0.0001,
+      "lr_factor": 0.5,
+      "min_lr": 1e-05,
+      "max_lr": 0.01,
+      "growth_factor": 2.0,
+      "max_growths": 2,
+      "min_updates": 64,
+      "stop_patience": 3
+    },
+    "initial_lr": 0.001,
+    "current_lr": 0.001,
+    "last_update": 256,
+    "best_train_loss": 0.026598901815759746,
+    "progress_anchor_loss": 0.026598901815759746,
+    "last_train_loss": 0.026598901815759746,
+    "plateau_observations": 0,
+    "ineffective_observations": 0,
+    "floor_plateau_observations": 0,
+    "growths": 0,
+    "reductions": 0,
+    "coverage_complete": true,
+    "stopped": false,
+    "stop_reason": null,
+    "observation_count": 17,
+    "decisions": [
+      {
+        "update": 0,
+        "train_loss": 1.882534853210018,
+        "coverage_complete": false,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "baseline"
+      },
+      {
+        "update": 16,
+        "train_loss": 1.6671501546434229,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 32,
+        "train_loss": 0.998267734604724,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 48,
+        "train_loss": 0.5354437642017729,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 64,
+        "train_loss": 0.2904131990553651,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 80,
+        "train_loss": 0.17987845377547274,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 96,
+        "train_loss": 0.12635676234276616,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 112,
+        "train_loss": 0.09613803020420164,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 128,
+        "train_loss": 0.07460641657189626,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 144,
+        "train_loss": 0.06244400903915448,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 160,
+        "train_loss": 0.052659479335943615,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 176,
+        "train_loss": 0.046599520444942755,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 192,
+        "train_loss": 0.04100916814923039,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 208,
+        "train_loss": 0.03683223722509865,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 224,
+        "train_loss": 0.031941397425271134,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 240,
+        "train_loss": 0.02911222839338734,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 256,
+        "train_loss": 0.026598901815759746,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      }
+    ]
+  },
+  "best_adaptive_controller_state": {
+    "schema": "mixtral-train-only-adaptive-fit-v1",
+    "config": {
+      "enabled": true,
+      "eval_interval": 16,
+      "patience": 3,
+      "min_delta": 0.0001,
+      "lr_factor": 0.5,
+      "min_lr": 1e-05,
+      "max_lr": 0.01,
+      "growth_factor": 2.0,
+      "max_growths": 2,
+      "min_updates": 64,
+      "stop_patience": 3
+    },
+    "initial_lr": 0.001,
+    "current_lr": 0.001,
+    "last_update": 256,
+    "best_train_loss": 0.026598901815759746,
+    "progress_anchor_loss": 0.026598901815759746,
+    "last_train_loss": 0.026598901815759746,
+    "plateau_observations": 0,
+    "ineffective_observations": 0,
+    "floor_plateau_observations": 0,
+    "growths": 0,
+    "reductions": 0,
+    "coverage_complete": true,
+    "stopped": false,
+    "stop_reason": null,
+    "observation_count": 17,
+    "decisions": [
+      {
+        "update": 0,
+        "train_loss": 1.882534853210018,
+        "coverage_complete": false,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "baseline"
+      },
+      {
+        "update": 16,
+        "train_loss": 1.6671501546434229,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 32,
+        "train_loss": 0.998267734604724,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 48,
+        "train_loss": 0.5354437642017729,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 64,
+        "train_loss": 0.2904131990553651,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 80,
+        "train_loss": 0.17987845377547274,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 96,
+        "train_loss": 0.12635676234276616,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 112,
+        "train_loss": 0.09613803020420164,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 128,
+        "train_loss": 0.07460641657189626,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 144,
+        "train_loss": 0.06244400903915448,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 160,
+        "train_loss": 0.052659479335943615,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 176,
+        "train_loss": 0.046599520444942755,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 192,
+        "train_loss": 0.04100916814923039,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 208,
+        "train_loss": 0.03683223722509865,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 224,
+        "train_loss": 0.031941397425271134,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 240,
+        "train_loss": 0.02911222839338734,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      },
+      {
+        "update": 256,
+        "train_loss": 0.026598901815759746,
+        "coverage_complete": true,
+        "ineffective_update": false,
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved"
+      }
+    ]
+  },
+  "experiment": "train_only_fixed_native_r1_adapter_fit",
+  "config": {
+    "rank": 8,
+    "updates": 256,
+    "batch_contexts": 8,
+    "max_train_contexts": 64,
+    "probe_chunk_contexts": 8,
+    "eval_interval": 16,
+    "learning_rate": 0.001,
+    "gradient_clip": 1.0,
+    "residual_scale": 1.0,
+    "fit_gain_threshold": 0.01,
+    "seed": 17,
+    "adaptive": {
+      "enabled": true,
+      "eval_interval": 16,
+      "patience": 3,
+      "min_delta": 0.0001,
+      "lr_factor": 0.5,
+      "min_lr": 1e-05,
+      "max_lr": 0.01,
+      "growth_factor": 2.0,
+      "max_growths": 2,
+      "min_updates": 64,
+      "stop_patience": 3
+    }
+  },
+  "checkpoint_selection": "minimum_fixed_train_probe_nll",
+  "initial_train_probe_nll": 1.882534853210018,
+  "best_train_probe_nll": 0.026598901815759746,
+  "latest_train_probe_nll": 0.026598901815759746,
+  "best_update": 256,
+  "latest_update": 256,
+  "train_fit_gain": 1.8559359513942582,
+  "train_fit_passed": true,
+  "fit_evidence_status": "fit_established",
+  "successful_updates": 256,
+  "attempted_updates": 256,
+  "train_contexts": 64,
+  "unique_contexts_visited": 64,
+  "context_visit_counts": [
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32
+  ],
+  "context_visits": 2048,
+  "minimum_context_visits": 32,
+  "effective_train_epochs": 32.0,
+  "work_accounting": {
+    "native_cache_terminal_ffn_batches": 8,
+    "native_cache_valid_contexts": 64,
+    "native_cache_contexts_including_padding": 64,
+    "optimizer_head_contexts": 2048,
+    "optimizer_backward_contexts": 2048,
+    "postupdate_diagnostic_contexts": 2048,
+    "train_probe_calls": 17,
+    "completed_train_probe_calls": 17,
+    "train_probe_head_batches": 136,
+    "train_probe_head_contexts_including_padding": 1088,
+    "train_probe_scored_contexts": 1088,
+    "train_probe_diagnostic_contexts_including_padding": 1088,
+    "optimizer_accepted_context_visits": 2048,
+    "total_head_forward_contexts_including_padding": 3136,
+    "total_adapter_correction_contexts_including_diagnostics_and_padding": 6272
+  },
+  "completed_epochs": 32,
+  "coverage_complete": true,
+  "train_probe_history": [
+    {
+      "update": 0,
+      "nll": 1.882534853210018,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 0.0,
+        "native_effective_change_rms": 0.0,
+        "native_effective_change_rate": 0.0,
+        "bf16_effective_change_rms": 0.0,
+        "bf16_effective_change_rate": 0.0,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "baseline",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 0,
+          "best_train_loss": 1.882534853210018,
+          "progress_anchor_loss": 1.882534853210018,
+          "last_train_loss": 1.882534853210018,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": false,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 1
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 0,
+        "accepted_updates": 0,
+        "nonzero_gradient_updates": 0,
+        "max_gradient_norm": 0.0
+      }
+    },
+    {
+      "update": 16,
+      "nll": 1.6671501546434229,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 0.10471764576585492,
+        "native_effective_change_rms": 0.10507770546107219,
+        "native_effective_change_rate": 0.8844184875488281,
+        "bf16_effective_change_rms": 0.10507770546107219,
+        "bf16_effective_change_rate": 0.8844184875488281,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 16,
+          "best_train_loss": 1.6671501546434229,
+          "progress_anchor_loss": 1.6671501546434229,
+          "last_train_loss": 1.6671501546434229,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 2
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 0,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 1.4432789087295532
+      }
+    },
+    {
+      "update": 32,
+      "nll": 0.998267734604724,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 0.6004402430922431,
+        "native_effective_change_rms": 0.6005571972262134,
+        "native_effective_change_rate": 0.9798851013183594,
+        "bf16_effective_change_rms": 0.6005571972262134,
+        "bf16_effective_change_rate": 0.9798851013183594,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 32,
+          "best_train_loss": 0.998267734604724,
+          "progress_anchor_loss": 0.998267734604724,
+          "last_train_loss": 0.998267734604724,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 3
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 16,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 2.1834654808044434
+      }
+    },
+    {
+      "update": 48,
+      "nll": 0.5354437642017729,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 1.1979831473782068,
+        "native_effective_change_rms": 1.1980864582350936,
+        "native_effective_change_rate": 0.9891090393066406,
+        "bf16_effective_change_rms": 1.1980864582350936,
+        "bf16_effective_change_rate": 0.9891090393066406,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 48,
+          "best_train_loss": 0.5354437642017729,
+          "progress_anchor_loss": 0.5354437642017729,
+          "last_train_loss": 0.5354437642017729,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 4
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 32,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 2.4139535427093506
+      }
+    },
+    {
+      "update": 64,
+      "nll": 0.2904131990553651,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 1.6573466571885629,
+        "native_effective_change_rms": 1.6575052141291635,
+        "native_effective_change_rate": 0.9918785095214844,
+        "bf16_effective_change_rms": 1.6575052141291635,
+        "bf16_effective_change_rate": 0.9918785095214844,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 64,
+          "best_train_loss": 0.2904131990553651,
+          "progress_anchor_loss": 0.2904131990553651,
+          "last_train_loss": 0.2904131990553651,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 5
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 48,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 1.9853347539901733
+      }
+    },
+    {
+      "update": 80,
+      "nll": 0.17987845377547274,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 1.9797196147595213,
+        "native_effective_change_rms": 1.9798056288771964,
+        "native_effective_change_rate": 0.993133544921875,
+        "bf16_effective_change_rms": 1.9798056288771964,
+        "bf16_effective_change_rate": 0.993133544921875,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 80,
+          "best_train_loss": 0.17987845377547274,
+          "progress_anchor_loss": 0.17987845377547274,
+          "last_train_loss": 0.17987845377547274,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 6
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 64,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 1.6406238079071045
+      }
+    },
+    {
+      "update": 96,
+      "nll": 0.12635676234276616,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 2.2813303906903553,
+        "native_effective_change_rms": 2.2813593147916955,
+        "native_effective_change_rate": 0.9939804077148438,
+        "bf16_effective_change_rms": 2.2813593147916955,
+        "bf16_effective_change_rate": 0.9939804077148438,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 96,
+          "best_train_loss": 0.12635676234276616,
+          "progress_anchor_loss": 0.12635676234276616,
+          "last_train_loss": 0.12635676234276616,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 7
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 80,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 1.7552300691604614
+      }
+    },
+    {
+      "update": 112,
+      "nll": 0.09613803020420164,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 2.4861570676342146,
+        "native_effective_change_rms": 2.486385280820562,
+        "native_effective_change_rate": 0.9949226379394531,
+        "bf16_effective_change_rms": 2.486385280820562,
+        "bf16_effective_change_rate": 0.9949226379394531,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 112,
+          "best_train_loss": 0.09613803020420164,
+          "progress_anchor_loss": 0.09613803020420164,
+          "last_train_loss": 0.09613803020420164,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 8
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 96,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.8374442458152771
+      }
+    },
+    {
+      "update": 128,
+      "nll": 0.07460641657189626,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 2.6776723391235184,
+        "native_effective_change_rms": 2.6776814898586387,
+        "native_effective_change_rate": 0.9949569702148438,
+        "bf16_effective_change_rms": 2.6776814898586387,
+        "bf16_effective_change_rate": 0.9949569702148438,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 128,
+          "best_train_loss": 0.07460641657189626,
+          "progress_anchor_loss": 0.07460641657189626,
+          "last_train_loss": 0.07460641657189626,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 9
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 112,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.49352341890335083
+      }
+    },
+    {
+      "update": 144,
+      "nll": 0.06244400903915448,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 2.7994713000006226,
+        "native_effective_change_rms": 2.7996390041395136,
+        "native_effective_change_rate": 0.9952163696289062,
+        "bf16_effective_change_rms": 2.7996390041395136,
+        "bf16_effective_change_rate": 0.9952163696289062,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 144,
+          "best_train_loss": 0.06244400903915448,
+          "progress_anchor_loss": 0.06244400903915448,
+          "last_train_loss": 0.06244400903915448,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 10
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 128,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.3556337058544159
+      }
+    },
+    {
+      "update": 160,
+      "nll": 0.052659479335943615,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 2.9057664795929035,
+        "native_effective_change_rms": 2.9060136563853263,
+        "native_effective_change_rate": 0.9958038330078125,
+        "bf16_effective_change_rms": 2.9060136563853263,
+        "bf16_effective_change_rate": 0.9958038330078125,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 160,
+          "best_train_loss": 0.052659479335943615,
+          "progress_anchor_loss": 0.052659479335943615,
+          "last_train_loss": 0.052659479335943615,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 11
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 144,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.3417598307132721
+      }
+    },
+    {
+      "update": 176,
+      "nll": 0.046599520444942755,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 3.001332367152585,
+        "native_effective_change_rms": 3.0014790445108783,
+        "native_effective_change_rate": 0.9959144592285156,
+        "bf16_effective_change_rms": 3.0014790445108783,
+        "bf16_effective_change_rate": 0.9959144592285156,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 176,
+          "best_train_loss": 0.046599520444942755,
+          "progress_anchor_loss": 0.046599520444942755,
+          "last_train_loss": 0.046599520444942755,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 12
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 160,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.28212791681289673
+      }
+    },
+    {
+      "update": 192,
+      "nll": 0.04100916814923039,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 3.0828894460902183,
+        "native_effective_change_rms": 3.0827738893022594,
+        "native_effective_change_rate": 0.9958915710449219,
+        "bf16_effective_change_rms": 3.0827738893022594,
+        "bf16_effective_change_rate": 0.9958915710449219,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 192,
+          "best_train_loss": 0.04100916814923039,
+          "progress_anchor_loss": 0.04100916814923039,
+          "last_train_loss": 0.04100916814923039,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 13
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 176,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.2151305377483368
+      }
+    },
+    {
+      "update": 208,
+      "nll": 0.03683223722509865,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 3.1525458137017908,
+        "native_effective_change_rms": 3.1526852491534,
+        "native_effective_change_rate": 0.9958648681640625,
+        "bf16_effective_change_rms": 3.1526852491534,
+        "bf16_effective_change_rate": 0.9958648681640625,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 208,
+          "best_train_loss": 0.03683223722509865,
+          "progress_anchor_loss": 0.03683223722509865,
+          "last_train_loss": 0.03683223722509865,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 14
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 192,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.20683997869491577
+      }
+    },
+    {
+      "update": 224,
+      "nll": 0.031941397425271134,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 3.222621974205332,
+        "native_effective_change_rms": 3.2226889707077953,
+        "native_effective_change_rate": 0.9959297180175781,
+        "bf16_effective_change_rms": 3.2226889707077953,
+        "bf16_effective_change_rate": 0.9959297180175781,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 224,
+          "best_train_loss": 0.031941397425271134,
+          "progress_anchor_loss": 0.031941397425271134,
+          "last_train_loss": 0.031941397425271134,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 15
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 208,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.18782126903533936
+      }
+    },
+    {
+      "update": 240,
+      "nll": 0.02911222839338734,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 3.2751382665877413,
+        "native_effective_change_rms": 3.275037762590238,
+        "native_effective_change_rate": 0.996124267578125,
+        "bf16_effective_change_rms": 3.275037762590238,
+        "bf16_effective_change_rate": 0.996124267578125,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 240,
+          "best_train_loss": 0.02911222839338734,
+          "progress_anchor_loss": 0.02911222839338734,
+          "last_train_loss": 0.02911222839338734,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 16
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 224,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.16752076148986816
+      }
+    },
+    {
+      "update": 256,
+      "nll": 0.026598901815759746,
+      "diagnostics": {
+        "fp32_proposed_correction_rms": 3.3286090551026017,
+        "native_effective_change_rms": 3.3285115121056665,
+        "native_effective_change_rate": 0.996185302734375,
+        "bf16_effective_change_rms": 3.3285115121056665,
+        "bf16_effective_change_rate": 0.996185302734375,
+        "bf16_diagnostic_is_actual_native": true,
+        "native_dtype": "torch.bfloat16"
+      },
+      "adaptive_decision": {
+        "action": "hold",
+        "lr": 0.001,
+        "stop": false,
+        "reason": "train_loss_improved",
+        "state": {
+          "current_lr": 0.001,
+          "last_update": 256,
+          "best_train_loss": 0.026598901815759746,
+          "progress_anchor_loss": 0.026598901815759746,
+          "last_train_loss": 0.026598901815759746,
+          "plateau_observations": 0,
+          "ineffective_observations": 0,
+          "floor_plateau_observations": 0,
+          "growths": 0,
+          "reductions": 0,
+          "coverage_complete": true,
+          "stopped": false,
+          "stop_reason": null,
+          "observation_count": 17
+        }
+      },
+      "probe_interval_gradients": {
+        "start_update_exclusive": 240,
+        "accepted_updates": 16,
+        "nonzero_gradient_updates": 16,
+        "max_gradient_norm": 0.1669050008058548
+      }
+    }
+  ],
+  "probe_spec": {
+    "split": "train",
+    "contexts": 64,
+    "chunk_contexts": 8,
+    "last_chunk_padding": "repeat_last_masked",
+    "order": "cached_index"
+  },
+  "trainable_parameters": 65536,
+  "initial_correction_diagnostics": {
+    "fp32_proposed_correction_rms": 0.0,
+    "native_effective_change_rms": 0.0,
+    "native_effective_change_rate": 0.0,
+    "bf16_effective_change_rms": 0.0,
+    "bf16_effective_change_rate": 0.0,
+    "bf16_diagnostic_is_actual_native": true,
+    "native_dtype": "torch.bfloat16"
+  },
+  "best_correction_diagnostics": {
+    "fp32_proposed_correction_rms": 3.3286090551026017,
+    "native_effective_change_rms": 3.3285115121056665,
+    "native_effective_change_rate": 0.996185302734375,
+    "bf16_effective_change_rms": 3.3285115121056665,
+    "bf16_effective_change_rate": 0.996185302734375,
+    "bf16_diagnostic_is_actual_native": true,
+    "native_dtype": "torch.bfloat16"
+  },
+  "latest_correction_diagnostics": {
+    "fp32_proposed_correction_rms": 3.3286090551026017,
+    "native_effective_change_rms": 3.3285115121056665,
+    "native_effective_change_rate": 0.996185302734375,
+    "bf16_effective_change_rms": 3.3285115121056665,
+    "bf16_effective_change_rate": 0.996185302734375,
+    "bf16_diagnostic_is_actual_native": true,
+    "native_dtype": "torch.bfloat16"
+  },
+  "added_capacity": true,
+  "recurrent_ffn": false,
+  "learned_stop": false,
+  "selection_used": false,
+  "heldout_gain_established": false,
+  "practical_gain_established": false,
+  "backbone_gradients_absent": true,
+  "arithmetic": "FP32 adapter; correction cast then native residual add; frozen differentiable norm/head",
+  "limits": [
+    "train fit is not generalization",
+    "threshold miss applies only to this bounded adapter fit",
+    "no recurrent FFN or learned STOP",
+    "added capacity requires parameter-matched controls",
+    "optional bounded LR feedback does not find globally optimal hyperparameters",
+    "rank, residual scale, architecture and stage gates never adapt",
+    "BF16 post-add diagnostics are not a quantization fix",
+    "fixed padded cache/probe shapes may differ numerically from full-document deployment",
+    "work counts include padding/probes; they are not FLOPs or a speed/cost conclusion"
+  ],
+  "binding_sha256": "17b8616a8c6d827decce5eb1b63788ef57f68a36e9e5889dd81e2bb77ee183a9",
+  "train_inputs_sha256": "04e2e4509af3cc256c2c95a4199ac24cf0715a9caa4b43c0010cf42a8a8ed9ce",
+  "cached_native_sha256": "55aad69919f5d7890f007df8d6ef276143c05350e8864e9ec3a34e56cf99f98f",
+  "elapsed_seconds": 2.064554600045085
+}

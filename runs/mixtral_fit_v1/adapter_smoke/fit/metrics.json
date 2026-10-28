@@ -1,0 +1,170 @@
+[
+  {
+    "update": 1,
+    "epoch": 1,
+    "visited_indices": [
+      7,
+      0,
+      1,
+      5,
+      6,
+      4,
+      3,
+      2
+    ],
+    "batch_contexts": 8,
+    "accepted": true,
+    "learning_rate": 0.001,
+    "train_batch_nll": 2.122729778289795,
+    "gradient_norm": 0.15548968315124512,
+    "correction_diagnostics": {
+      "fp32_proposed_correction_rms": 0.003856517744375193,
+      "native_effective_change_rms": 0.0024394990559201274,
+      "native_effective_change_rate": 0.18780517578125,
+      "bf16_effective_change_rms": 0.0024394990559201274,
+      "bf16_effective_change_rate": 0.18780517578125,
+      "bf16_diagnostic_is_actual_native": true,
+      "native_dtype": "torch.bfloat16"
+    },
+    "unique_contexts_visited": 8,
+    "completed_epochs": 1
+  },
+  {
+    "update": 2,
+    "epoch": 2,
+    "visited_indices": [
+      5,
+      4,
+      0,
+      2,
+      7,
+      1,
+      6,
+      3
+    ],
+    "batch_contexts": 8,
+    "accepted": true,
+    "learning_rate": 0.001,
+    "train_batch_nll": 2.1223437786102295,
+    "gradient_norm": 0.3987985849380493,
+    "correction_diagnostics": {
+      "fp32_proposed_correction_rms": 0.013283061514899584,
+      "native_effective_change_rms": 0.013878121001603379,
+      "native_effective_change_rate": 0.537322998046875,
+      "bf16_effective_change_rms": 0.013878121001603379,
+      "bf16_effective_change_rate": 0.537322998046875,
+      "bf16_diagnostic_is_actual_native": true,
+      "native_dtype": "torch.bfloat16"
+    },
+    "adaptive_decision": {
+      "action": "hold",
+      "lr": 0.001,
+      "stop": false,
+      "reason": "adaptive_disabled",
+      "state": {
+        "current_lr": 0.001,
+        "last_update": 2,
+        "best_train_loss": 2.061598831031006,
+        "progress_anchor_loss": 2.061598831031006,
+        "last_train_loss": 2.061598831031006,
+        "plateau_observations": 0,
+        "ineffective_observations": 0,
+        "floor_plateau_observations": 0,
+        "growths": 0,
+        "reductions": 0,
+        "coverage_complete": true,
+        "stopped": false,
+        "stop_reason": null,
+        "observation_count": 2
+      }
+    },
+    "next_learning_rate": 0.001,
+    "train_probe_nll": 2.061598831031006,
+    "unique_contexts_visited": 8,
+    "completed_epochs": 2
+  },
+  {
+    "update": 3,
+    "epoch": 3,
+    "visited_indices": [
+      7,
+      2,
+      4,
+      0,
+      5,
+      1,
+      6,
+      3
+    ],
+    "batch_contexts": 8,
+    "accepted": true,
+    "learning_rate": 0.001,
+    "train_batch_nll": 2.061598777770996,
+    "gradient_norm": 0.7773995399475098,
+    "correction_diagnostics": {
+      "fp32_proposed_correction_rms": 0.02932803575213851,
+      "native_effective_change_rms": 0.03059334183706719,
+      "native_effective_change_rate": 0.747467041015625,
+      "bf16_effective_change_rms": 0.03059334183706719,
+      "bf16_effective_change_rate": 0.747467041015625,
+      "bf16_diagnostic_is_actual_native": true,
+      "native_dtype": "torch.bfloat16"
+    },
+    "unique_contexts_visited": 8,
+    "completed_epochs": 3
+  },
+  {
+    "update": 4,
+    "epoch": 4,
+    "visited_indices": [
+      2,
+      5,
+      1,
+      0,
+      7,
+      6,
+      4,
+      3
+    ],
+    "batch_contexts": 8,
+    "accepted": true,
+    "learning_rate": 0.001,
+    "train_batch_nll": 1.953685998916626,
+    "gradient_norm": 1.135159969329834,
+    "correction_diagnostics": {
+      "fp32_proposed_correction_rms": 0.05285586322296475,
+      "native_effective_change_rms": 0.05364148031433663,
+      "native_effective_change_rate": 0.8509521484375,
+      "bf16_effective_change_rms": 0.05364148031433663,
+      "bf16_effective_change_rate": 0.8509521484375,
+      "bf16_diagnostic_is_actual_native": true,
+      "native_dtype": "torch.bfloat16"
+    },
+    "adaptive_decision": {
+      "action": "hold",
+      "lr": 0.001,
+      "stop": false,
+      "reason": "adaptive_disabled",
+      "state": {
+        "current_lr": 0.001,
+        "last_update": 4,
+        "best_train_loss": 1.8033444409957156,
+        "progress_anchor_loss": 1.8033444409957156,
+        "last_train_loss": 1.8033444409957156,
+        "plateau_observations": 0,
+        "ineffective_observations": 0,
+        "floor_plateau_observations": 0,
+        "growths": 0,
+        "reductions": 0,
+        "coverage_complete": true,
+        "stopped": false,
+        "stop_reason": null,
+        "observation_count": 3
+      }
+    },
+    "next_learning_rate": 0.001,
+    "train_probe_nll": 1.8033444409957156,
+    "unique_contexts_visited": 8,
+    "completed_epochs": 4
+  }
+]

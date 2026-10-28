@@ -1,0 +1,78 @@
+{
+  "actual_count": 8,
+  "available_positions": 254,
+  "contexts": [
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 356,
+      "token_position": 22
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 387,
+      "token_position": 90
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 5203,
+      "token_position": 122
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 28731,
+      "token_position": 46
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 28784,
+      "token_position": 38
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 5106,
+      "token_position": 98
+    },
+    {
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "target": 345,
+      "token_position": 103
+    },
+    {
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "target": 3403,
+      "token_position": 37
+    }
+  ],
+  "covered_document_count": 2,
+  "document_count": 2,
+  "document_coverage": 1.0,
+  "documents": [
+    {
+      "available_positions": 127,
+      "content_sha256": "7b6283fb4f83a4ca6fe10e854aeb9a1bb6da9599fed84e8aac7c72c47ea8197f",
+      "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+      "selected_count": 4
+    },
+    {
+      "available_positions": 127,
+      "content_sha256": "aad152afe0424d742953b0daeeb68219b893a4e6ee9299f19fa36407c271cdd5",
+      "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+      "selected_count": 4
+    }
+  ],
+  "eligible_document_count": 2,
+  "requested_count": 8,
+  "role": "train",
+  "sampling_sha256": "3e345f6039757bf7dcfaec59fb0efa8cda1c6eb1d33df6b9c70ad3d2dd6f6c44",
+  "seed": 17,
+  "strategy": "document_balanced_uniform_positions",
+  "version": 1
+}
