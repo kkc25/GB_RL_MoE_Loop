@@ -1,5 +1,7 @@
 # Mixtral：先拟合训练问题，再检验泛化，最后评估成本
 
+后续独立四角色 recovery 协议见 [RECOVERY_EXPERIMENTS.md](RECOVERY_EXPERIMENTS.md)：先做历史 cache/在线桥接，再由独立 development 选 checkpoint；本文原 baseline 与命令保持不变。
+
 本协议新增独立入口 `experiments.mixtral_fit_experiment`，不改变旧
 `experiments.mixtral_experiment` 的默认行为。它把三个问题按顺序拆开：
 

@@ -99,7 +99,7 @@ class FitPresetTests(unittest.TestCase):
 
     def test_legacy_presets_remain_valid_with_legacy_validator(self):
         for path in sorted(CONFIGS.glob('*.json')):
-            if path.name.startswith('fit_'):
+            if path.name.startswith(('fit_', 'recovery_')):
                 continue
             with self.subTest(path=path.name):
                 validate_config(json.loads(path.read_text()))
