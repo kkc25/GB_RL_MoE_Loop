@@ -15,7 +15,7 @@ import time
 
 import torch
 from mixtral_lab.protocol import (load_config, directory_identity, prepare_data, batch_row,
-                                 token_ce, canonical_hash, fresh_output, read_documents)
+                                 token_ce, canonical_hash, fresh_output, read_documents, sha256_file)
 
 
 def parser():
@@ -71,14 +71,33 @@ def require_complete_checkpoint(loading_info):
     return {key: [] for key in required}
 
 
-def load_local_model(config):
-    from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
-    from mixtral_lab.adapter import MixtralAdapter
-    # Real experiment paths are offline and explicit. No model-id fallback.
-    model_path, tokenizer_path = Path(config['model_path']), Path(config['tokenizer_path'])
-    if not model_path.is_dir() or not tokenizer_path.is_dir():
-        raise ValueError('download/pin the model and tokenizer separately; local directories are required')
-    metadata = AutoConfig.from_pretrained(str(model_path), local_files_only=True, trust_remote_code=False)
+def local_input_identity(config):
+    """Cheap config/tokenizer snapshot; full weight hashing waits for quota checks.
+
+    Match the artifact identity file contract, except for safetensors weights.
+    Hash both directories even when the tokenizer is separately pinned: model
+    metadata must describe the same configuration eventually given to HF.
+    """
+    identities = {}
+    for role, setting in (('model', 'model_path'), ('tokenizer', 'tokenizer_path')):
+        root = Path(config[setting])
+        if not root.is_dir():
+            raise ValueError('download/pin the model and tokenizer separately; local directories are required')
+        allowed = {'.json', '.model', '.txt', '.tiktoken'}
+        files = {str(p.relative_to(root)): sha256_file(p) for p in sorted(root.rglob('*'))
+                 if p.is_file() and p.suffix in allowed and '.cache' not in p.relative_to(root).parts}
+        if not files:
+            raise ValueError('local config/tokenizer artifact directory is empty')
+        identities[role] = {'directory': str(root.resolve()), 'files': files,
+                            'content_sha256': canonical_hash(files)}
+    return identities
+
+
+def load_local_inputs(config):
+    """Load only offline metadata and tokenizer, before any full model allocation."""
+    from transformers import AutoConfig, AutoTokenizer
+    snapshot = local_input_identity(config)
+    metadata = AutoConfig.from_pretrained(config['model_path'], local_files_only=True, trust_remote_code=False)
     expected = {'model_type': 'mixtral', 'num_local_experts': 8, 'num_experts_per_tok': 2,
                 'hidden_size': 4096, 'num_hidden_layers': 32}
     for name, value in expected.items():
@@ -86,17 +105,76 @@ def load_local_model(config):
             raise ValueError(f'expected Mixtral-8x7B Base architecture: {name}={value}')
     if getattr(metadata, 'quantization_config', None):
         raise ValueError('quantized checkpoints require a separate experiment')
-    model_identity = directory_identity(model_path)
-    tokenizer_identity = directory_identity(tokenizer_path) if tokenizer_path.resolve() != model_path.resolve() else model_identity
-    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path), local_files_only=True, trust_remote_code=False)
+    tokenizer = AutoTokenizer.from_pretrained(config['tokenizer_path'], local_files_only=True, trust_remote_code=False)
+    if local_input_identity(config) != snapshot:
+        raise ValueError('local config/tokenizer artifacts changed during preflight loading')
+    return {'metadata': metadata, 'tokenizer': tokenizer, 'identity': snapshot}
+
+
+
+def local_artifact_stats(config):
+    """Detect normal artifact replacement/write races without rereading 93GB.
+
+    Identity is still a full content hash. These signatures supplement it during
+    HF loading; they assume immutable operator-pinned local snapshot files.
+    """
+    snapshots = {}
+    for role, setting in (('model', 'model_path'), ('tokenizer', 'tokenizer_path')):
+        root = Path(config[setting])
+        files = {}
+        for path in sorted(root.rglob('*')):
+            if (path.is_file() and path.suffix in {'.json', '.safetensors', '.model', '.txt', '.tiktoken'}
+                    and '.cache' not in path.relative_to(root).parts):
+                stat = path.stat()
+                files[str(path.relative_to(root))] = (str(path.resolve()), stat.st_dev, stat.st_ino,
+                    stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+        snapshots[role] = {'directory': str(root.resolve()), 'files': files}
+    return snapshots
+
+
+def load_local_model(config, *, local_inputs=None):
+    """Load frozen weights; the one-argument public API remains supported.
+
+    The CLI passes the already-loaded tokenizer/config so quotas and actual
+    execution cannot silently use different tokenizers. Artifact snapshots are
+    checked around loading; failed checks never produce a completed experiment.
+    Weights are hashed once, then guarded by file metadata under the immutable
+    local snapshot contract, not a cryptographic concurrent-tampering guarantee.
+    """
+    from transformers import AutoModelForCausalLM
+    from mixtral_lab.adapter import MixtralAdapter
+    local_inputs = load_local_inputs(config) if local_inputs is None else local_inputs
+    metadata, tokenizer = local_inputs['metadata'], local_inputs['tokenizer']
+    if local_input_identity(config) != local_inputs['identity']:
+        raise ValueError('local config/tokenizer artifacts changed after preflight')
+    model_path, tokenizer_path = Path(config['model_path']), Path(config['tokenizer_path'])
     memory = {int(k): v for k, v in config['max_memory'].items()}
     if any(index >= torch.cuda.device_count() for index in memory):
         raise ValueError('configured GPU index is not currently visible')
-    model, loading_info = AutoModelForCausalLM.from_pretrained(str(model_path), local_files_only=True,
+    artifact_stats = local_artifact_stats(config)
+    model_identity = directory_identity(model_path)
+    tokenizer_identity = directory_identity(tokenizer_path) if tokenizer_path.resolve() != model_path.resolve() else model_identity
+    # Hashing weights can take time; reject changes to preflight inputs before
+    # allocating the model, as well as changes during the actual HF load below.
+    if local_input_identity(config) != local_inputs['identity']:
+        raise ValueError('local config/tokenizer artifacts changed before weight loading')
+    for role, identity in (('model', model_identity), ('tokenizer', tokenizer_identity)):
+        side_files = {name: digest for name, digest in identity['files'].items()
+                      if Path(name).suffix != '.safetensors'}
+        if (identity['directory'] != local_inputs['identity'][role]['directory']
+                or side_files != local_inputs['identity'][role]['files']):
+            raise ValueError('preflight inputs differ from the full local artifact identity')
+    if local_artifact_stats(config) != artifact_stats:
+        raise ValueError('local artifacts changed while hashing before weight loading')
+    model, loading_info = AutoModelForCausalLM.from_pretrained(str(model_path), config=metadata, local_files_only=True,
         trust_remote_code=False, use_safetensors=True, dtype=torch.bfloat16,
         device_map=config['device_map'], max_memory=memory, attn_implementation='sdpa',
         experts_implementation=config['experts_implementation'], output_loading_info=True)
     loading_info = require_complete_checkpoint(loading_info)
+    if local_artifact_stats(config) != artifact_stats:
+        raise ValueError('local artifacts changed during weight loading')
+    if local_input_identity(config) != local_inputs['identity']:
+        raise ValueError('local config/tokenizer artifacts changed during weight loading')
     model.eval().requires_grad_(False)
     backends = [layer.mlp.experts.config._experts_implementation for layer in model.model.layers]
     if any(value != config['experts_implementation'] for value in backends):
@@ -112,6 +190,9 @@ def load_local_model(config):
         'revision_status': 'operator-declared; actual local artifact bytes independently hashed',
         'device_map': {k: str(v) for k, v in placement.items()}, 'cuda_devices': devices,
         'checkpoint_loading_info': loading_info, 'model_config': metadata.to_dict(),
+        'artifact_verification': {'weights': 'content-hashed once before loading; path/inode/size/mtime/ctime checked before and after loading',
+            'config_and_tokenizer': 'content-hashed around preflight and full weight loading',
+            'scope': 'requires immutable local snapshots; not cryptographic proof against concurrent tampering'},
         'experts_implementation_by_layer': backends,
         'expert_backend_evidence': expert_backend_evidence(config['experts_implementation'], backends)}
 
@@ -329,45 +410,82 @@ def evaluate_second_round(adapter, rows, residual=None, *, repeat=False):
             'numerical_scope': 'full padded document shape; oracle scores use single-row shape and are not numerically interchangeable'}
 
 
+def context_requirements(config, stage, actor_checkpoint=None):
+    """Only caches consumed by this stage (or its checkpoint binding) are required."""
+    if stage in ('train', 'adapter') or (stage == 'profile' and actor_checkpoint):
+        return {'train': {'role': 'train', 'requested_count': config['max_train_contexts']}}
+    if stage == 'oracle':
+        from mixtral_lab.oracle import OracleConfig
+        settings = dict(config['oracle'])
+        role = settings.pop('role', 'calibration')
+        return {'oracle': {'role': role, 'requested_count': OracleConfig(**settings).max_contexts}}
+    return {}
+
+
 def main(argv=None):
     args = parser().parse_args(argv)
-    config = load_config(args.config)
+    config = load_config(args.config, stage=args.stage, actor_checkpoint=args.actor_checkpoint)
     if Path(config['output_dir']).exists():
         raise FileExistsError('choose a new output_dir; historical outputs are protected')
     if args.actor_checkpoint and args.stage != 'profile':
         raise ValueError('--actor-checkpoint is only for profile, never resume')
     if args.stage == 'adapter' and not config.get('second_round', {}).get('enabled', False):
         raise ValueError('adapter is default off; explicitly set second_round.enabled=true')
-    if not torch.cuda.is_available():
-        raise RuntimeError('real Mixtral experiments require CUDA; use CPU tiny-model unit tests for code checks')
-    # Reject split leakage/oversized source files before allocating model weights.
-    read_documents(config)
-    torch.manual_seed(config['seed'])
-    with precision_scope(config['allow_tf32']):
-        load_started = time.perf_counter()
-        model, tokenizer, adapter, model_info = load_local_model(config)
-        load_seconds = time.perf_counter() - load_started
-        stage_started = time.perf_counter()
-        data, data_identity = prepare_data(config, tokenizer)
+    output = fresh_output(config['output_dir'])
+    requirements = context_requirements(config, args.stage, args.actor_checkpoint)
+    report = {'schema': 'mixtral-experiment-report-v1', 'stage': args.stage,
+              'status': 'running', 'phase': 'preflight', 'model_load_started': False,
+              'config': config, 'config_sha256': canonical_hash(config),
+              'preflight': {'status': 'running', 'context_requirements': requirements},
+              'limitations': ['no held-out confirmation', 'no full-backbone training', 'no model-scale causal claim']}
+    atomic_json(output/'report.json', report)
+    preflight_started = time.perf_counter()
+    try:
+        # Retain all-role leakage/source checks, but do not allocate weights or
+        # impose unused train-context quotas on calibration-only experiments.
+        read_documents(config)
+        local_inputs = load_local_inputs(config)
+        report['preflight']['local_inputs'] = local_inputs['identity']
+        data, data_identity = prepare_data(config, local_inputs['tokenizer'])
+        report['preflight']['data'] = data_identity
         from mixtral_lab.sampling import plan_stratified_contexts, collect_stratified_contexts
-        train_manifest = plan_stratified_contexts(data['train'], config['max_train_contexts'], config['seed'], 'train')
-        output = fresh_output(config['output_dir'])
-        atomic_json(output/'train_contexts.json', train_manifest)
-        identity = {'model': model_info['model'], 'tokenizer': model_info['tokenizer'],
-                    'train': data_identity['train'], 'selection': data_identity['selection'],
-                    'calibration': data_identity['calibration'], 'code': code_identity(),
-                    'context_sampling': train_manifest,
-                    'numerical_contract': {'sampler': config['context_sampling'], **{key: config[key] for key in ('dtype', 'allow_tf32', 'experts_implementation', 'sequence_length', 'sequences', 'max_train_contexts')}, 'attention': 'sdpa', 'head_chunk': 128, 'runtime_versions': {name: version(name) for name in ('torch', 'transformers', 'accelerate', 'safetensors')}}}
-        report = {'schema': 'mixtral-experiment-report-v1', 'stage': args.stage, 'status': 'running',
-                  'model_load_wall_seconds': load_seconds, 'config': config, 'config_sha256': canonical_hash(config), 'identity': identity,
-                  'model': model_info, 'environment': {'torch': torch.__version__, 'cuda': torch.version.cuda,
-                      'packages': {name: version(name) for name in ('torch', 'transformers', 'accelerate', 'safetensors')},
-                      'cuda_visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'),
-                      'gpus': {str(i): {'name': torch.cuda.get_device_name(i),
-                               'total_memory_bytes': torch.cuda.get_device_properties(i).total_memory} for i in model_info['cuda_devices']}},
-                  'limitations': ['no held-out confirmation', 'no full-backbone training', 'no model-scale causal claim']}
+        manifests = {}
+        for name, required in requirements.items():
+            role, count = required['role'], required['requested_count']
+            required['available_positions'] = data_identity[role]['supervised_tokens']
+            try:
+                manifests[name] = plan_stratified_contexts(data[role], count, config['seed'], role)
+            except ValueError as exc:
+                raise ValueError(f'{role} context preflight failed: {exc}') from exc
+            atomic_json(output/f'{name}_contexts.json', manifests[name])
+        report['preflight'].update(status='complete', wall_seconds=time.perf_counter()-preflight_started)
         atomic_json(output/'report.json', report)
-        try:
+        report['phase'] = 'model_load'
+        if not torch.cuda.is_available():
+            raise RuntimeError('real Mixtral experiments require CUDA; use CPU tiny-model unit tests for code checks')
+        torch.manual_seed(config['seed'])
+        with precision_scope(config['allow_tf32']):
+            load_started = time.perf_counter()
+            report['model_load_started'] = True
+            atomic_json(output/'report.json', report)
+            model, tokenizer, adapter, model_info = load_local_model(config, local_inputs=local_inputs)
+            load_seconds = time.perf_counter() - load_started
+            stage_started = time.perf_counter()
+            identity = {'model': model_info['model'], 'tokenizer': model_info['tokenizer'],
+                        'train': data_identity['train'], 'selection': data_identity['selection'],
+                        'calibration': data_identity['calibration'], 'code': code_identity(),
+                        'numerical_contract': {'sampler': config['context_sampling'], **{key: config[key] for key in ('dtype', 'allow_tf32', 'experts_implementation', 'sequence_length', 'sequences', 'max_train_contexts')}, 'attention': 'sdpa', 'head_chunk': 128, 'runtime_versions': {name: version(name) for name in ('torch', 'transformers', 'accelerate', 'safetensors')}}}
+            if 'train' in manifests:
+                identity['context_sampling'] = manifests['train']
+            if 'oracle' in manifests:
+                identity['oracle_context_sampling'] = manifests['oracle']
+            report.update(phase='execution', model_load_wall_seconds=load_seconds, identity=identity,
+                          model=model_info, environment={'torch': torch.__version__, 'cuda': torch.version.cuda,
+                              'packages': {name: version(name) for name in ('torch', 'transformers', 'accelerate', 'safetensors')},
+                              'cuda_visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'),
+                              'gpus': {str(i): {'name': torch.cuda.get_device_name(i),
+                                       'total_memory_bytes': torch.cuda.get_device_properties(i).total_memory} for i in model_info['cuda_devices']}})
+            atomic_json(output/'report.json', report)
             report['native_equivalence'] = validate_native(adapter, data['calibration'], config)
             atomic_json(output/'report.json', report)
             if not report['native_equivalence']['eligible']:
@@ -392,6 +510,8 @@ def main(argv=None):
             elif args.stage == 'train':
                 from mixtral_lab.training import RouterTrainingConfig, train_router
                 h0, targets, report['training_contexts'] = collect_stratified_contexts(adapter, data['train'], config['max_train_contexts'], config['seed'], 'train')
+                if report['training_contexts'] != manifests['train']:
+                    raise ValueError('training contexts differ from the preflight manifest')
                 training_config = RouterTrainingConfig(**config['training'])
                 _, report['training'] = train_router(adapter, h0, targets, lambda actor: evaluate(adapter, data['selection'], actor),
                     training_config, identity, output/'router')
@@ -408,8 +528,9 @@ def main(argv=None):
                 role = oracle_settings.pop('role', 'calibration')
                 oracle_config = OracleConfig(**oracle_settings)
                 h0, targets, manifest = collect_stratified_contexts(adapter, data[role], oracle_config.max_contexts, config['seed'], role)
-                atomic_json(output/'oracle_contexts.json', manifest)
-                oracle_identity = {**identity, 'oracle_context_sampling': manifest}
+                if manifest != manifests['oracle']:
+                    raise ValueError('oracle contexts differ from the preflight manifest')
+                oracle_identity = identity
                 report['oracle'] = run_oracle(adapter, h0, targets, manifest['contexts'], oracle_identity, role=role, config=oracle_config)
                 report['oracle_contexts'] = manifest
             elif args.stage == 'adapter':
@@ -417,6 +538,8 @@ def main(argv=None):
                 settings = dict(config['second_round']); settings.pop('enabled')
                 adapter_config = SecondRoundConfig(**settings)
                 h0, targets, report['training_contexts'] = collect_stratified_contexts(adapter, data['train'], config['max_train_contexts'], config['seed'], 'train')
+                if report['training_contexts'] != manifests['train']:
+                    raise ValueError('training contexts differ from the preflight manifest')
                 report['adapter_controls'] = {
                     'fixed_native_r1_stop': evaluate_second_round(adapter, data['selection']),
                     'untrained_native_r2_repeat': evaluate_second_round(adapter, data['selection'], repeat=True)}
@@ -436,13 +559,16 @@ def main(argv=None):
                 report['selected_adapter_development'] = checkpoints['best']['selection']
                 report['latest_adapter_development'] = checkpoints['latest']['selection']
                 report['limitations'].append('adapter adds residual capacity; not evidence for repeated-MoE usefulness')
-            report['status'] = 'complete'
+            report['status'], report['phase'] = 'complete', 'complete'
             report['stage_wall_seconds_excluding_model_load'] = time.perf_counter() - stage_started
             atomic_json(output/'report.json', report)
-        except Exception as exc:
-            report['status'], report['error'] = 'failed', str(exc)
-            atomic_json(output/'report.json', report)
-            raise
+    except Exception as exc:
+        report['status'], report['error'] = 'failed', str(exc)
+        report['failure_phase'] = report['phase']
+        if report['phase'] == 'preflight':
+            report['preflight'].update(status='failed', wall_seconds=time.perf_counter()-preflight_started)
+        atomic_json(output/'report.json', report)
+        raise
     print(json.dumps({'report': str(output/'report.json'), 'status': 'complete'}))
 
 

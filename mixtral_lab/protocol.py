@@ -31,13 +31,18 @@ def integer(value, name, minimum=1, maximum=None):
     return value
 
 
-def load_config(path):
+def load_config(path, *, stage=None, actor_checkpoint=None):
     config = json.loads(Path(path).read_text())
-    validate_config(config)
+    validate_config(config, stage=stage, actor_checkpoint=actor_checkpoint)
     return config
 
 
-def validate_config(c):
+def validate_config(c, *, stage=None, actor_checkpoint=None):
+    # Standalone validation remains strict; CLI stages only require caches they use.
+    if stage not in (None, 'validate', 'profile', 'train', 'oracle', 'adapter'):
+        raise ValueError('unknown Mixtral experiment stage')
+    needs_train_contexts = (stage is None or stage in ('train', 'adapter')
+                            or (stage == 'profile' and bool(actor_checkpoint)))
     if c.get('schema') != SCHEMA:
         raise ValueError('unknown Mixtral experiment schema')
     for field in ('model_path', 'tokenizer_path', 'output_dir'):
@@ -67,7 +72,7 @@ def validate_config(c):
         raise ValueError('sequences must specify exactly train, selection, calibration')
     for role in ROLES:
         integer(counts[role], f'sequences.{role}', 1, c['max_documents_per_split'])
-    if c['max_train_contexts'] > counts['train'] * (c['sequence_length'] - 1):
+    if needs_train_contexts and c['max_train_contexts'] > counts['train'] * (c['sequence_length'] - 1):
         raise ValueError('max_train_contexts exceeds the configured train token upper bound')
     files = c.get('data_files')
     if not isinstance(files, dict) or set(files) != set(ROLES):
@@ -177,6 +182,7 @@ def prepare_data(config, tokenizer):
     result, effective_sequences = {}, {}
     for role, rows in documents.items():
         prepared = []
+        within_role_sequences = {}
         for row in rows:
             ids = tokenizer.encode(row['text'], add_special_tokens=True,
                                    truncation=True, max_length=config['sequence_length'])
@@ -190,6 +196,7 @@ def prepare_data(config, tokenizer):
                 raise ValueError('duplicate effective token sequence across development roles: '
                                  f'{previous[0]}:{previous[1]} and {role}:{row["id"]}')
             effective_sequences[effective] = (role, row['id'])
+            within_role_sequences.setdefault(effective, []).append(row['id'])
             valid = len(ids)
             ids = ids + [pad] * (config['sequence_length'] - valid)
             prepared.append({'id': row['id'], 'input_ids': torch.tensor(ids, dtype=torch.long),
@@ -198,6 +205,21 @@ def prepare_data(config, tokenizer):
                            'attention_mask': row['attention_mask'].tolist()} for row in prepared]
         identities[role]['tokenized_sha256'] = canonical_hash(token_identity)
         identities[role]['supervised_tokens'] = sum(int((row['attention_mask'][:-1] * row['attention_mask'][1:]).sum()) for row in prepared)
+        duplicate_groups = [
+            {'effective_tokens_sha256': canonical_hash(list(tokens)),
+             'document_ids': doc_ids, 'effective_token_count': len(tokens)}
+            for tokens, doc_ids in within_role_sequences.items() if len(doc_ids) > 1
+        ]
+        unique_count = len(within_role_sequences)
+        identities[role]['effective_input_statistics'] = {
+            'documents': len(prepared), 'unique_effective_sequences': unique_count,
+            'redundant_documents': len(prepared) - unique_count,
+            'redundant_document_fraction': (len(prepared) - unique_count) / len(prepared),
+            'documents_in_duplicate_groups': sum(len(group['document_ids']) for group in duplicate_groups),
+            'duplicate_groups': duplicate_groups,
+            'scope': 'exact effective token sequences after truncation, excluding padding and document IDs; not semantic or partial-prefix deduplication',
+            'sampling_changed': False,
+        }
         result[role] = prepared
     return result, identities
 

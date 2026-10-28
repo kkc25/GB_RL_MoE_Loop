@@ -1,5 +1,9 @@
 # Mixtral：可改善空间、可学习性与可选残差适配
 
+同一角色内截断后的重复输入现在写入数据身份的 `effective_input_statistics`：
+包含文档数、唯一有效序列数、冗余文档比例和重复组。该统计不改变采样权重，
+不自动删除文档，也不证明语义独立性；跨角色重复仍直接拒绝。
+
 ## 结论边界与本轮目标
 
 `runs/mixtral_v1/` 的 64 步实验只使用第一篇开头 32 个 token 位置；两篇
@@ -13,6 +17,22 @@ selection 的 greedy NLL 未改善。强制重复冻结末层 FFN 则显著恶�
 
 本次交付只提供代码、配置和 CPU 测试，不自动下载权重、执行 GPU 作业或打开
 newtest。CPU tiny 模型正确性不能代替真实 46.7B CUDA 数值与性能验证。
+
+### 启动前检查与阶段依赖
+
+先加载本地 tokenizer/config、分词并检查有效位置与本阶段配额，再加载大模型
+权重。`oracle` 仅规划其指定开发角色的 oracle context；`validate` 和无 actor 的
+`profile` 不强制规划训练缓存。`train`、`adapter` 以及带 actor checkpoint 的
+`profile` 仍严格重建训练采样清单，保持 checkpoint 数据绑定。
+
+所有阶段继续保留 train/selection/calibration 的来源与跨集合重复检查。
+配置结构错误仍可能在建立输出目录前失败；进入 preflight 后的错误会保留在
+新目录 `report.json` 中，包含 phase、preflight 状态和 `model_load_started`，
+可区分输入失败与模型加载/执行失败。失败目录不能原地覆盖。
+
+本地 tokenizer/config 在预检和后续装载间复用并复核。权重只做一次完整内容
+hash，另以文件签名检查加载期间的替换/写入；依赖不可变的本地 snapshot，
+不是抵抗主动伪造文件元数据的安全证明，也不重复读取整套权重做第二次 hash。
 
 ## A. 修正训练覆盖：文档平衡、位置随机
 
