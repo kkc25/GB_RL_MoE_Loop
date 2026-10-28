@@ -40,6 +40,39 @@ class Tokenizer:
         return [1,2,3,4,5 + int(text.split()[1])]
 
 
+
+@contextmanager
+def mocked_local_model(model, tokenizer, adapter, info):
+    # Keep cheap tokenizer preflight independent of the full-weight seam.
+    local_inputs = {'metadata': model.config, 'tokenizer': tokenizer,
+                    'identity': {'model': info['model'], 'tokenizer': info['tokenizer']}}
+    with patch.object(runner, 'load_local_inputs', return_value=local_inputs), \
+         patch.object(runner, 'load_local_model', return_value=(model, tokenizer, adapter, info)) as loader:
+        yield loader
+
+
+def pinned_local_inputs(tmp_path, c):
+    """Real offline config/tokenizer artifacts; no pretrained weights or download."""
+    from tokenizers import Tokenizer as BackendTokenizer
+    from tokenizers.models import WordLevel
+    from tokenizers.pre_tokenizers import Whitespace
+    from transformers import MixtralConfig, PreTrainedTokenizerFast
+    model_path, tokenizer_path = tmp_path/'model', tmp_path/'tokenizer'
+    model_path.mkdir(); tokenizer_path.mkdir()
+    MixtralConfig(hidden_size=4096, num_hidden_layers=32, num_local_experts=8,
+                  num_experts_per_tok=2).save_pretrained(model_path)
+    words = ['[UNK]', '[PAD]', 'train', 'selection', 'calibration', 'token', 'word', 'other', 'extra']
+    backend = BackendTokenizer(WordLevel(dict(zip(words, range(len(words)))), unk_token='[UNK]'))
+    backend.pre_tokenizer = Whitespace()
+    tokenizer = PreTrainedTokenizerFast(tokenizer_object=backend, unk_token='[UNK]', pad_token='[PAD]')
+    tokenizer.save_pretrained(tokenizer_path)
+    c.update(model_path=str(model_path), tokenizer_path=str(tokenizer_path), max_memory={'0':'1GiB'})
+    for role, text in {'train':'train token', 'selection':'selection token word other',
+                       'calibration':'calibration token word other extra'}.items():
+        Path(c['data_files'][role]).write_text(json.dumps({'id':role, 'text':text})+'\n')
+    return tokenizer
+
+
 def test_config_limits(tmp_path):
     c=config(tmp_path); validate_config(c)
     for key,value in [('sequence_length',True),('measurements',0),('nll_tolerance',float('nan')),('experts_implementation','batched_mm')]:
@@ -47,6 +80,14 @@ def test_config_limits(tmp_path):
         with raises(ValueError):validate_config(bad)
     bad=copy.deepcopy(c);bad['data_files']['test']='a'
     with raises(ValueError):validate_config(bad)
+    bad=copy.deepcopy(c);bad['max_train_contexts']=bad['training']['max_train_contexts']=8
+    for stage, actor in [(None, None), ('train', None), ('adapter', None), ('profile', 'bound.pt')]:
+        with raises(ValueError, match='train token upper bound'):
+            validate_config(copy.deepcopy(bad), stage=stage, actor_checkpoint=actor)
+    for stage in ('validate', 'oracle', 'profile'):
+        validate_config(copy.deepcopy(bad), stage=stage)
+    with raises(ValueError, match='unknown Mixtral experiment stage'):
+        validate_config(c, stage='unknown')
 
 
 def test_duplicates_and_tokenization(tmp_path):
@@ -174,7 +215,7 @@ def test_train_then_profile_new_output(tmp_path):
     c=config(tmp_path);path=tmp_path/'config.json'
     model=tiny(); adapter=MixtralAdapter(model)
     info={'model':{'hash':'same'},'tokenizer':{'hash':'same'},'cuda_devices':[]}
-    with patch.object(torch.cuda,'is_available',return_value=True), patch.object(torch.cuda,'is_current_stream_capturing',return_value=False), patch.object(runner,'load_local_model',return_value=(model,Tokenizer(),adapter,info)):
+    with patch.object(torch.cuda,'is_available',return_value=True), patch.object(torch.cuda,'is_current_stream_capturing',return_value=False), mocked_local_model(model,Tokenizer(),adapter,info):
         path.write_text(json.dumps(c))
         runner.main(['--config',str(path),'--stage','train'])
         report=json.loads((Path(c['output_dir'])/'report.json').read_text())
@@ -188,6 +229,9 @@ def test_train_then_profile_new_output(tmp_path):
         runner.main(['--config',str(path),'--stage','profile','--actor-checkpoint',str(checkpoint)])
         profile=json.loads((Path(c['output_dir'])/'report.json').read_text())
         assert profile['status']=='complete'
+        assert profile['identity'] == report['identity']
+        assert profile['identity']['context_sampling'] == report['identity']['context_sampling']
+        assert profile['identity']['context_sampling'] == json.loads((Path(c['output_dir'])/'train_contexts.json').read_text())
         assert 'learned_route_r1' in profile['timing']['variants']
         provenance = profile['actor_checkpoint']
         assert provenance['path'] == str(checkpoint.resolve())
@@ -211,6 +255,15 @@ def test_train_then_profile_new_output(tmp_path):
         assert other['actor_state_sha256'] != provenance['actor_state_sha256']
         assert other['binding_sha256'] == provenance['binding_sha256']
         assert other['update'] != provenance['update']
+        # A changed but still sufficient training corpus must not bypass binding.
+        Path(c['data_files']['train']).write_text(json.dumps({'id':'train', 'text':'document 9 changed content'})+'\n')
+        c['output_dir'] = str(tmp_path/'profile_changed_train'); path.write_text(json.dumps(c))
+        with raises(ValueError, match='checkpoint experiment identities mismatch'):
+            runner.main(['--config',str(path),'--stage','profile','--actor-checkpoint',str(checkpoint)])
+        failed = json.loads((Path(c['output_dir'])/'report.json').read_text())
+        assert failed['status'] == 'failed' and failed['failure_phase'] == 'execution'
+        assert failed['identity']['context_sampling'] != report['identity']['context_sampling']
+        assert failed['identity']['context_sampling']['actual_count'] == 4
 
 
 def test_complete_checkpoint_guard(tmp_path):
@@ -256,7 +309,7 @@ def test_oracle_and_adapter_cli_tiny(tmp_path):
     before={k:v.clone() for k,v in model.state_dict().items()}
     info={'model':{'hash':'same'},'tokenizer':{'hash':'same'},'cuda_devices':[]}
     c['oracle']={'role':'calibration','max_contexts':2,'max_score_calls':116}
-    with patch.object(torch.cuda,'is_available',return_value=True), patch.object(torch.cuda,'is_current_stream_capturing',return_value=False), patch.object(runner,'load_local_model',return_value=(model,Tokenizer(),adapter,info)):
+    with patch.object(torch.cuda,'is_available',return_value=True), patch.object(torch.cuda,'is_current_stream_capturing',return_value=False), mocked_local_model(model,Tokenizer(),adapter,info):
         path.write_text(json.dumps(c))
         runner.main(['--config',str(path),'--stage','oracle'])
         report=json.loads((Path(c['output_dir'])/'report.json').read_text())
@@ -265,7 +318,9 @@ def test_oracle_and_adapter_cli_tiny(tmp_path):
         assert len(report['oracle']['contexts'])==2
         assert 'native_selection' not in report
         assert 'controlled_original_selection' not in report
-        assert report['identity']['context_sampling']['actual_count']==4
+        assert 'context_sampling' not in report['identity']
+        assert report['identity']['oracle_context_sampling'] == report['oracle_contexts']
+        assert not (Path(c['output_dir'])/'train_contexts.json').exists()
         c['output_dir']=str(tmp_path/'disabled'); path.write_text(json.dumps(c))
         with raises(ValueError,match='default off'):
             runner.main(['--config',str(path),'--stage','adapter'])
@@ -288,7 +343,7 @@ def test_validate_cli_backward_compatible(tmp_path):
     c=config(tmp_path); path=tmp_path/'config.json'; path.write_text(json.dumps(c))
     model=tiny(); adapter=MixtralAdapter(model)
     info={'model':{'hash':'same'},'tokenizer':{'hash':'same'},'cuda_devices':[]}
-    with patch.object(torch.cuda,'is_available',return_value=True), patch.object(runner,'load_local_model',return_value=(model,Tokenizer(),adapter,info)):
+    with patch.object(torch.cuda,'is_available',return_value=True), mocked_local_model(model,Tokenizer(),adapter,info):
         runner.main(['--config',str(path)])
     report=json.loads((Path(c['output_dir'])/'report.json').read_text())
     assert report['stage']=='validate' and report['status']=='complete'
@@ -331,6 +386,158 @@ def test_route_diagnostics_preserves_full_padded_execution_shape(tmp_path):
     assert diagnostic['greedy_native_agreement']==.5
     assert torch.equal(result.actions.reshape(-1),actual[0][0])
     assert diagnostic['greedy_native_agreement']==float((actual[0][0][:4]==actual[0][1][:4]).float().mean())
+
+
+def test_stage_preflight_uses_only_required_quota_real_tokenizer(tmp_path):
+    c = config(tmp_path); pinned_local_inputs(tmp_path, c)
+    c['max_train_contexts'] = c['training']['max_train_contexts'] = 8
+    model = tiny(); adapter = MixtralAdapter(model)
+    c['oracle'] = {'role':'calibration', 'max_contexts':2, 'max_score_calls':116}
+    path = tmp_path/'config.json'
+    # Train has one valid position, and even its theoretical bound is below 8.
+    for stage, role in [('validate', None), ('profile', None),
+                        ('oracle', 'calibration'), ('oracle', 'selection')]:
+        c['output_dir'] = str(tmp_path/f'{stage}_{role}')
+        if role:
+            c['oracle']['role'] = role
+        path.write_text(json.dumps(c))
+        def load_weights(config, *, local_inputs):
+            report = json.loads((Path(config['output_dir'])/'report.json').read_text())
+            assert report['preflight']['status'] == 'complete'
+            assert report['preflight']['data']['train']['supervised_tokens'] == 1
+            assert 'train' not in report['preflight']['context_requirements']
+            if stage == 'oracle':
+                assert json.loads((Path(config['output_dir'])/'oracle_contexts.json').read_text())['role'] == role
+            tokenizer = local_inputs['tokenizer']
+            info = {**local_inputs['identity'], 'cuda_devices':[]}
+            return model, tokenizer, adapter, info
+        with patch.object(torch.cuda, 'is_available', return_value=True), \
+             patch.object(runner, 'load_local_model', side_effect=load_weights) as loader:
+            runner.main(['--config', str(path), '--stage', stage])
+        loader.assert_called_once()
+        report = json.loads((Path(c['output_dir'])/'report.json').read_text())
+        assert report['status'] == 'complete'
+        assert 'context_sampling' not in report['identity']
+        assert not (Path(c['output_dir'])/'train_contexts.json').exists()
+        if stage == 'oracle':
+            assert report['oracle_contexts']['actual_count'] == 2
+            assert report['oracle_contexts']['role'] == role
+            assert report['identity']['oracle_context_sampling'] == report['oracle_contexts']
+
+
+def test_required_quota_failure_is_reported_before_weights_or_cuda(tmp_path):
+    c = config(tmp_path); pinned_local_inputs(tmp_path, c)
+    c['second_round'] = {'enabled':True, 'rank':2, 'updates':1,
+                         'batch_contexts':2, 'max_train_contexts':4, 'eval_interval':1}
+    path = tmp_path/'config.json'
+    for stage, role, count in [('train', 'train', 4), ('adapter', 'train', 4),
+                                ('profile', 'train', 4), ('oracle', 'calibration', 5),
+                                ('oracle', 'selection', 4)]:
+        c['output_dir'] = str(tmp_path/f'failed_{stage}_{role}')
+        if stage == 'oracle':
+            c['oracle'] = {'role':role, 'max_contexts':count, 'max_score_calls':58*count}
+        path.write_text(json.dumps(c))
+        argv = ['--config', str(path), '--stage', stage]
+        if stage == 'profile':
+            argv += ['--actor-checkpoint', str(tmp_path/'bound_actor.pt')]
+        with patch.object(runner, 'load_local_model') as loader, \
+             patch.object(torch.cuda, 'is_available') as cuda_check:
+            with raises(ValueError, match=f'{role} context preflight failed'):
+                runner.main(argv)
+        loader.assert_not_called(); cuda_check.assert_not_called()
+        report_path = Path(c['output_dir'])/'report.json'
+        before = report_path.read_bytes()
+        report = json.loads(before)
+        assert report['status'] == 'failed' and report['failure_phase'] == 'preflight'
+        assert report['preflight']['status'] == 'failed'
+        assert report['model_load_started'] is False
+        required = report['preflight']['context_requirements']['oracle' if stage == 'oracle' else 'train']
+        assert required['role'] == role and required['requested_count'] == count
+        assert required['available_positions'] < count
+        with raises(FileExistsError):
+            runner.main(argv)
+        assert report_path.read_bytes() == before
+
+
+
+def test_data_leakage_preflight_failure_preserves_report_before_weights(tmp_path):
+    c = config(tmp_path); pinned_local_inputs(tmp_path, c)
+    c['oracle'] = {'role':'calibration', 'max_contexts':2, 'max_score_calls':116}
+    # Distinct raw documents truncate to the same consumed tokens in two roles.
+    Path(c['data_files']['train']).write_text(json.dumps({'id':'train', 'text':'token '*8+'train'}))
+    Path(c['data_files']['selection']).write_text(json.dumps({'id':'selection', 'text':'token '*8+'selection'}))
+    path = tmp_path/'config.json'; path.write_text(json.dumps(c))
+    with patch.object(runner, 'load_local_model') as loader, \
+         patch.object(torch.cuda, 'is_available') as cuda_check:
+        with raises(ValueError, match='effective token sequence across'):
+            runner.main(['--config', str(path), '--stage', 'oracle'])
+    loader.assert_not_called(); cuda_check.assert_not_called()
+    report = json.loads((Path(c['output_dir'])/'report.json').read_text())
+    assert report['status'] == 'failed' and report['failure_phase'] == 'preflight'
+    assert report['model_load_started'] is False
+    assert 'effective token sequence across' in report['error']
+
+
+def test_local_inputs_are_offline_cheap_and_change_guarded(tmp_path):
+    from transformers import AutoConfig, AutoTokenizer
+    c = config(tmp_path); pinned_local_inputs(tmp_path, c)
+    weight_path = Path(c['model_path'])/'model.safetensors'
+    weight_path.write_bytes(b'not loaded in input preflight')
+    original_hash = runner.sha256_file
+    def cheap_hash(path):
+        assert Path(path).suffix != '.safetensors'
+        return original_hash(path)
+    with patch.object(runner, 'sha256_file', side_effect=cheap_hash), \
+         patch.object(AutoConfig, 'from_pretrained', wraps=AutoConfig.from_pretrained) as metadata_loader, \
+         patch.object(AutoTokenizer, 'from_pretrained', wraps=AutoTokenizer.from_pretrained) as tokenizer_loader:
+        inputs = runner.load_local_inputs(c)
+    for loader in (metadata_loader, tokenizer_loader):
+        assert loader.call_args.kwargs['local_files_only'] is True
+        assert loader.call_args.kwargs['trust_remote_code'] is False
+    assert inputs['tokenizer'].encode('train token') == [2, 5]
+    assert 'model.safetensors' not in inputs['identity']['model']['files']
+    # Changes between preflight and weights cannot be rebound silently.
+    tokenizer_config = Path(c['tokenizer_path'])/'tokenizer_config.json'
+    tokenizer_config.write_text(tokenizer_config.read_text()+'\n')
+    from transformers import AutoModelForCausalLM
+    with patch.object(AutoModelForCausalLM, 'from_pretrained') as loader:
+        with raises(ValueError, match='changed after preflight'):
+            runner.load_local_model(c, local_inputs=inputs)
+    loader.assert_not_called()
+    # A mutation while tokenizer loading is in progress is also rejected.
+    original_loader = AutoTokenizer.from_pretrained
+    def changed_tokenizer(*args, **kwargs):
+        tokenizer = original_loader(*args, **kwargs)
+        tokenizer_config.write_text(tokenizer_config.read_text()+'\n')
+        return tokenizer
+    with patch.object(AutoTokenizer, 'from_pretrained', side_effect=changed_tokenizer):
+        with raises(ValueError, match='changed during preflight loading'):
+            runner.load_local_inputs(c)
+
+
+def test_weight_identity_change_during_loading_fails_closed(tmp_path):
+    from transformers import AutoModelForCausalLM
+    c = config(tmp_path); pinned_local_inputs(tmp_path, c)
+    weight_path = Path(c['model_path'])/'model.safetensors'
+    weight_path.write_bytes(b'original pinned weight bytes')
+    inputs = runner.load_local_inputs(c)
+    model = tiny()
+    def changing_weights(*args, **kwargs):
+        assert kwargs['config'] is inputs['metadata']
+        assert kwargs['local_files_only'] is True and kwargs['trust_remote_code'] is False
+        assert kwargs['use_safetensors'] is True and kwargs['output_loading_info'] is True
+        weight_path.write_bytes(b'changed while loading')
+        return model, {key:[] for key in ('missing_keys', 'unexpected_keys', 'mismatched_keys', 'error_msgs')}
+    with patch.object(torch.cuda, 'device_count', return_value=1), \
+         patch.object(AutoModelForCausalLM, 'from_pretrained', side_effect=changing_weights):
+        with raises(ValueError, match='local artifacts changed during weight loading'):
+            runner.load_local_model(c, local_inputs=inputs)
+        # Public one-argument API still performs cheap inputs before weights.
+        with patch.object(runner, 'load_local_inputs', return_value=inputs) as preflight:
+            with raises(ValueError, match='local artifacts changed during weight loading'):
+                runner.load_local_model(c)
+        preflight.assert_called_once_with(c)
+
 
 
 class ProtocolTests(unittest.TestCase):

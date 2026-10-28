@@ -182,3 +182,14 @@ rule 外，还必须包含 `confirmation_scope`。用
   初始 R1 等价、原骨干冻结。它不重跑原专家，也不训练 STOP，不提供续训接口。
 - 所有新阶段重新绑定当前实际模型、数据、数值与源码身份；原始临时 loop
   探针只作历史证据。具体配置、预算和解释规则见 [LEARNABILITY_PLAN.md](LEARNABILITY_PLAN.md)。
+
+## 12. 按阶段预检与重复输入统计
+
+- CLI 先校验本地 tokenizer/config、分词结果和实际所需配额，再加载模型权重。
+  Oracle 不再被无关训练配额阻断；训练、适配器和带 actor 的 profile 仍重建
+  完整训练采样身份。独立调用 load_config/validate_config 默认仍保持严格检查。
+- Preflight 失败保留新输出目录和 report.json，记录 failure_phase 与
+  model_load_started。旧目录不覆盖；修正配置后使用另一个新输出目录。
+- 同角色的有效输入重复率作为附加身份/统计记录，不改变采样；跨角色重复仍拒绝。
+  新源码/数据身份可能使旧 checkpoint 不匹配，按固定旧 commit 复核历史或新建运行。
+- 本轮不改变 R1 的 epsilon、group size 或有放回采样，探索机制升级仍是独立研究工作。
