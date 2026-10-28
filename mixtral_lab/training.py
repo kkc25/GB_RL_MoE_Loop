@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import copy
 import hashlib
+import io
 import json
 import math
 from pathlib import Path
@@ -37,12 +38,19 @@ class RouterTrainingConfig:
     gradient_clip: float = 1.0
     max_step_kl: float = 0.02
     seed: int = 17
+    score_mode: str = "reference"
+    score_atol: float = 1e-5
+    score_rtol: float = 1e-5
 
     def validate(self):
         for name in ('updates', 'batch_contexts', 'group_size', 'eval_interval', 'max_train_contexts'):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, int) or value < 1:
                 raise ValueError(f'{name} must be positive integer')
+        if self.score_mode not in ('reference', 'deduplicate_checked_v1'):
+            raise ValueError('unsupported frozen score mode')
+        _finite(self.score_atol, 'score_atol')
+        _finite(self.score_rtol, 'score_rtol')
         if self.group_size < 2:
             raise ValueError('RLOO requires group_size >= 2')
         if isinstance(self.seed, bool) or not isinstance(self.seed, int) or self.seed < 0:
@@ -156,6 +164,61 @@ def _selection(evaluator, actor):
     return result
 
 
+@torch.no_grad()
+def _sampled_scores(adapter, h, y, native, reference_ce, actions, config):
+    """Bounded update-local reuse diagnostic, never an unchecked speed claim.
+
+    Sampled actions and their order are untouched. Native CE is reusable only
+    for the same context index (not merely equal hidden values). Full reference
+    validation is charged as real work. A failed check uses reference scores.
+    Changing batch shapes can change GPU arithmetic; this is not bitwise parity.
+    """
+    batch, group = actions.shape
+    device = actions.device
+    pairs = _pairs(device)
+    reference = adapter.score_pairs(h.repeat_interleave(group, 0),
+        y.repeat_interleave(group), pairs[actions.reshape(-1)]).detach().to(device).reshape(batch, group)
+    requested = batch + actions.numel()
+    stats = {'mode': config.score_mode, 'version': 1, 'requested_rows': requested,
+             'scored_rows': requested, 'score_calls': 2, 'cache_hits': 0,
+             'validation_rows': 0, 'candidate_scored_rows': 0,
+             'candidate_eligible': None, 'candidate_used': False}
+    if config.score_mode == 'reference':
+        return reference, stats
+    # The key encodes context index and unordered pair id; storage is bounded
+    # by B * (G + 1), and discarded before the next update.
+    contexts = torch.arange(batch, device=device)[:, None].expand_as(actions)
+    native_ids = pair_actions(native).to(device)
+    native_hits = actions == native_ids[:, None]
+    keys = (contexts * 28 + actions).reshape(-1)
+    missing = ~native_hits.reshape(-1)
+    unique, inverse = torch.unique(keys[missing], sorted=True, return_inverse=True)
+    candidate = reference_ce[:, None].expand(batch, group).clone().reshape(-1)
+    extra_calls = 0
+    if unique.numel():
+        rows = torch.div(unique, 28, rounding_mode='floor')
+        values = adapter.score_pairs(h.index_select(0, rows.to(h.device)),
+            y.index_select(0, rows.to(y.device)), pairs[unique % 28]).detach().to(device)
+        candidate[missing] = values[inverse]
+        extra_calls = 1
+    candidate = candidate.reshape(batch, group)
+    error = (candidate - reference).abs()
+    tolerance = config.score_atol + config.score_rtol * reference.abs()
+    finite = torch.isfinite(candidate) & torch.isfinite(reference) & torch.isfinite(error)
+    eligible = bool((finite & (error <= tolerance)).all())
+    raw_errors = error.cpu().tolist()
+    raw_errors = [[v if math.isfinite(v) else None for v in row] for row in raw_errors]
+    stats.update(candidate_scored_rows=batch + unique.numel(),
+        scored_rows=requested + unique.numel(), score_calls=2 + extra_calls,
+        validation_rows=actions.numel(), cache_hits=actions.numel() - unique.numel(),
+        native_cache_hits=int(native_hits.sum()), candidate_eligible=eligible,
+        candidate_used=eligible, fallback_reason=None if eligible else 'score_tolerance_or_nonfinite',
+        atol=config.score_atol, rtol=config.score_rtol,
+        absolute_errors=raw_errors, nonfinite_score_count=int((~finite).sum()),
+        max_absolute_error=float(error.max()) if bool(torch.isfinite(error).all()) else None)
+    return candidate if eligible else reference, stats
+
+
 def train_router(adapter, train_h0, train_targets, selection_evaluator, config, identities, output_dir):
     """Train R1 actor on bounded train contexts and select on fixed selection data.
 
@@ -229,10 +292,7 @@ def train_router(adapter, train_h0, train_targets, selection_evaluator, config, 
                 reference_ce = adapter.score_pairs(h, y, native).detach().to(feats.device)
             log_probs = actor.log_probs(feats, native)
             actions = torch.multinomial(log_probs.detach().exp(), config.group_size, replacement=True, generator=generator)
-            with torch.no_grad():
-                pairs = _pairs(feats.device)[actions.reshape(-1)]
-                ce = adapter.score_pairs(h.repeat_interleave(config.group_size, 0),
-                                         y.repeat_interleave(config.group_size), pairs).detach().to(feats.device).reshape(config.batch_contexts, config.group_size)
+            ce, score_stats = _sampled_scores(adapter, h, y, native, reference_ce, actions, config)
             rewards = reference_ce[:, None] - ce
             advantage = rloo_advantage(rewards)
             loss = -(advantage * log_probs.gather(1, actions)).mean()
@@ -256,7 +316,7 @@ def train_router(adapter, train_h0, train_targets, selection_evaluator, config, 
                 status = 'stopped_step_kl'
             else:
                 successful = update
-            row = {'attempt': update, 'accepted': accepted, 'successful_updates': successful,
+            row = {'score_work': score_stats, 'attempt': update, 'accepted': accepted, 'successful_updates': successful,
                    'loss': float(loss.detach()), 'reward_mean': float(rewards.mean()),
                    'teacher_agreement': float((actions == pair_actions(native)[:,None]).float().mean()),
                    'zero_advantage_fraction': float((advantage == 0).all(1).float().mean()),
@@ -290,17 +350,24 @@ def train_router(adapter, train_h0, train_targets, selection_evaluator, config, 
               'best_update': best_update, 'best_selection_nll': best_nll if math.isfinite(best_nll) else None,
               'wall_seconds': elapsed, 'reserved_device_hours_estimate': elapsed*len(devices)/3600,
               'cuda_devices': sorted(devices), 'binding_sha256': binding['sha256'],
+              'score_mode': config.score_mode,
+              'score_candidate_used_updates': sum(row['score_work']['candidate_used'] for row in metrics),
+              'score_candidate_fallback_updates': sum(row['score_work']['candidate_eligible'] is False for row in metrics),
+              'score_work_totals': {key: sum(row['score_work'][key] for row in metrics)
+                  for key in ('requested_rows', 'scored_rows', 'score_calls', 'cache_hits', 'validation_rows')},
+              'score_reuse_note': 'checked candidate includes full reference validation cost; not a production speedup claim',
               'scope': 'R1 frozen-backbone routing only; no resume, R2 training or held-out confirmation'})
     return actor, json.loads((output/'summary.json').read_text())
 
 
-def load_actor_checkpoint(path, identities, device="cpu"):
+def load_actor_checkpoint_with_metadata(path, identities, device="cpu"):
     """Load an inference-only actor, requiring the exact experiment identities.
 
     This is deliberately not optimizer/RNG resume. Only trusted local experiment
     checkpoints should be supplied, and pickle objects are disallowed.
     """
-    payload = torch.load(path, map_location="cpu", weights_only=True)
+    snapshot = Path(path).read_bytes()
+    payload = torch.load(io.BytesIO(snapshot), map_location="cpu", weights_only=True)
     if not isinstance(payload, dict) or payload.get("format") != "mixtral-r1-router-v1":
         raise ValueError("unsupported router checkpoint")
     binding = copy.deepcopy(payload.get("binding", {}))
@@ -317,4 +384,18 @@ def load_actor_checkpoint(path, identities, device="cpu"):
     actor.load_state_dict(payload["actor_state_dict"], strict=True)
     if any(not bool(torch.isfinite(p).all()) for p in actor.parameters()):
         raise ValueError("checkpoint contains nonfinite actor weights")
-    return actor.eval()
+    update = payload.get('update')
+    if isinstance(update, bool) or not isinstance(update, int) or not 0 <= update <= cfg.updates:
+        raise ValueError('invalid checkpoint update')
+    metadata = {'path': str(Path(path).resolve()),
+                'checkpoint_sha256': hashlib.sha256(snapshot).hexdigest(),
+                'binding_sha256': checksum, 'update': update, 'epsilon': cfg.epsilon,
+                'training_config': copy.deepcopy(binding['config']),
+                'actor_state_sha256': _digest({key: _tensor_digest(value)
+                    for key, value in sorted(payload['actor_state_dict'].items())})}
+    return actor.eval(), metadata
+
+
+def load_actor_checkpoint(path, identities, device="cpu"):
+    """Backward-compatible actor-only inference loader (not a resume API)."""
+    return load_actor_checkpoint_with_metadata(path, identities, device)[0]

@@ -155,3 +155,18 @@ rule 外，还必须包含 `confirmation_scope`。用
 
 详细契约和后续验证示例见 [RUN_CONTRACT.md](RUN_CONTRACT.md)。运行中的旧实验应保持
 原 commit，不要中途更新依赖或代码再尝试强行续跑。本轮没有执行服务器/GPU实验。
+
+## 10. Mixtral 完整性、R1 快速路径与旧 Pair 报告修补
+
+- Mixtral 增加截断后有效 token 序列的跨角色重复检查；标准 HF 缓存路径不再
+  被误判为空。保留原文档检查，不能通过改 ID 绕过重复输入检查。
+- 独立 actor profile 写入所载 checkpoint 文件与状态身份；R1 快速路径保留
+  通用 `reference=True` 对照。详细配置与数值边界见
+  [MIXTRAL_EXPERIMENTS.md](MIXTRAL_EXPERIMENTS.md)。
+- 默认训练评分仍是 reference；`deduplicate_checked_v1` 是显式核验候选，
+  完整参考校验的成本全部计入，不是已验证的 GPU 提速方案。
+- 旧 Pair Trainer 从本版本起以 monotonic 区间累计单设备 CUDA 墙钟小时，CPU
+  不增加 GPU-hours；checkpoint 保存已记录成本，重复 finish 不重复计费。
+  这不是 GPU 利用率测量，也不回填历史零值或旧 checkpoint 未记录的区间。
+- 新摘要记录本次实际设备、模型规模和运行状态；CLI 来源指向实际入口，而不是
+  辅助模块。历史报告不被改写；旧 run 仍应使用固定旧 commit 复核。

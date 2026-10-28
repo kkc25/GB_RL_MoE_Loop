@@ -158,13 +158,19 @@ class MixtralAdapter:
             raise ValueError('first observation must not contain a previous pair')
         pair_to_action(previous_pairs[~fresh])
         n = self.layer.post_attention_layernorm(h)
-        n0 = self.layer.post_attention_layernorm(h0)
+        n0 = n if h0 is h else self.layer.post_attention_layernorm(h0)
         logits, _, pairs = self.moe.gate(n)
+        return self._observation(h, h0, n, n0, logits, pairs, rounds, previous_pairs, max_calls)
+
+    def _observation(self, h, h0, n, n0, logits, pairs, rounds, previous_pairs, max_calls, *, first=False):
+        """Build features from validated state; tensors are local to this invocation."""
+        count = len(h)
         centered = logits.float() - logits.float().mean(-1, keepdim=True)
         previous = torch.zeros(count, 8, dtype=torch.float32, device=h.device)
-        has_pair = (previous_pairs >= 0).all(-1)
-        if bool(has_pair.any()):
-            previous[has_pair] = previous[has_pair].scatter(1, previous_pairs[has_pair], 1.)
+        if not first:
+            has_pair = (previous_pairs >= 0).all(-1)
+            if bool(has_pair.any()):
+                previous[has_pair] = previous[has_pair].scatter(1, previous_pairs[has_pair], 1.)
         drift = torch.log1p((h.float()-h0.float()).norm(dim=-1)/(h0.float().norm(dim=-1)+1e-8))
         scalars = torch.stack((rounds.float()/max_calls, (max_calls-rounds).float()/max_calls,
                                (rounds == 0).float(), drift), -1)
@@ -182,6 +188,10 @@ class MixtralAdapter:
             raise ValueError('pair rows/device must match hidden')
         n = self.layer.post_attention_layernorm(flat)
         logits, native_weights, native_pairs = self.moe.gate(n)
+        return self._step_routed(flat, n, logits, native_weights, native_pairs, pairs).reshape(h.shape)
+
+    def _step_routed(self, flat, n, logits, native_weights, native_pairs, pairs):
+        """Execute validated pairs using this call's routing, never cached across calls."""
         same = (pairs.sort(-1).values == native_pairs.sort(-1).values).all(-1)
         selected = torch.where(same[:, None], native_pairs, pairs)
         # Conditional softmax avoids 0/0 if both non-native probabilities
@@ -190,7 +200,7 @@ class MixtralAdapter:
         weights = torch.softmax(logits.float().gather(1, selected), -1)
         weights = torch.where(same[:, None], native_weights, weights)
         update = self.moe.experts(n, selected, weights)
-        return (flat + update).reshape(h.shape)
+        return flat + update
 
     @torch.no_grad()
     def step(self, h, actions):
@@ -215,10 +225,13 @@ class MixtralAdapter:
         return torch.cat(pieces) if pieces else hidden.new_empty((0,), dtype=torch.float32)
 
     @torch.no_grad()
-    def forward(self, input_ids, attention_mask=None, *, policy=None, max_calls=1):
+    def forward(self, input_ids, attention_mask=None, *, policy=None, max_calls=1, reference=False):
+        """Run R1 without compaction; reference=True retains the generic R2 oracle."""
         if isinstance(max_calls, bool) or max_calls not in (1, 2):
             raise ValueError('max_calls must be 1 or 2')
         h0 = self.capture(input_ids, attention_mask)
+        if max_calls == 1 and not reference:
+            return self._forward_r1(h0, policy)
         shape = h0.shape
         h = h0.reshape(-1, self.hidden_size).clone()
         initial = h.clone()
@@ -251,3 +264,34 @@ class MixtralAdapter:
                 done[continuing] = rounds[continuing] >= max_calls
         final = h.reshape(shape)
         return AdapterOutput(self.readout(final), final, trace.reshape(*shape[:-1], max_calls), rounds.reshape(shape[:-1]))
+
+    def _forward_r1(self, h0, policy):
+        """Single terminal FFN call, preserving HF native order and routing weights."""
+        h = self._flat(h0)
+        n = self.layer.post_attention_layernorm(h)
+        logits, weights, pairs = self.moe.gate(n)
+        count = len(h)
+        if policy is None:
+            # No observation, STOP bookkeeping, compaction or alternate softmax.
+            # Gate-generated pairs obey the native Top-2 contract. The public
+            # pair_to_action entry point still validates arbitrary caller input.
+            a, b = pairs.sort(-1).values.unbind(-1)
+            actions = a * 8 - a * (a + 1) // 2 + b - a
+            final = h + self.moe.experts(n, pairs, weights)
+        else:
+            rounds = torch.zeros(count, dtype=torch.long, device=h.device)
+            previous = torch.full((count, 2), -1, dtype=torch.long, device=h.device)
+            obs = self._observation(h, h, n, n, logits, pairs, rounds, previous, 1, first=True)
+            actions = policy(obs)
+            if not isinstance(actions, torch.Tensor) or actions.dtype != torch.long or actions.shape != (count,):
+                raise ValueError('policy must return int64 [active_rows] actions')
+            if actions.device != h.device or bool(((actions < 0) | (actions > 28)).any()):
+                raise ValueError('policy actions must be on terminal device in 0..28')
+            if bool((actions == 0).any()):
+                raise ValueError('STOP is illegal before the first FFN call')
+            # Range already checked; avoid synchronizing again in action_to_pair.
+            chosen = torch.tensor(PAIR_TABLE, dtype=torch.long, device=h.device)[actions - 1]
+            final = self._step_routed(h, n, logits, weights, pairs, chosen)
+        final = final.reshape(h0.shape)
+        rounds = torch.ones(h0.shape[:-1], dtype=torch.long, device=h.device)
+        return AdapterOutput(self.readout(final), final, actions.reshape(*h0.shape[:-1], 1), rounds)

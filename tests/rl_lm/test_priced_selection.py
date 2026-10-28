@@ -2,6 +2,7 @@
 import copy
 import tempfile
 import unittest
+import torch
 from unittest.mock import patch
 from pathlib import Path
 from types import SimpleNamespace
@@ -86,14 +87,18 @@ class SelectionTests(unittest.TestCase):
         self.evaluate(t, 5.006, 1.)
         t.frozen_hash_at_start = "test-hash"
         t.ledger = SimpleNamespace(merge_peak=lambda _: None, to_dict=lambda: {})
-        t.device = "cpu"
+        t.device = torch.device("cpu")
+        t._cost_clock = 0.0
+        t._wall_time_seconds = 0.0
+        t._cost_finished = False
+        t._save_checkpoint = lambda _: None
         t.start_time = 0
         t.run_id = "test"
         t.initialization = "fresh"
         t.planned_updates = t.stop_after = 1
         t.lr_scale = 1.
         t.lr_backoffs = 0
-        with patch("rl_lm.trainer.model_parameter_hash", return_value="test-hash"):
+        with patch("rl_lm.trainer.model_parameter_hash", return_value="test-hash"), patch.object(t, "_summary_markdown", return_value="summary"):
             summary = t._finish("completed")
         self.assertEqual(summary["selection_status"], "no_feasible_candidate")
         self.assertIsNone(summary["best"])
