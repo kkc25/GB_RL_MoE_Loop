@@ -1,0 +1,287 @@
+[
+  {
+    "update": 0,
+    "train": {
+      "tokens": 510,
+      "native_nll": 1.79513529165922,
+      "nll": 1.79513529165922,
+      "gain_nats": 0.0,
+      "gain_median_nats": 0.0,
+      "gain_worst_nats": 0.0,
+      "positive_fraction": 0.0,
+      "top2_positive_gain_share": 0.0,
+      "native_agreement": 1.0,
+      "entropy": 3.080047130584717,
+      "action_diagnostics_protocol": "executed full-padded-document policy, valid positions only",
+      "greedy_action_counts": [
+        2,
+        2,
+        6,
+        76,
+        0,
+        39,
+        1,
+        5,
+        38,
+        2,
+        75,
+        0,
+        2,
+        0,
+        0,
+        4,
+        4,
+        64,
+        4,
+        36,
+        77,
+        22,
+        0,
+        26,
+        2,
+        0,
+        4,
+        19
+      ],
+      "surrogate_nll": 1.79395305508219,
+      "surrogate_minus_actual_nll": -0.0011822365770298988,
+      "surrogate_actual_max_abs": 0.12449312210083008,
+      "surrogate_is_deployment_cost": false,
+      "per_document": [
+        {
+          "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+          "tokens": 255,
+          "native_nll": 1.5471375455223364,
+          "nll": 1.5471375455223364,
+          "gain_nats": 0.0
+        },
+        {
+          "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+          "tokens": 255,
+          "native_nll": 2.0431330377961037,
+          "nll": 2.0431330377961037,
+          "gain_nats": 0.0
+        }
+      ],
+      "populations": {
+        "all_train_positions": {
+          "tokens": 510,
+          "native_nll": 1.79513529165922,
+          "nll": 1.79513529165922
+        },
+        "optimizer_seen_positions": {
+          "tokens": 0,
+          "native_nll": null,
+          "nll": null
+        },
+        "optimizer_unseen_positions": {
+          "tokens": 510,
+          "native_nll": 1.79513529165922,
+          "nll": 1.79513529165922
+        }
+      }
+    },
+    "fixed_surrogate_objective": 3.4869243844104214,
+    "learning_rate_used": null,
+    "learning_rate_next": 0.001,
+    "adaptive_decision": null,
+    "training_coverage": {
+      "eligible_train_positions": 510,
+      "optimizer_position_visits": 0,
+      "unique_positions_visited": 0,
+      "coverage_fraction": 0.0,
+      "minimum_visits": 0,
+      "maximum_visits": 0
+    }
+  },
+  {
+    "update": 2,
+    "train": {
+      "tokens": 510,
+      "native_nll": 1.79513529165922,
+      "nll": 1.79513529165922,
+      "gain_nats": 0.0,
+      "gain_median_nats": 0.0,
+      "gain_worst_nats": 0.0,
+      "positive_fraction": 0.0,
+      "top2_positive_gain_share": 0.0,
+      "native_agreement": 1.0,
+      "entropy": 3.0814896508759144,
+      "action_diagnostics_protocol": "executed full-padded-document policy, valid positions only",
+      "greedy_action_counts": [
+        2,
+        2,
+        6,
+        76,
+        0,
+        39,
+        1,
+        5,
+        38,
+        2,
+        75,
+        0,
+        2,
+        0,
+        0,
+        4,
+        4,
+        64,
+        4,
+        36,
+        77,
+        22,
+        0,
+        26,
+        2,
+        0,
+        4,
+        19
+      ],
+      "surrogate_nll": 1.79395305508219,
+      "surrogate_minus_actual_nll": -0.0011822365770298988,
+      "surrogate_actual_max_abs": 0.12449312210083008,
+      "surrogate_is_deployment_cost": false,
+      "per_document": [
+        {
+          "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+          "tokens": 255,
+          "native_nll": 1.5471375455223364,
+          "nll": 1.5471375455223364,
+          "gain_nats": 0.0
+        },
+        {
+          "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+          "tokens": 255,
+          "native_nll": 2.0431330377961037,
+          "nll": 2.0431330377961037,
+          "gain_nats": 0.0
+        }
+      ],
+      "populations": {
+        "all_train_positions": {
+          "tokens": 510,
+          "native_nll": 1.79513529165922,
+          "nll": 1.79513529165922
+        },
+        "optimizer_seen_positions": {
+          "tokens": 16,
+          "native_nll": 1.2707633409572736,
+          "nll": 1.2707633409572736
+        },
+        "optimizer_unseen_positions": {
+          "tokens": 494,
+          "native_nll": 1.8121189985645463,
+          "nll": 1.8121189985645463
+        }
+      }
+    },
+    "fixed_surrogate_objective": 3.4857947512921177,
+    "learning_rate_used": 0.001,
+    "learning_rate_next": 0.001,
+    "adaptive_decision": null,
+    "training_coverage": {
+      "eligible_train_positions": 510,
+      "optimizer_position_visits": 16,
+      "unique_positions_visited": 16,
+      "coverage_fraction": 0.03137254901960784,
+      "minimum_visits": 0,
+      "maximum_visits": 1
+    }
+  },
+  {
+    "update": 4,
+    "train": {
+      "tokens": 510,
+      "native_nll": 1.79513529165922,
+      "nll": 1.79513529165922,
+      "gain_nats": 0.0,
+      "gain_median_nats": 0.0,
+      "gain_worst_nats": 0.0,
+      "positive_fraction": 0.0,
+      "top2_positive_gain_share": 0.0,
+      "native_agreement": 1.0,
+      "entropy": 3.0847734689712523,
+      "action_diagnostics_protocol": "executed full-padded-document policy, valid positions only",
+      "greedy_action_counts": [
+        2,
+        2,
+        6,
+        76,
+        0,
+        39,
+        1,
+        5,
+        38,
+        2,
+        75,
+        0,
+        2,
+        0,
+        0,
+        4,
+        4,
+        64,
+        4,
+        36,
+        77,
+        22,
+        0,
+        26,
+        2,
+        0,
+        4,
+        19
+      ],
+      "surrogate_nll": 1.79395305508219,
+      "surrogate_minus_actual_nll": -0.0011822365770298988,
+      "surrogate_actual_max_abs": 0.12449312210083008,
+      "surrogate_is_deployment_cost": false,
+      "per_document": [
+        {
+          "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+          "tokens": 255,
+          "native_nll": 1.5471375455223364,
+          "nll": 1.5471375455223364,
+          "gain_nats": 0.0
+        },
+        {
+          "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+          "tokens": 255,
+          "native_nll": 2.0431330377961037,
+          "nll": 2.0431330377961037,
+          "gain_nats": 0.0
+        }
+      ],
+      "populations": {
+        "all_train_positions": {
+          "tokens": 510,
+          "native_nll": 1.79513529165922,
+          "nll": 1.79513529165922
+        },
+        "optimizer_seen_positions": {
+          "tokens": 32,
+          "native_nll": 1.2668309312014117,
+          "nll": 1.2668309312014117
+        },
+        "optimizer_unseen_positions": {
+          "tokens": 478,
+          "native_nll": 1.8305029475894496,
+          "nll": 1.8305029475894496
+        }
+      }
+    },
+    "fixed_surrogate_objective": 3.4838084675443475,
+    "learning_rate_used": 0.001,
+    "learning_rate_next": 0.001,
+    "adaptive_decision": null,
+    "training_coverage": {
+      "eligible_train_positions": 510,
+      "optimizer_position_visits": 32,
+      "unique_positions_visited": 32,
+      "coverage_fraction": 0.06274509803921569,
+      "minimum_visits": 0,
+      "maximum_visits": 1
+    }
+  }
+]

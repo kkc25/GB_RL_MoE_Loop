@@ -1,0 +1,62 @@
+[
+  {
+    "update": 1,
+    "objective_before_update": 3.4735410514546903,
+    "gradient_norm": 0.14914856851100922,
+    "learning_rate_used": 0.001,
+    "optimizer_positions": 8,
+    "training_coverage": {
+      "eligible_train_positions": 510,
+      "optimizer_position_visits": 8,
+      "unique_positions_visited": 8,
+      "coverage_fraction": 0.01568627450980392,
+      "minimum_visits": 0,
+      "maximum_visits": 1
+    }
+  },
+  {
+    "update": 2,
+    "objective_before_update": 3.47833550649913,
+    "gradient_norm": 0.06992817670106888,
+    "learning_rate_used": 0.001,
+    "optimizer_positions": 8,
+    "training_coverage": {
+      "eligible_train_positions": 510,
+      "optimizer_position_visits": 16,
+      "unique_positions_visited": 16,
+      "coverage_fraction": 0.03137254901960784,
+      "minimum_visits": 0,
+      "maximum_visits": 1
+    }
+  },
+  {
+    "update": 3,
+    "objective_before_update": 3.482702506869436,
+    "gradient_norm": 0.09136341512203217,
+    "learning_rate_used": 0.001,
+    "optimizer_positions": 8,
+    "training_coverage": {
+      "eligible_train_positions": 510,
+      "optimizer_position_visits": 24,
+      "unique_positions_visited": 24,
+      "coverage_fraction": 0.047058823529411764,
+      "minimum_visits": 0,
+      "maximum_visits": 1
+    }
+  },
+  {
+    "update": 4,
+    "objective_before_update": 3.4367238639845428,
+    "gradient_norm": 0.09390097856521606,
+    "learning_rate_used": 0.001,
+    "optimizer_positions": 8,
+    "training_coverage": {
+      "eligible_train_positions": 510,
+      "optimizer_position_visits": 32,
+      "unique_positions_visited": 32,
+      "coverage_fraction": 0.06274509803921569,
+      "minimum_visits": 0,
+      "maximum_visits": 1
+    }
+  }
+]

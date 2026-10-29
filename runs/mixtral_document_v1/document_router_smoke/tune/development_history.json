@@ -1,0 +1,236 @@
+[
+  {
+    "update": 0,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "controlled_original": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "candidate": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "nll": 1.76277145533031,
+    "patience_observations": 0
+  },
+  {
+    "update": 2,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "controlled_original": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "candidate": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "nll": 1.76277145533031,
+    "patience_observations": 1
+  },
+  {
+    "update": 4,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "controlled_original": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "candidate": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "nll": 1.76277145533031,
+    "patience_observations": 2
+  }
+]

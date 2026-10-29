@@ -1,0 +1,694 @@
+{
+  "format": "mixtral-document-router-v1",
+  "status": "complete",
+  "failure": null,
+  "stop_reason": "max_updates",
+  "successful_updates": 4,
+  "best_update": 0,
+  "initial_train_metrics": {
+    "tokens": 510,
+    "native_nll": 1.79513529165922,
+    "nll": 1.79513529165922,
+    "gain_nats": 0.0,
+    "gain_median_nats": 0.0,
+    "gain_worst_nats": 0.0,
+    "positive_fraction": 0.0,
+    "top2_positive_gain_share": 0.0,
+    "native_agreement": 1.0,
+    "entropy": 3.080047130584717,
+    "action_diagnostics_protocol": "executed full-padded-document policy, valid positions only",
+    "greedy_action_counts": [
+      2,
+      2,
+      6,
+      76,
+      0,
+      39,
+      1,
+      5,
+      38,
+      2,
+      75,
+      0,
+      2,
+      0,
+      0,
+      4,
+      4,
+      64,
+      4,
+      36,
+      77,
+      22,
+      0,
+      26,
+      2,
+      0,
+      4,
+      19
+    ],
+    "surrogate_nll": 1.79395305508219,
+    "surrogate_minus_actual_nll": -0.0011822365770298988,
+    "surrogate_actual_max_abs": 0.12449312210083008,
+    "surrogate_is_deployment_cost": false,
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+        "tokens": 255,
+        "native_nll": 1.5471375455223364,
+        "nll": 1.5471375455223364,
+        "gain_nats": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+        "tokens": 255,
+        "native_nll": 2.0431330377961037,
+        "nll": 2.0431330377961037,
+        "gain_nats": 0.0
+      }
+    ],
+    "populations": {
+      "all_train_positions": {
+        "tokens": 510,
+        "native_nll": 1.79513529165922,
+        "nll": 1.79513529165922
+      },
+      "optimizer_seen_positions": {
+        "tokens": 0,
+        "native_nll": null,
+        "nll": null
+      },
+      "optimizer_unseen_positions": {
+        "tokens": 510,
+        "native_nll": 1.79513529165922,
+        "nll": 1.79513529165922
+      }
+    }
+  },
+  "nonzero_gradient_updates": 4,
+  "best_train_metrics": {
+    "tokens": 510,
+    "native_nll": 1.79513529165922,
+    "nll": 1.79513529165922,
+    "gain_nats": 0.0,
+    "gain_median_nats": 0.0,
+    "gain_worst_nats": 0.0,
+    "positive_fraction": 0.0,
+    "top2_positive_gain_share": 0.0,
+    "native_agreement": 1.0,
+    "entropy": 3.080047130584717,
+    "action_diagnostics_protocol": "executed full-padded-document policy, valid positions only",
+    "greedy_action_counts": [
+      2,
+      2,
+      6,
+      76,
+      0,
+      39,
+      1,
+      5,
+      38,
+      2,
+      75,
+      0,
+      2,
+      0,
+      0,
+      4,
+      4,
+      64,
+      4,
+      36,
+      77,
+      22,
+      0,
+      26,
+      2,
+      0,
+      4,
+      19
+    ],
+    "surrogate_nll": 1.79395305508219,
+    "surrogate_minus_actual_nll": -0.0011822365770298988,
+    "surrogate_actual_max_abs": 0.12449312210083008,
+    "surrogate_is_deployment_cost": false,
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+        "tokens": 255,
+        "native_nll": 1.5471375455223364,
+        "nll": 1.5471375455223364,
+        "gain_nats": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+        "tokens": 255,
+        "native_nll": 2.0431330377961037,
+        "nll": 2.0431330377961037,
+        "gain_nats": 0.0
+      }
+    ],
+    "populations": {
+      "all_train_positions": {
+        "tokens": 510,
+        "native_nll": 1.79513529165922,
+        "nll": 1.79513529165922
+      },
+      "optimizer_seen_positions": {
+        "tokens": 0,
+        "native_nll": null,
+        "nll": null
+      },
+      "optimizer_unseen_positions": {
+        "tokens": 510,
+        "native_nll": 1.79513529165922,
+        "nll": 1.79513529165922
+      }
+    }
+  },
+  "latest_train_metrics": {
+    "tokens": 510,
+    "native_nll": 1.79513529165922,
+    "nll": 1.79513529165922,
+    "gain_nats": 0.0,
+    "gain_median_nats": 0.0,
+    "gain_worst_nats": 0.0,
+    "positive_fraction": 0.0,
+    "top2_positive_gain_share": 0.0,
+    "native_agreement": 1.0,
+    "entropy": 3.0847734689712523,
+    "action_diagnostics_protocol": "executed full-padded-document policy, valid positions only",
+    "greedy_action_counts": [
+      2,
+      2,
+      6,
+      76,
+      0,
+      39,
+      1,
+      5,
+      38,
+      2,
+      75,
+      0,
+      2,
+      0,
+      0,
+      4,
+      4,
+      64,
+      4,
+      36,
+      77,
+      22,
+      0,
+      26,
+      2,
+      0,
+      4,
+      19
+    ],
+    "surrogate_nll": 1.79395305508219,
+    "surrogate_minus_actual_nll": -0.0011822365770298988,
+    "surrogate_actual_max_abs": 0.12449312210083008,
+    "surrogate_is_deployment_cost": false,
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:26481153-8735-46c2-b8ce-58404d47d864>",
+        "tokens": 255,
+        "native_nll": 1.5471375455223364,
+        "nll": 1.5471375455223364,
+        "gain_nats": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:e3d9b765-ee92-4a28-baa1-37c126a91625>",
+        "tokens": 255,
+        "native_nll": 2.0431330377961037,
+        "nll": 2.0431330377961037,
+        "gain_nats": 0.0
+      }
+    ],
+    "populations": {
+      "all_train_positions": {
+        "tokens": 510,
+        "native_nll": 1.79513529165922,
+        "nll": 1.79513529165922
+      },
+      "optimizer_seen_positions": {
+        "tokens": 32,
+        "native_nll": 1.2668309312014117,
+        "nll": 1.2668309312014117
+      },
+      "optimizer_unseen_positions": {
+        "tokens": 478,
+        "native_nll": 1.8305029475894496,
+        "nll": 1.8305029475894496
+      }
+    }
+  },
+  "initial_development_nll": 1.76277145533031,
+  "best_development_nll": 1.76277145533031,
+  "initial_development_metrics": {
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "controlled_original": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "candidate": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "nll": 1.76277145533031
+  },
+  "best_development_metrics": {
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 2,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "controlled_original": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "candidate": {
+      "nll": 1.76277145533031,
+      "tokens": 510,
+      "sequences": 2
+    },
+    "nll": 1.76277145533031
+  },
+  "development_history": [
+    {
+      "update": 0,
+      "status": "ok",
+      "role": "development",
+      "protocol": "full_document_online_nll",
+      "document_ids": [
+        "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>"
+      ],
+      "per_document": [
+        {
+          "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+          "tokens": 255,
+          "native_nll": 0.9962772237006055,
+          "controlled_nll": 0.9962772237006055,
+          "candidate_nll": 0.9962772237006055,
+          "candidate_minus_native_nll": 0.0,
+          "candidate_minus_controlled_nll": 0.0
+        },
+        {
+          "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+          "tokens": 255,
+          "native_nll": 2.5292656869600143,
+          "controlled_nll": 2.5292656869600143,
+          "candidate_nll": 2.5292656869600143,
+          "candidate_minus_native_nll": 0.0,
+          "candidate_minus_controlled_nll": 0.0
+        }
+      ],
+      "document_statistics": {
+        "unit": "document",
+        "confidence_interval": null,
+        "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+        "native": {
+          "document_mean_delta_nll": 0.0,
+          "document_population_std_delta_nll": 0.0,
+          "minimum_delta_nll": 0.0,
+          "maximum_delta_nll": 0.0,
+          "improved_documents": 0,
+          "degraded_documents": 0,
+          "unchanged_documents": 2,
+          "positive_token_gain_total_nats": 0.0,
+          "top_document_positive_gain_fraction": 0.0,
+          "top_two_documents_positive_gain_fraction": 0.0
+        },
+        "controlled": {
+          "document_mean_delta_nll": 0.0,
+          "document_population_std_delta_nll": 0.0,
+          "minimum_delta_nll": 0.0,
+          "maximum_delta_nll": 0.0,
+          "improved_documents": 0,
+          "degraded_documents": 0,
+          "unchanged_documents": 2,
+          "positive_token_gain_total_nats": 0.0,
+          "top_document_positive_gain_fraction": 0.0,
+          "top_two_documents_positive_gain_fraction": 0.0
+        }
+      },
+      "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+      "scope": "independent development selection",
+      "native": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "controlled_original": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "candidate": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "nll": 1.76277145533031,
+      "patience_observations": 0
+    },
+    {
+      "update": 2,
+      "status": "ok",
+      "role": "development",
+      "protocol": "full_document_online_nll",
+      "document_ids": [
+        "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>"
+      ],
+      "per_document": [
+        {
+          "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+          "tokens": 255,
+          "native_nll": 0.9962772237006055,
+          "controlled_nll": 0.9962772237006055,
+          "candidate_nll": 0.9962772237006055,
+          "candidate_minus_native_nll": 0.0,
+          "candidate_minus_controlled_nll": 0.0
+        },
+        {
+          "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+          "tokens": 255,
+          "native_nll": 2.5292656869600143,
+          "controlled_nll": 2.5292656869600143,
+          "candidate_nll": 2.5292656869600143,
+          "candidate_minus_native_nll": 0.0,
+          "candidate_minus_controlled_nll": 0.0
+        }
+      ],
+      "document_statistics": {
+        "unit": "document",
+        "confidence_interval": null,
+        "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+        "native": {
+          "document_mean_delta_nll": 0.0,
+          "document_population_std_delta_nll": 0.0,
+          "minimum_delta_nll": 0.0,
+          "maximum_delta_nll": 0.0,
+          "improved_documents": 0,
+          "degraded_documents": 0,
+          "unchanged_documents": 2,
+          "positive_token_gain_total_nats": 0.0,
+          "top_document_positive_gain_fraction": 0.0,
+          "top_two_documents_positive_gain_fraction": 0.0
+        },
+        "controlled": {
+          "document_mean_delta_nll": 0.0,
+          "document_population_std_delta_nll": 0.0,
+          "minimum_delta_nll": 0.0,
+          "maximum_delta_nll": 0.0,
+          "improved_documents": 0,
+          "degraded_documents": 0,
+          "unchanged_documents": 2,
+          "positive_token_gain_total_nats": 0.0,
+          "top_document_positive_gain_fraction": 0.0,
+          "top_two_documents_positive_gain_fraction": 0.0
+        }
+      },
+      "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+      "scope": "independent development selection",
+      "native": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "controlled_original": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "candidate": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "nll": 1.76277145533031,
+      "patience_observations": 1
+    },
+    {
+      "update": 4,
+      "status": "ok",
+      "role": "development",
+      "protocol": "full_document_online_nll",
+      "document_ids": [
+        "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>"
+      ],
+      "per_document": [
+        {
+          "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+          "tokens": 255,
+          "native_nll": 0.9962772237006055,
+          "controlled_nll": 0.9962772237006055,
+          "candidate_nll": 0.9962772237006055,
+          "candidate_minus_native_nll": 0.0,
+          "candidate_minus_controlled_nll": 0.0
+        },
+        {
+          "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+          "tokens": 255,
+          "native_nll": 2.5292656869600143,
+          "controlled_nll": 2.5292656869600143,
+          "candidate_nll": 2.5292656869600143,
+          "candidate_minus_native_nll": 0.0,
+          "candidate_minus_controlled_nll": 0.0
+        }
+      ],
+      "document_statistics": {
+        "unit": "document",
+        "confidence_interval": null,
+        "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+        "native": {
+          "document_mean_delta_nll": 0.0,
+          "document_population_std_delta_nll": 0.0,
+          "minimum_delta_nll": 0.0,
+          "maximum_delta_nll": 0.0,
+          "improved_documents": 0,
+          "degraded_documents": 0,
+          "unchanged_documents": 2,
+          "positive_token_gain_total_nats": 0.0,
+          "top_document_positive_gain_fraction": 0.0,
+          "top_two_documents_positive_gain_fraction": 0.0
+        },
+        "controlled": {
+          "document_mean_delta_nll": 0.0,
+          "document_population_std_delta_nll": 0.0,
+          "minimum_delta_nll": 0.0,
+          "maximum_delta_nll": 0.0,
+          "improved_documents": 0,
+          "degraded_documents": 0,
+          "unchanged_documents": 2,
+          "positive_token_gain_total_nats": 0.0,
+          "top_document_positive_gain_fraction": 0.0,
+          "top_two_documents_positive_gain_fraction": 0.0
+        }
+      },
+      "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+      "scope": "independent development selection",
+      "native": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "controlled_original": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "candidate": {
+        "nll": 1.76277145533031,
+        "tokens": 510,
+        "sequences": 2
+      },
+      "nll": 1.76277145533031,
+      "patience_observations": 2
+    }
+  ],
+  "training_coverage": {
+    "eligible_train_positions": 510,
+    "optimizer_position_visits": 32,
+    "unique_positions_visited": 32,
+    "coverage_fraction": 0.06274509803921569,
+    "minimum_visits": 0,
+    "maximum_visits": 1
+  },
+  "work_totals": {
+    "table_attempted_document_forwards": 58,
+    "table_completed_document_forwards": 58,
+    "table_head_rows": 14848,
+    "probe_attempted_document_forwards": 6,
+    "probe_completed_document_forwards": 6,
+    "probe_head_rows": 1536
+  },
+  "adaptive": {
+    "schema": "mixtral-train-only-adaptive-fit-v1",
+    "config": {
+      "enabled": false,
+      "eval_interval": 16,
+      "patience": 3,
+      "min_delta": 0.0001,
+      "lr_factor": 0.5,
+      "min_lr": 1e-05,
+      "max_lr": 0.02,
+      "growth_factor": 2.0,
+      "max_growths": 2,
+      "min_updates": 64,
+      "stop_patience": 3
+    },
+    "initial_lr": 0.001,
+    "current_lr": 0.001,
+    "last_update": null,
+    "best_train_loss": null,
+    "progress_anchor_loss": null,
+    "last_train_loss": null,
+    "plateau_observations": 0,
+    "ineffective_observations": 0,
+    "floor_plateau_observations": 0,
+    "growths": 0,
+    "reductions": 0,
+    "coverage_complete": false,
+    "stopped": false,
+    "stop_reason": null,
+    "observation_count": 0,
+    "decisions": []
+  },
+  "binding_sha256": "561b0b09c6d2f71983c15b191af3b2114aa1c7ebf414f9d328153d107be7ec4e",
+  "checkpoint_rule": "minimum full-document development NLL; earliest tie; includes update zero",
+  "surrogate_is_deployment_cost": false,
+  "scope": "Full-document uniform-action supervision surrogate; actual mixed-policy train probes and development-only model selection; no final test or deployment claim.",
+  "final_test_evaluated": false,
+  "resume_supported": false,
+  "wall_seconds": 2.7923140389611945
+}

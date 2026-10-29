@@ -1,0 +1,1796 @@
+[
+  {
+    "update": 0,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 0
+  },
+  {
+    "update": 16,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 1
+  },
+  {
+    "update": 32,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 2
+  },
+  {
+    "update": 48,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 3
+  },
+  {
+    "update": 64,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 4
+  },
+  {
+    "update": 80,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 5
+  },
+  {
+    "update": 96,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 6
+  },
+  {
+    "update": 112,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 7
+  },
+  {
+    "update": 128,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 8
+  },
+  {
+    "update": 144,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 9
+  },
+  {
+    "update": 160,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 10
+  },
+  {
+    "update": 176,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 11
+  },
+  {
+    "update": 192,
+    "status": "ok",
+    "role": "development",
+    "protocol": "full_document_online_nll",
+    "document_ids": [
+      "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+      "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+      "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+      "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+      "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+      "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+      "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+      "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>"
+    ],
+    "per_document": [
+      {
+        "document_id": "<urn:uuid:f8496c23-2245-4c16-b2f0-a0b7c7fba484>",
+        "tokens": 255,
+        "native_nll": 0.9962772237006055,
+        "controlled_nll": 0.9962772237006055,
+        "candidate_nll": 0.9962772237006055,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:c3a94e21-ddc6-4784-88c0-60948059e454>",
+        "tokens": 255,
+        "native_nll": 2.5292656869600143,
+        "controlled_nll": 2.5292656869600143,
+        "candidate_nll": 2.5292656869600143,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:67644445-6219-4fb6-8e55-20e068b1bd10>",
+        "tokens": 178,
+        "native_nll": 2.0744738497115383,
+        "controlled_nll": 2.0744738497115383,
+        "candidate_nll": 2.0744738497115383,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:0125f8d0-a228-4abb-b56f-ead2c84a946f>",
+        "tokens": 255,
+        "native_nll": 1.7008624677244513,
+        "controlled_nll": 1.7008624677244513,
+        "candidate_nll": 1.7008624677244513,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:3497fdf1-2c6a-4ad6-8d76-084bb21c53e4>",
+        "tokens": 101,
+        "native_nll": 2.9000382886720173,
+        "controlled_nll": 2.9000382886720173,
+        "candidate_nll": 2.9000382886720173,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:ef425716-42fe-4c20-b472-6f8c82a4cc0d>",
+        "tokens": 255,
+        "native_nll": 2.3399375008581793,
+        "controlled_nll": 2.3399375008581793,
+        "candidate_nll": 2.3399375008581793,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:02615412-c4f3-4b8e-803b-07755c065b66>",
+        "tokens": 255,
+        "native_nll": 1.9925640335787058,
+        "controlled_nll": 1.9925640335787058,
+        "candidate_nll": 1.9925640335787058,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      },
+      {
+        "document_id": "<urn:uuid:201552c2-0a97-4558-9990-b587b77b3675>",
+        "tokens": 255,
+        "native_nll": 1.8365811139154282,
+        "controlled_nll": 1.8365811139154282,
+        "candidate_nll": 1.8365811139154282,
+        "candidate_minus_native_nll": 0.0,
+        "candidate_minus_controlled_nll": 0.0
+      }
+    ],
+    "document_statistics": {
+      "unit": "document",
+      "confidence_interval": null,
+      "interpretation": "descriptive only; documents, not tokens, are the independent evaluation units",
+      "native": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      },
+      "controlled": {
+        "document_mean_delta_nll": 0.0,
+        "document_population_std_delta_nll": 0.0,
+        "minimum_delta_nll": 0.0,
+        "maximum_delta_nll": 0.0,
+        "improved_documents": 0,
+        "degraded_documents": 0,
+        "unchanged_documents": 8,
+        "positive_token_gain_total_nats": 0.0,
+        "top_document_positive_gain_fraction": 0.0,
+        "top_two_documents_positive_gain_fraction": 0.0
+      }
+    },
+    "execution": "fresh full prefix plus shared full padded terminal tail/head; no cached development scoring",
+    "scope": "independent development selection",
+    "native": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "controlled_original": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "candidate": {
+      "nll": 1.9723657596586845,
+      "tokens": 1809,
+      "sequences": 8
+    },
+    "nll": 1.9723657596586845,
+    "patience_observations": 12
+  }
+]
