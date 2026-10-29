@@ -2,6 +2,9 @@
 
 For an operator checklist in Chinese, see [MIGRATION.md](MIGRATION.md).
 
+For the separate 100M runtime diagnosis protocol, native all-layer controls and
+experimental readout comparisons, see [RUNTIME_DIAGNOSTICS.md](RUNTIME_DIAGNOSTICS.md).
+
 This update is based on main `ead65b2`. It does **not** establish better trained
 quality, GPU throughput, or end-to-end latency. Existing research results remain
 historical records and are not regenerated or reinterpreted.
