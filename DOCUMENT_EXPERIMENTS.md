@@ -244,3 +244,11 @@ python -m experiments.mixtral_document --config local_configs/document_adapter_p
 
 CPU/tiny 模型测试用于软件正确性；真实多 GPU BF16 parity、学习收益、速度与显存
 仍需服务器实测。只有质量稳定后再判断性能成本，不能把 kernel 较快替代质量验证。
+
+
+## 9. 现有 router 产物的只读 CPU 诊断
+
+见 [Router artifact diagnostics](ROUTER_ARTIFACT_DIAGNOSTICS.md)：读取原始监督表与
+latest/best actor，分解软标签、先验、残差与 argmax margin；不加载预训练模型、
+不重训、不改历史配置/报告。真实二进制诊断仍待服务器运行，不能把 CPU 有效行
+诊断或 uniform-action 表内成本当作完整 GPU 策略的部署收益。
