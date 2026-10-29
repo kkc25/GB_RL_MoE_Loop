@@ -30,6 +30,10 @@ SCHEMA = 'mixtral-cache-online-bridge-v1'
 MAX_CHECKPOINT_BYTES = 512 * 1024 * 1024
 
 
+def _index_select_own_device(tensor, indices):
+    return tensor.index_select(0, indices.to(tensor.device))
+
+
 def safe_path(path, name='path'):
     """Reject traversal spellings rather than silently normalizing report paths."""
     if not isinstance(path, (str, Path)) or not str(path).strip():
@@ -401,8 +405,8 @@ def diagnose_bridge(adapter, train_rows, candidate, config, *, manifest=None,
                 native_ce, native_logits, native_hidden = all_ce, flat_logits, hidden.reshape(-1, adapter.hidden_size)
             if name in ('controlled', 'zero'):
                 valid_tensor = torch.tensor(valid, dtype=torch.long, device=flat_logits.device)
-                diffs.add(f'native_vs_{name}.logits', native_logits.index_select(0, valid_tensor),
-                          flat_logits.index_select(0, valid_tensor))
+                diffs.add(f'native_vs_{name}.logits', _index_select_own_device(native_logits, valid_tensor),
+                          _index_select_own_device(flat_logits, valid_tensor))
                 hidden_valid = valid_tensor.to(hidden.device)
                 diffs.add(f'native_vs_{name}.hidden', native_hidden.index_select(0, hidden_valid.to(native_hidden.device)),
                           hidden.reshape(-1, adapter.hidden_size).index_select(0, hidden_valid))

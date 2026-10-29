@@ -1,0 +1,27 @@
+test_adapter_fixed_tail_padding_and_cache_hashes (tests.test_mixtral_bridge.BridgeTests.test_adapter_fixed_tail_padding_and_cache_hashes) ... ok
+test_all_selected_empty_unselected_is_not_nan (tests.test_mixtral_bridge.BridgeTests.test_all_selected_empty_unselected_is_not_nan) ... ok
+test_forcing_changes_only_requested_positions (tests.test_mixtral_bridge.BridgeTests.test_forcing_changes_only_requested_positions) ... ok
+test_learned_router_and_forced_action_drift_are_visible (tests.test_mixtral_bridge.BridgeTests.test_learned_router_and_forced_action_drift_are_visible) ... ok
+test_manifest_target_position_and_nontrain_rejected (tests.test_mixtral_bridge.BridgeTests.test_manifest_target_position_and_nontrain_rejected) ... ok
+test_nonfinite_rejected_and_hooks_cleaned (tests.test_mixtral_bridge.BridgeTests.test_nonfinite_rejected_and_hooks_cleaned) ... ok
+test_recovery_adapter_scientific_settings_preserved (tests.test_mixtral_bridge.BridgeTests.test_recovery_adapter_scientific_settings_preserved) ... ok
+test_router_fp32_bf16_masks_labels_and_zero_identity (tests.test_mixtral_bridge.BridgeTests.test_router_fp32_bf16_masks_labels_and_zero_identity) ... ok
+test_shape_dependent_fake_scores_fail_declared_screen (tests.test_mixtral_bridge.BridgeTests.test_shape_dependent_fake_scores_fail_declared_screen) ... ok
+test_tolerances_are_explicit_not_auto_widened (tests.test_mixtral_bridge.BridgeTests.test_tolerances_are_explicit_not_auto_widened) ... ok
+test_index_select_moves_indices_to_each_tensor_device (tests.test_mixtral_bridge.DeviceIndexTests.test_index_select_moves_indices_to_each_tensor_device) ... ok
+test_cli_rejects_report_tamper_without_loading_and_records_failure (tests.test_mixtral_bridge.HistoricalBridgeTests.test_cli_rejects_report_tamper_without_loading_and_records_failure) ... ok
+test_historical_checkpoint_tamper_rejected_before_model_load (tests.test_mixtral_bridge.HistoricalBridgeTests.test_historical_checkpoint_tamper_rejected_before_model_load) ... ok
+test_historical_failed_fit_gate_router_and_adapter_run_without_selection (tests.test_mixtral_bridge.HistoricalBridgeTests.test_historical_failed_fit_gate_router_and_adapter_run_without_selection) ... ok
+test_only_train_tokenized_all_roles_hash_checked (tests.test_mixtral_bridge.HistoricalBridgeTests.test_only_train_tokenized_all_roles_hash_checked) ... ok
+test_source_and_report_path_traversal_and_symlink_escape (tests.test_mixtral_bridge.HistoricalBridgeTests.test_source_and_report_path_traversal_and_symlink_escape) ... ok
+test_sources_ignore_new_modules_and_commit_but_reject_old_tamper (tests.test_mixtral_bridge.HistoricalBridgeTests.test_sources_ignore_new_modules_and_commit_but_reject_old_tamper) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 1.073s
+
+OK
+{"report": "/tmp/tmpgagctchy/old-fit/report.json", "status": "complete"}
+{"report": "/tmp/tmpm3vh33wj/old-fit/report.json", "status": "complete"}
+{"report": "/tmp/tmpm3vh33wj/bridge/report.json", "status": "complete", "numerical_screen_passed": true}
+{"report": "/tmp/tmp6znthda5/old-fit/report.json", "status": "complete"}
+{"report": "/tmp/tmp6znthda5/bridge/report.json", "status": "complete", "numerical_screen_passed": true}

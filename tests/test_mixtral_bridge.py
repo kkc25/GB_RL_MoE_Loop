@@ -323,5 +323,17 @@ class HistoricalBridgeTests(unittest.TestCase):
                       '--checkpoint', str(self.root/'checkpoint.pt'), '--output-dir', str(self.root/'diagnosis')])
 
 
+class DeviceIndexTests(unittest.TestCase):
+    def test_index_select_moves_indices_to_each_tensor_device(self):
+        from mixtral_lab.bridge import _index_select_own_device
+        indices = torch.tensor([1, 3])
+        native = torch.empty(4, 2, device='meta')
+        controlled = torch.arange(8).reshape(4, 2)
+        self.assertEqual(_index_select_own_device(native, indices).device.type, 'meta')
+        self.assertEqual(_index_select_own_device(native, indices).shape, (2, 2))
+        self.assertTrue(torch.equal(_index_select_own_device(controlled, indices),
+                                    torch.tensor([[2, 3], [6, 7]])))
+
+
 if __name__ == '__main__':
     unittest.main()
