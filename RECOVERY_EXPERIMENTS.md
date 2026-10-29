@@ -9,6 +9,9 @@
 启动 GPU、追加预算或读取最终 held-out/newtest。所有参数都是待验证的研究默认值，
 不保证收敛、泛化、数值等价、加速或最优。
 
+> 后续全文形状协议见 [DOCUMENT_EXPERIMENTS.md](DOCUMENT_EXPERIMENTS.md)。它不改写本文历史
+> singleton/probe 的结果或门槛，而是用完整文档缓存与独立的同协议 replay 检查建立新运行。
+
 ## 1. 现有结果究竟说明什么
 
 结果上传 commit 为 `bdca6a3`；其中 `runs/mixtral_fit_v1/*_64_pr10/` 的实际执行

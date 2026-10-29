@@ -278,3 +278,34 @@ rule 外，还必须包含 `confirmation_scope`。用
 
 完整可执行命令、数据拆分、8 个有界模板、数值与质量关见
 [RECOVERY_EXPERIMENTS.md](RECOVERY_EXPERIMENTS.md)。
+
+
+## 16. 全文形状缓存与独立开发集训练
+
+- 新入口 `experiments.mixtral_document --stage tune|evaluate|profile` 使用
+  `mixtral-full-document-recovery-v1`，配置使用 `document` 节，不复用旧
+  `fit/recovery/training` 节。旧 fit/recovery/bridge 接口与产物保持独立。
+- 新缓存保留完整文档 padding 与末层输入，adapter 使用完整原生末层输出；
+  FFN、修正和输出头先按全文形状执行，再用 mask 选损失。训练位置轮换并记录
+  独立覆盖，不能把重复访问当新样本，不能把同文档未访问位置当独立测试。
+  Adapter CE 轮换 mask，native KL/修正正则覆盖全有效位置；未被 CE 选中
+  不代表完全没有训练约束。
+- 正确性门针对新协议的 native/controlled/zero 与缓存尾部/完整模型重放，
+  同时验证非零候选。旧 singleton/full 差异继续保留为历史诊断，不简单放宽
+  旧容差、不修改失败报告，也不让已弃用的旧路径无限阻断新协议。
+- Router 的全文形状 28 动作成本表仍是监督 surrogate：其他 token 的选路
+  可以改变 expert batch 数值。真实全文 mixed-policy probe/development/selection
+  才决定在线质量，不能把表内收益宣称为部署收益。
+- 四角色 train/development/selection/calibration 保持完整来源隔离；development
+  选 best/早停，update 0 原模型参选。selection 只评估冻结 best，profile 需先
+  满足数值与质量门槛。calibration 来源仅绑定身份并作泄漏预检，此新 CLI
+  不在 calibration 上执行模型评估；同协议 replay 在完整 train 文档上做，
+  只是受测输入/形状的数值 screen，不是全局等价证明。旧 selection 不是最终
+  held-out，不支持 newtest。
+- 新 schema、配置、源码、模型与数据身份重新绑定；旧 checkpoint 不转换、
+  不重写身份，不支持 exact resume。每个阶段用新输出目录，保留失败和阴性证据。
+- 新代码与 CPU 测试不是实际 GPU 训练或加速结果。先 smoke、再独立 adapter/router
+  pilot 和预声明多 seed；同更新步数不是同成本预算，不自动租卡或追加训练。
+
+模板、数据拆分、服务器命令和解释限制见
+[DOCUMENT_EXPERIMENTS.md](DOCUMENT_EXPERIMENTS.md)。
