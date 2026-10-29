@@ -1,0 +1,76 @@
+{
+  "schema": "mixtral-full-document-recovery-v1",
+  "model_path": "/nvme-1/zhoukegu/models/Mixtral-8x7B-v0.1",
+  "tokenizer_path": "/nvme-1/zhoukegu/models/Mixtral-8x7B-v0.1",
+  "model_revision": "fc7ac94680e38d7348cfa806e51218e6273104b0",
+  "output_dir": "runs/mixtral_document_v1/document_adapter_pilot_seed43_evaluate",
+  "dtype": "bfloat16",
+  "experts_implementation": "grouped_mm",
+  "device_map": "balanced",
+  "max_memory": {
+    "0": "44GiB",
+    "1": "44GiB",
+    "2": "44GiB",
+    "3": "44GiB"
+  },
+  "sequence_length": 256,
+  "max_documents_per_split": 64,
+  "max_text_characters": 100000,
+  "warmup": 3,
+  "repeats": 3,
+  "measurements": 32,
+  "sequences": {
+    "train": 24,
+    "development": 8,
+    "selection": 16,
+    "calibration": 8
+  },
+  "data_files": {
+    "train": "/nvme-1/zhoukegu/GB_RL_MoE_Loop/data/mixtral/document-v1/train.jsonl",
+    "development": "/nvme-1/zhoukegu/GB_RL_MoE_Loop/data/mixtral/document-v1/development.jsonl",
+    "selection": "/nvme-1/zhoukegu/GB_RL_MoE_Loop/data/mixtral/document-v1/selection.jsonl",
+    "calibration": "/nvme-1/zhoukegu/GB_RL_MoE_Loop/data/mixtral/document-v1/calibration.jsonl"
+  },
+  "nll_tolerance": 0.0001,
+  "ce_mean_abs_tolerance": 0.0001,
+  "logit_max_abs_tolerance": 0.001,
+  "allow_tf32": false,
+  "seed": 43,
+  "document": {
+    "kind": "adapter",
+    "training": {
+      "updates": 256,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "eval_interval": 16,
+      "development_patience": 4,
+      "min_updates": 64,
+      "development_min_delta": 0.0001,
+      "seed": 43,
+      "adaptive": {
+        "enabled": true,
+        "eval_interval": 16,
+        "patience": 3,
+        "min_delta": 0.0001,
+        "lr_factor": 0.5,
+        "min_lr": 1e-05,
+        "max_lr": 0.002,
+        "growth_factor": 2.0,
+        "max_growths": 1,
+        "min_updates": 64,
+        "stop_patience": 3
+      },
+      "max_cache_bytes": 1073741824,
+      "max_logit_elements": 16777216,
+      "parity_atol": 0.0,
+      "parity_rtol": 0.0,
+      "rank": 8,
+      "positions_per_document": 32,
+      "residual_scale": 0.1,
+      "native_kl_beta": 0.1,
+      "relative_correction_l2": 0.0
+    },
+    "development_min_gain": 0.001,
+    "selection_min_gain": 0.001
+  }
+}
