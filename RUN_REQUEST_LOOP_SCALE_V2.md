@@ -1,6 +1,6 @@
 # 运行请求：Mixtral 数据规模与固定幅度实验 v2
 
-**状态：待服务器执行；本次任务仅完成开发、CPU 测试和 GitHub 上传。** 不把 CI、微型模型测试或上轮离线复算写成新 GPU 效果。完整研究规则见 `LOOP_SCALE_EXPERIMENTS.md`，迁移说明见 `LOOP_SCALE_MIGRATION.md`。旧 `RUN_REQUEST.md` 原样保留。
+**状态：待服务器执行；本次任务仅完成开发、CPU 测试和 GitHub 上传。** 不把 CI、微型模型测试或上轮离线复算写成新 GPU 效果。完整研究规则见 `LOOP_SCALE_EXPERIMENTS.md`，迁移说明见 `LOOP_SCALE_MIGRATION.md`。旧请求逐字节存档于 `docs/history/RUN_REQUEST_TRAINABLE_LOOP_V1_3559a307.md`，根 `RUN_REQUEST.md` 为当前 v2 入口。
 
 ## 执行身份与范围
 
@@ -65,6 +65,8 @@ $PY -m experiments.mixtral_loop_scale --config "$CONFIG" --expected-commit "$COD
 
 第一条 `validate` 通过只说明配置合法；只有实际 `prepare` 成功并再次校验全部非测试清单后，才称数据已冻结。核对 `freeze.json`、`preparation.json`、历史排除、实际来源/文档/位置数量、权重字节哈希及 preflight 结论。清单校验不读取最终测试用于调参，默认训练/开发入口拒绝加载测试。
 
+预检只测四篇文档及固定幅度路径，当前不会自动外推完整训练/门/候选评估阶段的吞吐或耗时。操作者必须先按实际清单、更新数、候选数估算整阶段时间和磁盘并保存依据；7200 秒 cell 是硬上限，CPU 测试或小样本通过不保证能完成。
+
 若预检发现 native parity、冻结专家反传、适配器有效更新、BF16 或紧凑执行不通过，停止。不要切 backend、增大容差或下载替代权重后继续同一运行。
 
 ## 先执行 100k 三个 cell
@@ -80,6 +82,8 @@ $PY -m experiments.mixtral_loop_scale --config "$CONFIG" --expected-commit "$COD
 ```
 
 `cache` 一次生成最大冻结训练池（900k adapter、100k gate-fit）和开发两半的 prefix，并绑定模型与运行环境；不捕获测试。先核对这个前置成本，不能称为只缓存 100k。300k/1m 复用同一缓存，不重复执行 cache。
+
+报告输入及各档来源组成（source_id/source_group 文档数和有效位置）；哈希排序不等于领域分层，缺少领域映射时明确 unknown，不能声称已领域平衡。各档同时扩 adapter-fit 与 gate-fit，gated 曲线属于总监督规模效应，不能只归因 adapter 数据。
 
 审阅三个完整 cell 与全部候选，不只看赢家。对 forced-all 和 gated outcome 使用各自预定选择规则；全 STOP、负收益、失败、unknown 都是需回传结果。门只用 pre-R2 `h1`；其标签来源不能回流 adapter-train。
 
@@ -152,3 +156,7 @@ $PY -m experiments.mixtral_loop_scale --config "$CONFIG" --expected-commit "$COD
 验收至少包含：STOP 零额外专家；CONTINUE 真实 Top-2 计算；无 padding 计分；冻结主干无变化；梯度经过专家进入适配器；单篇惰性缓存与有界分块；epoch 固定评估；独立 gate-fit；校准与选择分离；最终测试封存/lock；完整尝试、完成、失败、未知和成本记录。匹配参数、曝光、调用数和真实 FLOPs 是不同结论，不能混写。
 
 回传完整代码 SHA、运行配置/清单/checkpoint/证据哈希、完整逐文档及可复算逐位置数据、命令/日志/退出码、每卡显存、实际吞吐与所有失败限制。大模型、源语料、隐藏缓存和 `.pt` 不进 Git，保留可访问的受控原始副本和哈希。代码与结果分开提交；结果上传后重新核对远端精确 SHA、逐文件字节及 CI 终态。草稿 PR 保持未合并。
+
+## 本轮结论边界
+
+确认是缓存前缀的 teacher-forced 截断文档质量，不代表自由生成、长上下文或端到端加速。需要这些结论时须另行冻结并执行相应验证，不能从本轮 CPU/质量检查推断。

@@ -2,7 +2,7 @@
 
 ## 历史保持原样
 
-历史 `RUN_REQUEST.md`、`TRAINABLE_LOOP_EXPERIMENTS.md`、v1 配置、代码和 `runs/mixtral_trainable_loop_v1/` 保留原含义。新请求入口为 `RUN_REQUEST_LOOP_SCALE_V2.md`，研究协议为 `LOOP_SCALE_EXPERIMENTS.md`。不要把旧请求中的“待执行”改成新任务状态，也不要删除旧失败、全 STOP 或未执行阶段。
+旧 `RUN_REQUEST.md` 已逐字节存档于 `docs/history/RUN_REQUEST_TRAINABLE_LOOP_V1_3559a307.md`，保留原含义。根 `RUN_REQUEST.md` 改为当前 v2 入口；`TRAINABLE_LOOP_EXPERIMENTS.md`、v1 配置、代码和 `runs/mixtral_trainable_loop_v1/` 保持原样。新请求入口为 `RUN_REQUEST_LOOP_SCALE_V2.md`，研究协议为 `LOOP_SCALE_EXPERIMENTS.md`。不要把历史存档请求中的“待执行”改成新任务状态，也不要删除旧失败、全 STOP 或未执行阶段。
 
 新分支从 `ac80b445376b05e2a974226bbea86fcc8daaecaa` 的 main 建立，合入 #14 的 `3559a307cb8af347444b09444044bfac31084cc0`，使 v2 同时具备最新结果与真正第二轮实现。#14 仍是未合并的独立草稿依赖；新 PR 的差异会包含依赖代码，这不表示 #14 已获批准或 main 已更新。禁止强推、覆盖旧分支、重写历史或自动合并。
 

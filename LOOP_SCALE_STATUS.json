@@ -16,5 +16,8 @@
     "no collaborators contacted",
     "no merge/force-push/deletion"
   ],
-  "historical_diagnostic_publication": "reproduction tool included; detailed output retained locally and not publicly uploaded"
+  "historical_diagnostic_publication": "reproduction tool included; detailed output retained locally and not publicly uploaded",
+  "current_request": "RUN_REQUEST.md",
+  "historical_v1_request": "docs/history/RUN_REQUEST_TRAINABLE_LOOP_V1_3559a307.md",
+  "historical_v1_request_sha256": "a0b2cf413d27e9c9e869e5204c544a10f0aca098fadbf24b0bb54bc742bda09e"
 }
