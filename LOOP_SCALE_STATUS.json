@@ -1,0 +1,19 @@
+{
+  "schema": "mixtral-loop-scale-delivery-status-v2",
+  "research_status": "pending_server_execution",
+  "dataset_status": "not_prepared_no_new_corpus_in_repository",
+  "gpu_status": "not_executed",
+  "base_main": "ac80b445376b05e2a974226bbea86fcc8daaecaa",
+  "dependency_pr14_head": "3559a307cb8af347444b09444044bfac31084cc0",
+  "branch": "experiment/mixtral-loop-data-scale-v2-20261030",
+  "run_request": "RUN_REQUEST_LOOP_SCALE_V2.md",
+  "protocol": "LOOP_SCALE_EXPERIMENTS.md",
+  "historical_diagnostic": "diagnostics/loop_v1_oracle.json",
+  "prohibitions": [
+    "no GPU execution in this delivery",
+    "no model downloads",
+    "no server access",
+    "no collaborators contacted",
+    "no merge/force-push/deletion"
+  ]
+}
