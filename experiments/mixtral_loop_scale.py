@@ -286,6 +286,8 @@ def execute_prepared(args,c,code):
         out=Path(c['run_root'])/'preflight.json'
         if out.exists(): raise FileExistsError('preflight exists; do not repeat completed formal stage')
         started=time.time(); results=[]; rows=load_manifest(path,role='adapter_train_100000')
+        # Shared across all documents/amplitudes/parameter states, not per case.
+        expert_probe_budget=dict(remaining=2, deadline=time.monotonic()+max(0.,min(c['preflight_wall_seconds'],suite_deadline(c)-time.time())))
         if len(rows)<c['preflight_documents']:
             raise ValueError('insufficient documents for complete preflight coverage')
         for i in range(c['preflight_documents']):
@@ -309,13 +311,14 @@ def execute_prepared(args,c,code):
                     attempted_case=attempt,completed_cases=len(results)))
                 t=time.perf_counter()
                 try:
-                    result=core.preflight(adapter,cache,scale_config(c,17),amplitude=amplitude)
+                    result=core.preflight(adapter,cache,scale_config(c,17),amplitude=amplitude,expert_probe_budget=expert_probe_budget)
                     torch.cuda.synchronize()
                 except BaseException as error:
                     _atomic_json(Path(c['run_root'])/'preflight_progress.json',dict(status='failed',
                         code=code,freeze_sha256=index['freeze_sha256'],results=results,model=model,
                         attempted_case=attempt,completed_cases=len(results),
-                        error_type=type(error).__name__,error=str(error)))
+                        error_type=type(error).__name__,error=str(error),
+                        diagnostic_evidence=getattr(error,'diagnostic_evidence',None)))
                     raise
                 result.update(document_id=cache.document_id,seconds=time.perf_counter()-t)
                 results.append(result)
