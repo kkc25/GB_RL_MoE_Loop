@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/nvme-1/zhoukegu/Mixtral-loop-scale-v2-ec7f78a79ef6/experiments/mixtral_loop_scale.py", line 631, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/nvme-1/zhoukegu/Mixtral-loop-scale-v2-ec7f78a79ef6/experiments/mixtral_loop_scale.py", line 215, in main
+    code=source_identity(args.expected_commit,clean=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nvme-1/zhoukegu/Mixtral-loop-scale-v2-ec7f78a79ef6/experiments/mixtral_loop_scale.py", line 83, in source_identity
+    raise ValueError('formal execution requires clean committed checkout')
+ValueError: formal execution requires clean committed checkout

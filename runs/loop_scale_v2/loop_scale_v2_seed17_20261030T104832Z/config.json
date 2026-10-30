@@ -1,0 +1,51 @@
+{
+  "schema": "mixtral-loop-scale-run-v2",
+  "model_path": "/nvme-1/zhoukegu/models/Mixtral-8x7B-v0.1",
+  "tokenizer_path": "/nvme-1/zhoukegu/models/Mixtral-8x7B-v0.1",
+  "model_revision": "fc7ac94680e38d7348cfa806e51218e6273104b0",
+  "source_files": [
+    "/nvme-1/zhoukegu/mixtral-loop-scale-v2-input/candidates.jsonl"
+  ],
+  "historical_report": "runs/mixtral_trainable_loop_v1/trainable_loop_v1_seed17_exportfix_20261030T080210Z/fit/report.json",
+  "freeze_dir": "/nvme-1/zhoukegu/mixtral-loop-scale-v2-runs/loop_scale_v2_seed17_20261030T104832Z_frozen",
+  "run_root": "/nvme-1/zhoukegu/mixtral-loop-scale-v2-runs/loop_scale_v2_seed17_20261030T104832Z",
+  "train_budgets": [
+    100000,
+    300000,
+    1000000
+  ],
+  "development_budget": 100000,
+  "test_budget": 100000,
+  "sequence_length": 256,
+  "split_seed": 17,
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "amplitudes": [
+    1.0,
+    0.1
+  ],
+  "dtype": "bfloat16",
+  "experts_implementation": "eager",
+  "device_map": "balanced",
+  "max_memory": {
+    "0": "44GiB",
+    "1": "44GiB",
+    "2": "44GiB",
+    "3": "44GiB"
+  },
+  "allow_tf32": false,
+  "cell_wall_seconds": 7200,
+  "suite_wall_seconds": 86400,
+  "cache_wall_seconds": 7200,
+  "preflight_wall_seconds": 300,
+  "preflight_documents": 4,
+  "max_shard_bytes": 67108864,
+  "max_document_bytes": 16777216,
+  "max_cache_disk_bytes": 68719476736,
+  "minimum_gain": 0.001,
+  "require_gpu_name": "A6000",
+  "minimum_source_groups": 30
+}
