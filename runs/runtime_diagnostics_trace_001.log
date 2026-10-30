@@ -1,0 +1,5 @@
+/nvme-1/zhoukegu/conda-envs/gb/lib/python3.12/site-packages/torch/profiler/profiler.py:272: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+USDT:2026-10-30 15:48:58 99951:99951 ActivityProfilerController.cpp:415] profiler_start
+USDT:2026-10-30 15:48:58 99951:99951 ActivityProfilerController.cpp:455] profiler_stop
+{"report": "/nvme-1/zhoukegu/GB_RL_MoE_Loop/runs/runtime_diagnostics/trace_001/diagnostic_report.json", "status": "complete"}
