@@ -1,0 +1,23 @@
+{
+  "schema": "mixtral-loop-scale-delivery-status-v2",
+  "research_status": "pending_server_execution",
+  "dataset_status": "not_prepared_no_new_corpus_in_repository",
+  "gpu_status": "not_executed",
+  "base_main": "ac80b445376b05e2a974226bbea86fcc8daaecaa",
+  "dependency_pr14_head": "3559a307cb8af347444b09444044bfac31084cc0",
+  "branch": "experiment/mixtral-loop-data-scale-v2-20261030",
+  "run_request": "RUN_REQUEST_LOOP_SCALE_V2.md",
+  "protocol": "LOOP_SCALE_EXPERIMENTS.md",
+  "historical_diagnostic": "experiments/diagnose_loop_v1.py",
+  "prohibitions": [
+    "no GPU execution in this delivery",
+    "no model downloads",
+    "no server access",
+    "no collaborators contacted",
+    "no merge/force-push/deletion"
+  ],
+  "historical_diagnostic_publication": "reproduction tool included; detailed output retained locally and not publicly uploaded",
+  "current_request": "RUN_REQUEST.md",
+  "historical_v1_request": "docs/history/RUN_REQUEST_TRAINABLE_LOOP_V1_3559a307.md",
+  "historical_v1_request_sha256": "a0b2cf413d27e9c9e869e5204c544a10f0aca098fadbf24b0bb54bc742bda09e"
+}

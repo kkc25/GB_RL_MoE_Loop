@@ -1,0 +1,70 @@
+{
+  "schema": "mixtral-trainable-loop-run-v1",
+  "model_path": "/models/Mixtral-8x7B-v0.1",
+  "tokenizer_path": "/models/Mixtral-8x7B-v0.1",
+  "model_revision": "fc7ac94680e38d7348cfa806e51218e6273104b0",
+  "output_dir": "runs/mixtral_trainable_loop_v1/pilot_seed17_fit",
+  "dtype": "bfloat16",
+  "experts_implementation": "eager",
+  "device_map": "balanced",
+  "max_memory": {
+    "0": "44GiB",
+    "1": "44GiB",
+    "2": "44GiB",
+    "3": "44GiB"
+  },
+  "sequence_length": 256,
+  "max_documents_per_split": 64,
+  "max_text_characters": 100000,
+  "warmup": 3,
+  "repeats": 3,
+  "measurements": 32,
+  "sequences": {
+    "train": 24,
+    "development": 8,
+    "selection": 16,
+    "calibration": 8
+  },
+  "data_files": {
+    "train": "data/mixtral/document-v1/train.jsonl",
+    "development": "data/mixtral/document-v1/development.jsonl",
+    "selection": "data/mixtral/document-v1/selection.jsonl",
+    "calibration": "data/mixtral/document-v1/calibration.jsonl"
+  },
+  "nll_tolerance": 0.0001,
+  "ce_mean_abs_tolerance": 0.0001,
+  "logit_max_abs_tolerance": 0.001,
+  "allow_tf32": false,
+  "seed": 17,
+  "total_wall_seconds": 7200,
+  "selection_min_gain": 0.001,
+  "loop": {
+    "rank": 8,
+    "epochs": 8,
+    "positions_per_document": 32,
+    "max_updates": 2048,
+    "learning_rate": 0.001,
+    "gradient_clip": 1.0,
+    "seed": 17,
+    "gate_updates": 512,
+    "gate_batch": 256,
+    "gate_learning_rate": 0.001,
+    "eligibility_fraction": 0.05,
+    "eligibility_gain": 0.01,
+    "eligibility_top_fraction": 0.25,
+    "eligibility_top_mean": 0.005,
+    "thresholds": [
+      0.0,
+      0.001,
+      0.005,
+      0.01,
+      0.02,
+      0.05
+    ],
+    "max_cache_bytes": 1073741824,
+    "max_logit_elements": 16777216,
+    "max_train_tokens": 8192,
+    "parity_atol": 0.0001,
+    "parity_rtol": 0.0001
+  }
+}
