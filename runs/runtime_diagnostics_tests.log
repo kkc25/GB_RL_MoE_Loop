@@ -1,0 +1,15 @@
+test_all_layer_native_vs_prefix_and_exception_restoration (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_all_layer_native_vs_prefix_and_exception_restoration) ... ok
+test_cache_rejects_replacement_and_training (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_cache_rejects_replacement_and_training) ... ok
+test_cached_head_cuda_same_chunk (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_cached_head_cuda_same_chunk) ... ok
+test_cached_head_exact_same_chunk_cpu_bf16_and_state_unchanged (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_cached_head_exact_same_chunk_cpu_bf16_and_state_unchanged) ... ok
+test_cancellation_and_actions_not_hidden_by_nll (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_cancellation_and_actions_not_hidden_by_nll) ... ok
+test_existing_cli_output_rejected_before_loading (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_existing_cli_output_rejected_before_loading) ... ok
+test_invalid_arguments_and_protected_outputs (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_invalid_arguments_and_protected_outputs) ... ok
+test_mocked_cli_full_wiring_on_cpu (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_mocked_cli_full_wiring_on_cpu) ... ok
+test_real_tiny_online_and_native_comparisons (tests.rl_lm.test_runtime_diagnostics.RuntimeDiagnosticTests.test_real_tiny_online_and_native_comparisons) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.848s
+
+OK
+{"report": "/tmp/tmpv8_oz_nx/diagnostic/diagnostic_report.json", "status": "complete"}

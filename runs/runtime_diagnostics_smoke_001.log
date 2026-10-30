@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop_runtime_100m/experiments/rl_lm_diagnose_runtime.py", line 311, in <module>
+    main()
+  File "/nvme-1/zhoukegu/conda-envs/gb/lib/python3.12/contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/nvme-1/zhoukegu/conda-envs/gb/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop_runtime_100m/experiments/rl_lm_diagnose_runtime.py", line 194, in main
+    check_exclusive(device, args.physical_gpu_index)
+  File "/nvme-1/zhoukegu/GB_RL_MoE_Loop_runtime_100m/experiments/rl_lm_profile.py", line 108, in check_exclusive
+    raise RuntimeError(f"GPU {index} is not exclusive; compute apps still present: {others}")
+RuntimeError: GPU 0 is not exclusive; compute apps still present: ['46838, 734 MiB']
