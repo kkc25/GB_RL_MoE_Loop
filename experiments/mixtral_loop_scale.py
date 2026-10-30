@@ -49,6 +49,8 @@ def validate_config(raw):
         raise ValueError('BF16 eager protocol required')
     if c.get('device_map') != 'balanced' or c.get('max_memory') != {str(i):'44GiB' for i in range(4)}:
         raise ValueError('four resident A6000 placement budgets required')
+    if c.get('r2_precision','native_bf16') not in ('native_bf16','fp32_experts'):
+        raise ValueError('unknown R2 precision protocol')
     if c.get('allow_tf32') is not False: raise ValueError('TF32 must remain disabled')
     for key in ('cell_wall_seconds', 'suite_wall_seconds', 'cache_wall_seconds', 'preflight_wall_seconds'):
         n=c.get(key)
@@ -186,7 +188,7 @@ class StageReceipt:
 def parser():
     p=argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument('--config',required=True)
-    p.add_argument('--stage',required=True,choices=('prepare','validate','cache','preflight','fit','report','finalize','final-test'))
+    p.add_argument('--stage',required=True,choices=('prepare','validate','cache','preflight','precision-screen','fit','report','finalize','final-test'))
     p.add_argument('--expected-commit')
     p.add_argument('--budget',type=int,choices=(100000,300000,1000000),default=100000)
     p.add_argument('--cell',choices=tuple(CELLS),default='r2_reduced')
@@ -279,7 +281,14 @@ def execute_prepared(args,c,code):
         raise FileExistsError('cache already complete; use --resume only for verification')
     if args.stage=='fit' and cell_output(c,args.budget,args.cell,args.seed,args.matched_exposure).exists() and not args.resume:
         raise FileExistsError('cell already exists; use --resume for incomplete matching state')
+    if args.stage=='precision-screen':
+        if c.get('r2_precision')!='fp32_experts':
+            raise ValueError('precision-screen requires explicit fp32_experts candidate config')
+        if any((Path(c['run_root'])/name).exists() for name in ('precision_screen.json','precision_screen_progress.json')):
+            raise FileExistsError('precision screen already attempted; preserve evidence and use a new run_id')
     adapter,model=gpu_adapter(c,index)
+    if args.stage=='precision-screen':
+        return precision_screen(adapter,model,c,code,path,index)
     if args.stage=='preflight':
         from mixtral_lab.document_training import cache_documents
         import torch
@@ -287,7 +296,8 @@ def execute_prepared(args,c,code):
         if out.exists(): raise FileExistsError('preflight exists; do not repeat completed formal stage')
         started=time.time(); results=[]; rows=load_manifest(path,role='adapter_train_100000')
         # Shared across all documents/amplitudes/parameter states, not per case.
-        expert_probe_budget=dict(remaining=2, deadline=time.monotonic()+max(0.,min(c['preflight_wall_seconds'],suite_deadline(c)-time.time())))
+        preflight_deadline=min(suite_deadline(c),started+c['preflight_wall_seconds'])
+        expert_probe_budget=dict(remaining=2, deadline=time.monotonic()+max(0.,preflight_deadline-time.time()))
         if len(rows)<c['preflight_documents']:
             raise ValueError('insufficient documents for complete preflight coverage')
         for i in range(c['preflight_documents']):
@@ -311,7 +321,7 @@ def execute_prepared(args,c,code):
                     attempted_case=attempt,completed_cases=len(results)))
                 t=time.perf_counter()
                 try:
-                    result=core.preflight(adapter,cache,scale_config(c,17),amplitude=amplitude,expert_probe_budget=expert_probe_budget)
+                    result=core.preflight(adapter,cache,replace(scale_config(c,17),absolute_deadline_utc=preflight_deadline),amplitude=amplitude,expert_probe_budget=expert_probe_budget)
                     torch.cuda.synchronize()
                 except BaseException as error:
                     _atomic_json(Path(c['run_root'])/'preflight_progress.json',dict(status='failed',
@@ -408,7 +418,7 @@ def check_suite_deadline(c):
 
 def scale_config(c,seed,*,target=None,gate_target=None):
     from mixtral_lab.loop_scale import ScaleConfig
-    return ScaleConfig(rank=8,epochs=2,positions_per_update=256,seed=seed,
+    return ScaleConfig(r2_precision=c.get('r2_precision','native_bf16'),rank=8,epochs=2,positions_per_update=256,seed=seed,
         max_updates=100000,max_wall_seconds=c['cell_wall_seconds'],target_exposures=target,
         gate_target_exposures=gate_target,absolute_deadline_utc=suite_deadline(c))
 
@@ -664,6 +674,71 @@ def completed_final(c,lock,resume):
         if Path(name).is_absolute() or '..' in Path(name).parts or sha256_file(path.parent/name)!=claimed:
             raise ValueError('completed final test artifact changed')
     return r
+
+
+
+
+
+# Imported use only; main() is moved below these definitions.
+def precision_screen(adapter, model, c, code, path, index):
+    """Bounded paired numerical screen; NEVER writes a preflight certificate."""
+    import torch
+    from mixtral_lab import loop_scale as core
+    from mixtral_lab.document_training import cache_documents
+    root=Path(c['run_root']); started=time.time()
+    deadline=min(suite_deadline(c),started+c['preflight_wall_seconds'])
+    rows=load_manifest(path,role='adapter_train_100000')
+    if len(rows)<c['preflight_documents']:
+        raise ValueError('insufficient documents for precision screen')
+    records=[];attempt=None
+    def publish(status, **extra):
+        value=dict(status=status,code=code,model=model,freeze_sha256=index['freeze_sha256'],
+            config_sha256=digest(c),protocol='fp32-r2-screen-v1',absolute_deadline_utc=deadline,
+            results=records,completed_cases=len(records),expected_cases=c['preflight_documents']*len(c['amplitudes'])*2,
+            attempted_case=attempt,scope='numerical candidate screen only; no preflight certificate or training authority',**extra)
+        _atomic_json(root/'precision_screen_progress.json',value)
+        return value
+    def sync():
+        for device in range(torch.cuda.device_count()):torch.cuda.synchronize(device)
+    def check():
+        if time.time()>=deadline:raise TimeoutError('precision screen shared deadline exhausted')
+    try:
+        publish('incomplete')
+        for i in range(c['preflight_documents']):
+            check();attempt=dict(document_index=i,operation='capture')
+            publish('incomplete')
+            cache=cache_documents(adapter,[rows[i]],max_cache_bytes=c['max_document_bytes'])[0]
+            for j,amplitude in enumerate(c['amplitudes']):
+                modes=('native_bf16','fp32_experts') if (i+j)%2==0 else ('fp32_experts','native_bf16')
+                for mode in modes:
+                    check();sync()
+                    for device in range(torch.cuda.device_count()):torch.cuda.reset_peak_memory_stats(device)
+                    baseline={str(d):dict(allocated=torch.cuda.memory_allocated(d),reserved=torch.cuda.memory_reserved(d))
+                        for d in range(torch.cuda.device_count())}
+                    attempt=dict(document_index=i,amplitude=amplitude,r2_precision=mode,operation='preflight_with_gradients')
+                    publish('incomplete')
+                    config=replace(scale_config(c,17),r2_precision=mode,absolute_deadline_utc=deadline)
+                    t=time.perf_counter()
+                    result=core.preflight(adapter,cache,config,amplitude=amplitude,gradient_checks=True,diagnostics=False)
+                    sync()
+                    result.update(document_index=i,document_id=cache.document_id,
+                        seconds=time.perf_counter()-t,peak_memory=memory_peaks(),baseline_memory=baseline,
+                        cost_scope='synchronized correctness+gradient screen, NOT isolated inference throughput')
+                    records.append(result);publish('incomplete')
+                    if not result['backbone_gradients_absent'] or not result['backbone_parameter_versions_unchanged']:
+                        raise ValueError('backbone integrity failed during precision screen')
+                    check()
+        expected=c['preflight_documents']*len(c['amplitudes'])
+        by_mode={mode:[r for r in records if r['r2_precision']==mode] for mode in ('native_bf16','fp32_experts')}
+        acceptance={mode:len(values)==expected and all(r['passed'] for r in values) for mode,values in by_mode.items()}
+        value=publish('complete',numerical_checks_passed=acceptance,seconds=time.time()-started,
+            conclusion='candidate still requires separate bound preflight and explicit operator decision before training')
+        _atomic_json(root/'precision_screen.json',value)
+        return value
+    except BaseException as error:
+        publish('failed',error_type=type(error).__name__,error=str(error),
+            diagnostic_evidence=getattr(error,'diagnostic_evidence',None),peak_memory=memory_peaks())
+        raise
 
 
 if __name__=='__main__': main()

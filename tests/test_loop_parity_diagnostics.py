@@ -113,7 +113,9 @@ class PreflightCoverageTests(unittest.TestCase):
             stack.enter_context(patch('mixtral_lab.document_training.cache_documents',return_value=[cache]))
             mock=stack.enter_context(patch('mixtral_lab.loop_scale.preflight',side_effect=results))
             try: cli.execute_prepared(SimpleNamespace(stage='preflight'),c,code)
-            finally: self.calls=mock.call_count
+            finally:
+                self.calls=mock.call_count
+                self.core_configs=[call.args[2] for call in mock.call_args_list]
 
     @staticmethod
     def case(passed=False, safe=True):
@@ -149,6 +151,15 @@ class PreflightCoverageTests(unittest.TestCase):
             evidence=json.loads((Path(td)/'preflight.json').read_text())
             self.assertEqual(evidence['status'],'complete')
             self.assertEqual(len(evidence['results']),8)
+
+    def test_formal_core_has_same_preflight_deadline(self):
+        import tempfile,time
+        start=time.time()
+        with tempfile.TemporaryDirectory() as td:self.exercise(td,[self.case(True) for _ in range(8)])
+        deadlines=[c.absolute_deadline_utc for c in self.core_configs]
+        self.assertEqual(len(set(deadlines)),1)
+        self.assertGreaterEqual(deadlines[0],start)
+        self.assertLessEqual(deadlines[0],time.time()+300)
 
     def test_unsafe_backbone_stops_immediately(self):
         import tempfile
