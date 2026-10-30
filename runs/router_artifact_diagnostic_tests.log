@@ -1,0 +1,24 @@
+test_compressed_uncompressed_budget_and_malformed_archives_preflight (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactArchiveTests.test_compressed_uncompressed_budget_and_malformed_archives_preflight) ... ok
+test_malformed_storage_is_rejected_not_executed (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactArchiveTests.test_malformed_storage_is_rejected_not_executed) ... ok
+test_weights_only_cpu_load_and_size_budget (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactArchiveTests.test_weights_only_cpu_load_and_size_budget) ... ok
+test_best_is_zero_fallback_not_mislabelled_latest (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_best_is_zero_fallback_not_mislabelled_latest) ... ok
+test_checkpoint_metadata_config_and_state_tampering_rejected (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_checkpoint_metadata_config_and_state_tampering_rejected) ... ok
+test_cli_writes_report_with_explicit_checkpoint_and_cpu_batch (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_cli_writes_report_with_explicit_checkpoint_and_cpu_batch) ... ok
+test_fresh_output_required_before_loading (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_fresh_output_required_before_loading) ... ok
+test_report_config_disagreement_even_with_valid_seal (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_report_config_disagreement_even_with_valid_seal) ... ok
+test_report_corruption_missing_and_unsealed_fail_closed (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_report_corruption_missing_and_unsealed_fail_closed) ... ok
+test_strict_legacy_loader_consumes_checked_snapshot_not_original_path (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_strict_legacy_loader_consumes_checked_snapshot_not_original_path) ... ok
+test_table_tampering_rejected (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_table_tampering_rejected) ... ok
+test_valid_legacy_inputs_cpu_only_and_bitwise_nonmutating (tests.test_mixtral_router_artifact_diagnostics.RouterArtifactDiagnosticsTests.test_valid_legacy_inputs_cpu_only_and_bitwise_nonmutating) ... ok
+test_chunk_sizes_preserve_all_rows_and_forbidden_parameters (tests.test_mixtral_router_artifact_diagnostics.RouterDiagnosticMathematicsTests.test_chunk_sizes_preserve_all_rows_and_forbidden_parameters) ... ok
+test_flat_costs_nonzero_native_index_are_minimizers_not_unique_alternates (tests.test_mixtral_router_artifact_diagnostics.RouterDiagnosticMathematicsTests.test_flat_costs_nonzero_native_index_are_minimizers_not_unique_alternates) ... ok
+test_handcomputed_soft_targets_prior_barrier_and_objectives (tests.test_mixtral_router_artifact_diagnostics.RouterDiagnosticMathematicsTests.test_handcomputed_soft_targets_prior_barrier_and_objectives) ... ok
+test_near_ties_are_explicit_cpu_math_not_executed_actions (tests.test_mixtral_router_artifact_diagnostics.RouterDiagnosticMathematicsTests.test_near_ties_are_explicit_cpu_math_not_executed_actions) ... ok
+test_reported_objective_matches_exact_historical_training_math (tests.test_mixtral_router_artifact_diagnostics.RouterDiagnosticMathematicsTests.test_reported_objective_matches_exact_historical_training_math) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.601s
+
+OK
+{"report": "/tmp/tmpvb4v3xc0/run/report.json", "status": "complete"}
+{"status": "complete", "label": "SUPERVISION DIAGNOSTIC \u2014 not deployment gain", "checkpoint_update": 2, "output_dir": "/tmp/tmpvb4v3xc0/tmp6y8ovvdf/cli"}
