@@ -1,0 +1,37 @@
+{
+  "schema": "mixtral-loop-scale-cpu-summary-v2",
+  "status": "passed",
+  "audited_code_commit": "9633ea6127b713bf1fadecda07a089cc344eb741",
+  "audited_code_tree": "7cec8b3ed79fe57f3a3ef16b665f71663e41e5cd",
+  "tests": 1269,
+  "passed": 1258,
+  "skipped": 11,
+  "skip_scope": "CUDA and multi-GPU conditional checks",
+  "independent_fresh_checkout": true,
+  "all_tracked_files_unchanged_after_tests": true,
+  "tracked_files_verified": 1343,
+  "changed_files_verified": 26,
+  "suite_seconds": 43.125,
+  "command": "python -m unittest discover -s tests -t . -v",
+  "additional_checks": [
+    "pip check",
+    "compileall",
+    "offline configuration validation"
+  ],
+  "environment": {
+    "python": "3.14.7",
+    "torch": "2.12.1",
+    "transformers": "5.15.1",
+    "accelerate": "1.15.0",
+    "safetensors": "0.8.0"
+  },
+  "research_status": "pending_server_execution; no new corpus prepared",
+  "limits": [
+    "No GPU experiment executed",
+    "No large model downloaded",
+    "No server accessed",
+    "No collaborator contacted",
+    "CPU checks do not prove four-GPU numerics, memory, throughput or quality"
+  ],
+  "publication_scope": "software validation only; no historical research metrics, document identifiers, machine paths or corpus data"
+}

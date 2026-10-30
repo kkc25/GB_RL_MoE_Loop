@@ -8,12 +8,13 @@
   "branch": "experiment/mixtral-loop-data-scale-v2-20261030",
   "run_request": "RUN_REQUEST_LOOP_SCALE_V2.md",
   "protocol": "LOOP_SCALE_EXPERIMENTS.md",
-  "historical_diagnostic": "diagnostics/loop_v1_oracle.json",
+  "historical_diagnostic": "experiments/diagnose_loop_v1.py",
   "prohibitions": [
     "no GPU execution in this delivery",
     "no model downloads",
     "no server access",
     "no collaborators contacted",
     "no merge/force-push/deletion"
-  ]
+  ],
+  "historical_diagnostic_publication": "reproduction tool included; detailed output retained locally and not publicly uploaded"
 }
