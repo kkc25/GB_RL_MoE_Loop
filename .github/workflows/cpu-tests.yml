@@ -2,7 +2,7 @@ name: CPU correctness
 on:
   pull_request:
   push:
-    branches: [main, research/rl-lm-pair-v1, 'fix/**']
+    branches: [main, research/rl-lm-pair-v1, 'fix/**', experiment/trainable-loop-hard-gate-v1]
 permissions:
   contents: read
 jobs:
