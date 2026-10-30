@@ -19,5 +19,13 @@
   "historical_diagnostic_publication": "reproduction tool included; detailed output retained locally and not publicly uploaded",
   "current_request": "RUN_REQUEST.md",
   "historical_v1_request": "docs/history/RUN_REQUEST_TRAINABLE_LOOP_V1_3559a307.md",
-  "historical_v1_request_sha256": "a0b2cf413d27e9c9e869e5204c544a10f0aca098fadbf24b0bb54bc742bda09e"
+  "historical_v1_request_sha256": "a0b2cf413d27e9c9e869e5204c544a10f0aca098fadbf24b0bb54bc742bda09e",
+  "parity_repair": {
+    "status": "pending_gpu_diagnostic",
+    "baseline_code": "51cc1afcb63958f8575cf0a041a42a6f2968ccb2",
+    "failure_result_commit": "636023994099ac37ef9965cb9588eef2cb92bed8",
+    "request": "RUN_REQUEST_PARITY_REPAIR.md",
+    "production_math_changed": false,
+    "gpu_root_cause_fixed": false
+  }
 }

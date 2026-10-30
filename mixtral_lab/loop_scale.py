@@ -762,6 +762,7 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4):
         mask=torch.zeros(h1.shape[-2],dtype=torch.bool,device=adapter.device)
         before=dict(work);stopped=branch(adapter,h1,mask,work=work)
         stop_ok=torch.equal(stopped,h1) and work==before
+    conditional_before=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=True)
     branch.train();hh,tt=_batch(adapter,cache,positions[:config.positions_per_update],config)
     ce=_ce(adapter,hh,tt,branch,work=work)
     ce.mean().backward()
@@ -781,20 +782,21 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4):
     effective=int((before_input!=after_input).sum())
     hidden_changes=int((before_hidden!=after_hidden).sum())
     unchanged=all(p._version==backbone_versions[name] for name,p in adapter.model.named_parameters())
-    conditional=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work)
+    conditional=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=True)
     _assert_frozen(adapter)
-    return dict(status='complete',passed=stop_ok and gradient_ok and effective>0 and unchanged and conditional['passed'] and all(x['mismatched_elements']==0 for x in metrics.values()),
+    return dict(status='complete',passed=stop_ok and gradient_ok and effective>0 and unchanged and conditional_before['passed'] and conditional['passed'] and all(x['mismatched_elements']==0 for x in metrics.values()),
                 comparisons=metrics,stop_zero_experts=stop_ok,up_gradient_norm=None if gradient is None else float(gradient.norm()),
                 backbone_gradients_absent=all(p.grad is None for p in adapter.model.parameters()),
                 optimizer_steps=1,optimizer_scope='ephemeral discarded train-only branch; no formal update',
                 effective_expert_input_changed_elements=effective,post_update_hidden_changed_elements=hidden_changes,
                 backbone_parameter_versions_unchanged=unchanged,conditional_parity=conditional,
+                conditional_parity_before_update=conditional_before,
                 work=work,amplitude=amplitude,tolerances=dict(atol=atol,rtol=rtol),
                 scope='actual backend/shape correctness and gradient only; no quality or speed claim')
 
 
 @torch.no_grad()
-def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None):
+def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None,diagnostics=False):
     """Full-shape masked versus genuinely compacted trained STOP/mixed/all R2."""
     from .document_training import _comparison
     records=[]
@@ -806,6 +808,10 @@ def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None):
                'all':torch.ones(n,dtype=torch.bool,device=adapter.device),
                'mixed':torch.zeros(n,dtype=torch.bool,device=adapter.device)}
         masks['mixed'][positions[::2].to(adapter.device)]=True
+        for suffix,selected in (('singleton_first',positions[:1]),('singleton_last',positions[-1:]),('mixed_odd',positions[1::2])):
+            masks[suffix]=torch.zeros(n,dtype=torch.bool,device=adapter.device)
+            masks[suffix][selected.to(adapter.device)]=True
+        diagnostic_used=False
         for name,mask in masks.items():
             before={} if work is None else dict(work)
             compact=branch(adapter,h1,mask,compact=True,work=work)
@@ -817,5 +823,10 @@ def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None):
             stop_ok=(name!='stop' or (torch.equal(compact,h1) and (work is None or work.get('extra_expert_token_calls',0)==before.get('extra_expert_token_calls',0))))
             records.append(dict(document_id=cache.document_id,mask=name,continued_tokens=int(mask.sum()),
                                 comparisons=metrics,stop_zero_experts=stop_ok))
+            # Trace at most one failing mixed mask per document and parameter state.
+            if diagnostics and not diagnostic_used and 0<int(mask.sum())<n and any(m['mismatched_elements'] for m in metrics.values()):
+                from .loop_parity_diagnostics import diagnose_compaction
+                records[-1]['layer_diagnostic']=diagnose_compaction(adapter,cache,branch,mask,atol=atol,rtol=rtol,work=work)
+                diagnostic_used=True
     return dict(status='complete',passed=all(r['stop_zero_experts'] and all(m['mismatched_elements']==0 for m in r['comparisons'].values()) for r in records),
-                documents=records,tolerances=dict(atol=atol,rtol=rtol),scope='frozen predeclared STOP/all/alternating valid positions; compact versus compute-all then mask')
+                documents=records,tolerances=dict(atol=atol,rtol=rtol),scope='STOP/all/even/odd/singleton-first/singleton-last; compact versus compute-all then mask')

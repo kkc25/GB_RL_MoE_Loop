@@ -286,20 +286,55 @@ def execute_prepared(args,c,code):
         out=Path(c['run_root'])/'preflight.json'
         if out.exists(): raise FileExistsError('preflight exists; do not repeat completed formal stage')
         started=time.time(); results=[]; rows=load_manifest(path,role='adapter_train_100000')
-        for i in range(min(c['preflight_documents'],len(rows))):
+        if len(rows)<c['preflight_documents']:
+            raise ValueError('insufficient documents for complete preflight coverage')
+        for i in range(c['preflight_documents']):
+            if time.time()-started>c['preflight_wall_seconds']:
+                raise TimeoutError('throughput preflight hard cap exhausted')
+            check_suite_deadline(c)
+            _atomic_json(Path(c['run_root'])/'preflight_progress.json',dict(status='incomplete',
+                code=code,freeze_sha256=index['freeze_sha256'],results=results,model=model,
+                attempted_capture=dict(document_index=i,status='running_or_unknown_until_completed'),
+                completed_cases=len(results)))
             cache=cache_documents(adapter,[rows[i]],max_cache_bytes=c['max_document_bytes'])[0]
             for amplitude in c['amplitudes']:
                 torch.cuda.synchronize()
+                if time.time()-started>c['preflight_wall_seconds']:
+                    raise TimeoutError('throughput preflight hard cap exhausted')
+                check_suite_deadline(c)
+                attempt=dict(document_index=i,document_id=cache.document_id,amplitude=amplitude,
+                    status='running_or_unknown_until_completed')
+                _atomic_json(Path(c['run_root'])/'preflight_progress.json',dict(status='incomplete',
+                    code=code,freeze_sha256=index['freeze_sha256'],results=results,model=model,
+                    attempted_case=attempt,completed_cases=len(results)))
                 t=time.perf_counter()
-                result=core.preflight(adapter,cache,scale_config(c,17),amplitude=amplitude)
-                torch.cuda.synchronize()
+                try:
+                    result=core.preflight(adapter,cache,scale_config(c,17),amplitude=amplitude)
+                    torch.cuda.synchronize()
+                except BaseException as error:
+                    _atomic_json(Path(c['run_root'])/'preflight_progress.json',dict(status='failed',
+                        code=code,freeze_sha256=index['freeze_sha256'],results=results,model=model,
+                        attempted_case=attempt,completed_cases=len(results),
+                        error_type=type(error).__name__,error=str(error)))
+                    raise
                 result.update(document_id=cache.document_id,seconds=time.perf_counter()-t)
                 results.append(result)
                 _atomic_json(Path(c['run_root'])/'preflight_progress.json',dict(status='incomplete',
                     code=code,freeze_sha256=index['freeze_sha256'],results=results,model=model))
-                if not result['passed']: raise ValueError('actual backend/compaction/backward preflight failed')
+                # A numerical failure is evidence, not permission to train. Collect
+                # the remaining bounded cases so one failure cannot hide amplitude coverage.
+                if not result['passed'] and (not result['backbone_gradients_absent'] or not result['backbone_parameter_versions_unchanged']):
+                    raise ValueError('backbone integrity failed; unsafe to continue preflight')
                 if time.time()-started>c['preflight_wall_seconds']: raise TimeoutError('throughput preflight hard cap exhausted')
                 check_suite_deadline(c)
+        if len(results)!=c['preflight_documents']*len(c['amplitudes']):
+            raise ValueError('preflight coverage incomplete')
+        if not all(x['passed'] for x in results):
+            _atomic_json(Path(c['run_root'])/'preflight_progress.json',dict(status='failed',
+                code=code,freeze_sha256=index['freeze_sha256'],results=results,model=model,
+                expected_cases=c['preflight_documents']*len(c['amplitudes']),
+                completed_cases=len(results),reason='strict parity/backward checks failed; formal stages remain blocked'))
+            raise ValueError('actual backend/compaction/backward preflight failed')
         total=sum(x['seconds'] for x in results)
         result=dict(status='complete',code=code,freeze_sha256=index['freeze_sha256'],results=results,
             seconds=total,model=model,peak_memory=memory_peaks(),
