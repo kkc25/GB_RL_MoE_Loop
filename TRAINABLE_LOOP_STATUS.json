@@ -1,0 +1,18 @@
+{
+  "baseline_commit": "7f21de3b4a14a5f954cbeae51db03a4377ab4ec6",
+  "code_commit": null,
+  "code_commit_binding": "Use delivered full SHA with required --expected-commit; each stage records exact source identity.",
+  "config": "local_configs/trainable_loop_pilot.json",
+  "formal_gpu_run_performed": false,
+  "latest_processed_router_result": "205a567453c41abb768828920ccd12ca212c6767",
+  "learned_amplitude_gate": false,
+  "notes": "Independent experiment branch. Preserve previous results; no automatic merge or server launch. No recurring monitoring.",
+  "protocol": "TRAINABLE_LOOP_EXPERIMENTS.md",
+  "request": "RUN_REQUEST.md",
+  "result_commit": null,
+  "run_id": null,
+  "schema": "mixtral-trainable-loop-delivery-status-v1",
+  "scope": "One additional terminal expert FFN with trained rank-8 input adaptation, followed by pre-R2 hard compute gate; not full decoder recurrence.",
+  "status": "pending_execution",
+  "status_zh": "待服务器固定提交执行，CPU测试不代表GPU结果"
+}
