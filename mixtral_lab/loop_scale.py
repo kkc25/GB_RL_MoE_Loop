@@ -731,7 +731,7 @@ def load_selected(output, config, identity, device='cpu', *, which='gated'):
     return branch,gate,selection
 
 
-def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4):
+def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, expert_probe_budget=None):
     """Actual-backend gradient plus full/compacted native and R2 CE audit.
 
     Run on the real target GPUs before accepting throughput. A failure is an
@@ -762,7 +762,7 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4):
         mask=torch.zeros(h1.shape[-2],dtype=torch.bool,device=adapter.device)
         before=dict(work);stopped=branch(adapter,h1,mask,work=work)
         stop_ok=torch.equal(stopped,h1) and work==before
-    conditional_before=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=True)
+    conditional_before=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=True,expert_probe_budget=expert_probe_budget)
     branch.train();hh,tt=_batch(adapter,cache,positions[:config.positions_per_update],config)
     ce=_ce(adapter,hh,tt,branch,work=work)
     ce.mean().backward()
@@ -782,7 +782,7 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4):
     effective=int((before_input!=after_input).sum())
     hidden_changes=int((before_hidden!=after_hidden).sum())
     unchanged=all(p._version==backbone_versions[name] for name,p in adapter.model.named_parameters())
-    conditional=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=True)
+    conditional=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=True,expert_probe_budget=expert_probe_budget)
     _assert_frozen(adapter)
     return dict(status='complete',passed=stop_ok and gradient_ok and effective>0 and unchanged and conditional_before['passed'] and conditional['passed'] and all(x['mismatched_elements']==0 for x in metrics.values()),
                 comparisons=metrics,stop_zero_experts=stop_ok,up_gradient_norm=None if gradient is None else float(gradient.norm()),
@@ -796,7 +796,7 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4):
 
 
 @torch.no_grad()
-def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None,diagnostics=False):
+def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None,diagnostics=False,expert_probe_budget=None):
     """Full-shape masked versus genuinely compacted trained STOP/mixed/all R2."""
     from .document_training import _comparison
     records=[]
@@ -826,7 +826,7 @@ def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None,dia
             # Trace at most one failing mixed mask per document and parameter state.
             if diagnostics and not diagnostic_used and 0<int(mask.sum())<n and any(m['mismatched_elements'] for m in metrics.values()):
                 from .loop_parity_diagnostics import diagnose_compaction
-                records[-1]['layer_diagnostic']=diagnose_compaction(adapter,cache,branch,mask,atol=atol,rtol=rtol,work=work)
+                records[-1]['layer_diagnostic']=diagnose_compaction(adapter,cache,branch,mask,atol=atol,rtol=rtol,work=work,expert_probe_budget=expert_probe_budget)
                 diagnostic_used=True
     return dict(status='complete',passed=all(r['stop_zero_experts'] and all(m['mismatched_elements']==0 for m in r['comparisons'].values()) for r in records),
                 documents=records,tolerances=dict(atol=atol,rtol=rtol),scope='STOP/all/even/odd/singleton-first/singleton-last; compact versus compute-all then mask')

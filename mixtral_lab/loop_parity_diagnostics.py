@@ -55,7 +55,7 @@ def _capture(adapter, branch, h1, mask, compact, work):
 
 
 @torch.no_grad()
-def diagnose_compaction(adapter, cache, branch, mask, *, atol=1e-4, rtol=1e-4, work=None):
+def diagnose_compaction(adapter, cache, branch, mask, *, atol=1e-4, rtol=1e-4, work=None, expert_probe_budget=None):
     """One mixed mask, <=256 rows. Freeze identical expert inputs/routes to
     isolate expert batching; compare identical hidden rows through the head.
     Neither isolation experiment is a deployable policy or a proposed fallback.
@@ -95,7 +95,7 @@ def diagnose_compaction(adapter, cache, branch, mask, *, atol=1e-4, rtol=1e-4, w
     valid = cache.valid_mask.to(idx.device)[idx]
     head_only = _difference(sliced_ce.reshape(-1)[valid],full_ce.reshape(-1)[idx][valid],atol,rtol)
     work['diagnostic_completed'] = work.get('diagnostic_completed',0)+1
-    return dict(status='complete',scope='diagnostic only; no tolerance or execution fallback',
+    result = dict(status='complete',scope='diagnostic only; no tolerance or execution fallback',
                 selected_rows=int(len(idx)),total_rows=n,tolerances=dict(atol=atol,rtol=rtol),
                 comparisons=comparisons,
                 first_exact_difference=next((k for k,v in comparisons.items() if v['exact_differences']),None),
@@ -103,3 +103,24 @@ def diagnose_compaction(adapter, cache, branch, mask, *, atol=1e-4, rtol=1e-4, w
                 fixed_dense_inputs_routes_expert_only=expert_only,
                 fixed_dense_hidden_head_only=head_only,
                 interpretation='First divergence is observed location, not proof of ultimate root cause; expert/head isolation changes row count only.')
+
+    precision = dict(status='not_requested')
+    if expert_probe_budget is not None:
+        if expert_probe_budget['remaining'] > 0:
+            expert_probe_budget['remaining'] -= 1
+            from .expert_precision_diagnostics import diagnose_expert_precision
+            progress = {}
+            try:
+                precision = diagnose_expert_precision(adapter.moe.experts, dense['expert_input'],
+                    dense['router_pairs'], dense['router_weights'], idx,
+                    dense_output=dense['expert_output'], compact_output=fixed, work=work,
+                    deadline=expert_probe_budget.get('deadline'), atol=atol, rtol=rtol, progress=progress)
+            except Exception as error:
+                error.diagnostic_evidence = dict(layer_diagnostic=result,
+                    expert_precision_partial=progress, work=dict(work),
+                    error_type=type(error).__name__, error=str(error))
+                raise
+        else:
+            precision = dict(status='skipped_probe_budget_exhausted')
+    result['expert_precision'] = precision
+    return result

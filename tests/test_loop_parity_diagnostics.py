@@ -107,6 +107,7 @@ class PreflightCoverageTests(unittest.TestCase):
             stack.enter_context(patch.object(cli,'load_manifest',return_value=[{}]*documents))
             stack.enter_context(patch.object(cli,'scale_config',return_value=config()))
             stack.enter_context(patch.object(cli,'memory_peaks',return_value={}))
+            stack.enter_context(patch.object(cli,'suite_deadline',return_value=1e20))
             stack.enter_context(patch.object(cli,'check_suite_deadline',side_effect=[None,None,TimeoutError('budget')] if budget_failure else None))
             stack.enter_context(patch('torch.cuda.synchronize'))
             stack.enter_context(patch('mixtral_lab.document_training.cache_documents',return_value=[cache]))
@@ -156,6 +157,18 @@ class PreflightCoverageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'backbone integrity'):
                 self.exercise(td,[self.case(False,False)])
             self.assertEqual(self.calls,1);self.assertFalse((Path(td)/'preflight.json').exists())
+
+    def test_precision_failure_persists_current_case_evidence(self):
+        import tempfile,json
+        from pathlib import Path
+        error=TimeoutError('precision deadline')
+        error.diagnostic_evidence={'layer_diagnostic':{'status':'complete'},
+            'expert_precision_partial':{'stage':'fp32_reference'},'work':{'precision_probe_attempts':1}}
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaises(TimeoutError):self.exercise(td,[error])
+            evidence=json.loads((Path(td)/'preflight_progress.json').read_text())
+            self.assertEqual(evidence['diagnostic_evidence'],error.diagnostic_evidence)
+            self.assertFalse((Path(td)/'preflight.json').exists())
 
     def test_budget_failure_preserves_partial_without_certificate(self):
         import tempfile,json
