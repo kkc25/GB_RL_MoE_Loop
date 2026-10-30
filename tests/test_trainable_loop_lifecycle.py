@@ -171,4 +171,13 @@ class LifecycleTests(unittest.TestCase):
         with self.assertRaises(ValueError):cli.require_parity({'status':'complete','passed':True,'documents':[]})
         with self.assertRaises(ValueError):cli.require_parity({'status':'complete','passed':True,'documents':[{'comparisons':{'ce':{'elements':2,'mismatched_elements':1}}}]})
 
+    def test_token_evidence_accepts_integer_dictionary_keys(self):
+        row={'document_id':'d','tokens':1,'valid_position_indices':[0],
+             'native_ce':[1.0],'candidate_ce':[0.5],'continue_mask':[True]}
+        with tempfile.TemporaryDirectory() as t:
+            report={0:{'per_document':[row]}}
+            cli.export_token_evidence(report,Path(t))
+            evidence=Path(report['evidence_artifacts']['tokens']['path'])
+            self.assertEqual(len(evidence.read_text().splitlines()),1)
+
 if __name__=='__main__':unittest.main()

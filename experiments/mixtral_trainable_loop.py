@@ -208,7 +208,7 @@ def export_token_evidence(report,output):
                         raise ValueError('missing bounded per-token evidence')
                     records.append({'source':path,'record':row})
             for key,item in value.items():
-                if key!='per_document': visit(item,path+'/'+key)
+                if key!='per_document': visit(item,path+'/'+str(key))
         elif isinstance(value,list):
             for i,item in enumerate(value): visit(item,path+'/'+str(i))
     for label,value in sources:visit(value,label)
