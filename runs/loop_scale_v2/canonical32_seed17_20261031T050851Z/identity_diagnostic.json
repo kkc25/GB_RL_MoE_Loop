@@ -1,0 +1,26 @@
+{
+  "schema": "canonical32-preflight-identity-diagnostic-v1",
+  "code_commit": "fea92b07288f4b1dedaea4f8b480ecc1578934d6",
+  "freeze_sha256": "e5ffd918ee9c0e1dafec89436e2e39613ed9e922de94543cbe15ca9253790ba2",
+  "formal_scope": "precision_scope(False), CUDA_VISIBLE_DEVICES=3,4,5,7",
+  "code_identity_matches": true,
+  "freeze_identity_matches": true,
+  "preflight_status_complete": true,
+  "raw_actual_model_equals_json_preflight": false,
+  "json_normalized_actual_model_equals_preflight": true,
+  "difference": {
+    "path": "model/model_config/id2label",
+    "in_memory": {
+      "0": "LABEL_0",
+      "1": "LABEL_1"
+    },
+    "in_memory_key_type": "int",
+    "json_key_type": "str"
+  },
+  "cache_error": "successful source/model/data/runtime-bound preflight required",
+  "root_cause": "require_preflight compared the in-memory identity directly with its JSON-deserialized form; JSON integer dictionary keys become strings",
+  "cache_complete": false,
+  "training_started": false,
+  "development_evaluation_started": false,
+  "diagnostic_scope_note": "The two earlier logs without formal precision_scope are retained for audit but are not used for the root-cause conclusion; formal_scope_identity_diagnostic.log is authoritative for this comparison."
+}

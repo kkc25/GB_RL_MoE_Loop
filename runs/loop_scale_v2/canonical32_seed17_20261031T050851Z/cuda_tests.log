@@ -1,0 +1,11 @@
+torch: 2.12.1+cu130
+cuda_available: True
+cuda_device_count: 4
+gpu_names: ['NVIDIA RTX A6000', 'NVIDIA RTX A6000', 'NVIDIA RTX A6000', 'NVIDIA RTX A6000']
+test_cuda_bf16_singleton_permutation (tests.test_canonical_execution.CanonicalExecutionTests.test_cuda_bf16_singleton_permutation) ... ok
+test_cuda_bf16_frozen_linear_backward (tests.test_fp32_experts.PrecisionScreenTests.test_cuda_bf16_frozen_linear_backward) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.648s
+
+OK
