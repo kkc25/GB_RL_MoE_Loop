@@ -1,0 +1,31 @@
+{
+  "schema": "canonical32-1m-resource-assessment-v1",
+  "code_commit": "510194a3dc95f8c8b5df0d50ea91ae299f78243b",
+  "freeze_sha256": "e5ffd918ee9c0e1dafec89436e2e39613ed9e922de94543cbe15ca9253790ba2",
+  "quality_gate": {
+    "screen_300k_status": "complete",
+    "allow_next_budget": true,
+    "all_four_same_cell_mode_trends_pass": true
+  },
+  "resource_gate": {
+    "status": "blocked_pending_operator_decision",
+    "cell_wall_seconds_hard_cap": 7200,
+    "method": "Scale measured 300k per-operation compute and following-wall-gap components by exact 1M adapter updates, gate updates and train-document counts; keep development/calibration populations fixed",
+    "estimates": {
+      "r2_full": {
+        "estimated_core_seconds": 8404.414659432046,
+        "estimated_hours": 2.334559627620013,
+        "excess_seconds_over_cap": 1204.414659432046
+      },
+      "r2_reduced": {
+        "estimated_core_seconds": 8319.710879261744,
+        "estimated_hours": 2.3110307997949286,
+        "excess_seconds_over_cap": 1119.710879261744
+      }
+    },
+    "dominant_costs": "checkpoint/state persistence and per-document evidence I/O in addition to real expert computation",
+    "action": "No 1M cell started. Do not extend timestamps, shrink frozen data, bypass fit_guard, or treat quality approval as resource feasibility."
+  },
+  "one_m_cells_started": false,
+  "test_accessed": false
+}
