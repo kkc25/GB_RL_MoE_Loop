@@ -1,0 +1,36 @@
+{
+  "schema": "canonical32-300k-1m-budget-precheck-v1",
+  "code_commit": "510194a3dc95f8c8b5df0d50ea91ae299f78243b",
+  "freeze_sha256": "e5ffd918ee9c0e1dafec89436e2e39613ed9e922de94543cbe15ca9253790ba2",
+  "authorized_sequence": [
+    300000,
+    1000000
+  ],
+  "required_gate": "Review 300k same-amplitude/same-result-type trends versus 100k; enter 1M only with at least one improvement >=0.001 nat and paired 95% CI lower bound >0",
+  "cache": "Reuse the completed maximum-tier prefix cache; no recache and no test capture",
+  "suite_remaining_hours_at_precheck": 21.656151571207577,
+  "cell_hard_cap_seconds_each": 7200,
+  "six_cell_hard_cap_hours": 12.0,
+  "operation_counts": {
+    "300000": {
+      "adapter_unique_positions_per_cell": 270108,
+      "adapter_exposures_per_cell": 540216,
+      "adapter_updates_per_cell": 2112,
+      "gate_unique_positions_per_r2_candidate": 30032,
+      "gate_updates_per_r2_cell": 236
+    },
+    "1000000": {
+      "adapter_unique_positions_per_cell": 900059,
+      "adapter_exposures_per_cell": 1800118,
+      "adapter_updates_per_cell": 7032,
+      "gate_unique_positions_per_r2_candidate": 100127,
+      "gate_updates_per_r2_cell": 784
+    }
+  },
+  "measured_100k_core_seconds": {
+    "parameter_control": 222.87726378440857,
+    "r2_full": 1746.9451439380646,
+    "r2_reduced": 1769.5485463142395
+  },
+  "scope": "Hard-cap feasibility and exact operation counts, not a throughput guarantee. Do not bypass the 300k report gate, run matched-exposure controls, add seeds, finalize, or access final test without separate authorization."
+}
