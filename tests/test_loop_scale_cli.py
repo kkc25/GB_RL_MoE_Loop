@@ -85,6 +85,20 @@ class ScaleCLIGuards(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'run_root identity changed'):
                 cli.StageReceipt(changed,code,'cache',resume=True)
 
+    def test_preflight_compares_json_normalized_identity_without_ignoring_runtime_changes(self):
+        with tempfile.TemporaryDirectory() as td:
+            c=dict(run_root=td)
+            code={'commit':'a'*40,'sources':{}}
+            index=dict(freeze_sha256='f'*64)
+            model=dict(model_config=dict(id2label={0:'LABEL_0',1:'LABEL_1'}),
+                runtime=dict(cudnn_tf32=False))
+            write(Path(td)/'preflight.json',dict(status='complete',code=code,
+                freeze_sha256=index['freeze_sha256'],model=model))
+            self.assertEqual(cli.require_preflight(c,code,index,model)['status'],'complete')
+            changed=deepcopy(model);changed['runtime']['cudnn_tf32']=True
+            with self.assertRaisesRegex(ValueError,'runtime-bound preflight required'):
+                cli.require_preflight(c,code,index,changed)
+
     def test_actual_loaded_tokenizer_must_match_frozen_bytes(self):
         identity=dict(model=dict(files={'config.json':'a'*64,'weights.safetensors':'b'*64}),
             tokenizer=dict(files={'tokenizer.json':'c'*64}))

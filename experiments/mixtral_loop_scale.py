@@ -485,8 +485,9 @@ def cost_summary(c):
 
 def require_preflight(c,code,index,model):
     preflight=read_json(Path(c['run_root'])/'preflight.json')
+    actual_model=json.loads(json.dumps(model,allow_nan=False))
     if (preflight['status']!='complete' or preflight['code']!=code or
-            preflight['freeze_sha256']!=index['freeze_sha256'] or preflight['model']!=model):
+            preflight['freeze_sha256']!=index['freeze_sha256'] or preflight['model']!=actual_model):
         raise ValueError('successful source/model/data/runtime-bound preflight required')
     return preflight
 
