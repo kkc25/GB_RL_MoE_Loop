@@ -1,0 +1,47 @@
+{
+  "schema": "canonical32-100k-fit-budget-precheck-v1",
+  "code_commit": "510194a3dc95f8c8b5df0d50ea91ae299f78243b",
+  "freeze_sha256": "e5ffd918ee9c0e1dafec89436e2e39613ed9e922de94543cbe15ca9253790ba2",
+  "authorized_budget": 100000,
+  "cells": [
+    "parameter_control",
+    "r2_full",
+    "r2_reduced"
+  ],
+  "seed": 17,
+  "cache": {
+    "status": "complete",
+    "roles": {
+      "adapter_train_1000000": 3667,
+      "gate_fit_1000000": 407,
+      "development_calibration": 203,
+      "development_selection": 201
+    },
+    "wall_seconds": 2034.6498987674713,
+    "bytes_including_orphans": 18826246930,
+    "disk_free_tib_at_precheck": 5.1
+  },
+  "formal_preflight": {
+    "status": "complete",
+    "cases_passed": 8,
+    "core_seconds": 29.824078114004806
+  },
+  "operation_bounds": {
+    "adapter_unique_positions_per_cell": 90215,
+    "adapter_exposures_per_cell": 180430,
+    "adapter_updates_per_cell": 706,
+    "gate_unique_positions_per_r2_candidate": 10249,
+    "gate_updates_per_r2_cell": 82,
+    "forced_epoch_train_and_development_position_visits_per_cell": 420861,
+    "r2_calibration_position_visits_including_native_and_six_thresholds_per_r2_cell": 703234,
+    "maximum_matched_control_development_position_visits_per_r2_cell": 200288
+  },
+  "budget": {
+    "suite_remaining_hours_at_precheck": 23.298104814887047,
+    "cell_hard_cap_seconds_each": 7200,
+    "three_cell_hard_cap_hours": 6.0,
+    "additional_model_load_allowance_seconds_each": 300,
+    "precheck_passed": true
+  },
+  "scope": "Operation counts and hard-cap feasibility, not a throughput prediction. Preflight and precision-screen timings are not inference throughput. Measure the first cell before estimating subsequent cells; no 300k, 1M, matched-exposure, final-test, or additional seeds are authorized."
+}

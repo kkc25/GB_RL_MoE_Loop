@@ -1,0 +1,12 @@
+torch: 2.12.1+cu130
+cuda_available: True
+gpu_names: ['NVIDIA RTX A6000', 'NVIDIA RTX A6000', 'NVIDIA RTX A6000', 'NVIDIA RTX A6000']
+test_preflight_compares_json_normalized_identity_without_ignoring_runtime_changes (tests.test_loop_scale_cli.ScaleCLIGuards.test_preflight_compares_json_normalized_identity_without_ignoring_runtime_changes) ... ok
+test_cuda_bf16_singleton_permutation (tests.test_canonical_execution.CanonicalExecutionTests.test_cuda_bf16_singleton_permutation) ... ok
+test_cuda_bf16_frozen_linear_backward (tests.test_fp32_experts.PrecisionScreenTests.test_cuda_bf16_frozen_linear_backward) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.612s
+
+OK
+{"status": "config_valid", "data_status": "not_prepared", "gpu_status": "not_executed"}
