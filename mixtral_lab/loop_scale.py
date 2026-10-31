@@ -97,7 +97,7 @@ class ScaleConfig:
     r2_precision: str = 'native_bf16'
 
     def validate(self):
-        if self.r2_precision not in ('native_bf16', 'fp32_experts'):
+        if self.r2_precision not in ('native_bf16', 'fp32_experts', 'fp32_canonical32'):
             raise ValueError('unknown R2 precision protocol')
         for name, low, high in (('rank', 1, 256), ('epochs', 1, 2),
                 ('positions_per_update', 1, 4096), ('seed', 0, 2**63-1),
@@ -138,7 +138,7 @@ class ScaleBranch(LoopBranch):
         self.scale_config = config
         self.amplitude = float(amplitude)
 
-    def forward(self, adapter, h1, mask=None, *, compact=True, work=None):
+    def forward(self, adapter, h1, mask=None, *, compact=True, work=None, trace=None):
         _check_config_deadline(self.scale_config)
         _assert_frozen(adapter)
         if h1.requires_grad or h1.shape[-1] != self.hidden_size:
@@ -152,30 +152,47 @@ class ScaleBranch(LoopBranch):
         if not len(selected):
             return h1.clone()
         active = flat[selected] if compact and len(selected) != len(flat) else flat
-        x = adapter.layer.post_attention_layernorm(active)
-        if self.kind == 'r2' and self.scale_config.r2_precision == 'fp32_experts':
-            from .fp32_experts import correction_fp32
-            correction = correction_fp32(self.correction, x, deadline=self.scale_config.absolute_deadline_utc)
+        from .canonical_execution import MODE, norm_and_correction, route, observe
+        canonical = self.scale_config.r2_precision == MODE
+        if canonical:
+            x,correction=norm_and_correction(adapter,self,active,work)
         else:
-            correction = self.correction(x)
+            x=adapter.layer.post_attention_layernorm(active)
+            if self.kind=='r2' and self.scale_config.r2_precision=='fp32_experts':
+                from .fp32_experts import correction_fp32
+                correction=correction_fp32(self.correction,x,deadline=self.scale_config.absolute_deadline_utc)
+            else:correction=self.correction(x)
+        observe(trace,'normalized_input',x);observe(trace,'correction_fp32',correction)
         if self.kind == 'r2':
             with torch.no_grad():
-                _, weights, pairs = adapter.moe.gate(x)
+                if canonical:logits,weights,pairs=route(adapter,x,deadline=self.scale_config.absolute_deadline_utc,work=work)
+                else:logits,weights,pairs=adapter.moe.gate(x)
+            observe(trace,'router_logits',logits);observe(trace,'router_weights',weights);observe(trace,'router_pairs',pairs)
             if work is not None:
                 work['extra_expert_forward_attempts'] = work.get('extra_expert_forward_attempts', 0) + 1
                 work['extra_expert_token_calls'] = work.get('extra_expert_token_calls', 0) + 2*len(active)
-            if self.scale_config.r2_precision == 'fp32_experts':
+            expert_input=(x.float()+correction) if self.scale_config.r2_precision!='native_bf16' else (x.float()+correction).to(x.dtype)
+            observe(trace,'expert_input',expert_input)
+            if canonical:
+                from .canonical_execution import experts
+                update=experts(adapter,expert_input,pairs.detach(),weights.detach(),
+                    deadline=self.scale_config.absolute_deadline_utc,work=work)
+            elif self.scale_config.r2_precision == 'fp32_experts':
                 from .fp32_experts import experts_fp32
-                update = experts_fp32(adapter.moe.experts, x.float()+correction,
+                update = experts_fp32(adapter.moe.experts, expert_input,
                     pairs.detach(), weights.detach(), deadline=self.scale_config.absolute_deadline_utc, work=work)
             else:
-                update = adapter.moe.experts((x.float()+correction).to(x.dtype), pairs.detach(), weights.detach())
+                update = adapter.moe.experts(expert_input, pairs.detach(), weights.detach())
+            observe(trace,'expert_output',update)
             if work is not None:
                 work['extra_expert_forward_completed'] = work.get('extra_expert_forward_completed', 0) + 1
         else:
             update = correction
         # Apply amplitude BEFORE the residual addition and BF16 rounding.
-        changed = (active.float() + self.amplitude*update.float()).to(active.dtype)
+        residual=active.float()+self.amplitude*update.float()
+        observe(trace,'residual_fp32',residual)
+        changed=residual.to(active.dtype)
+        observe(trace,'cast_hidden',changed)
         if len(selected) == len(flat):
             return changed.reshape(h1.shape)
         return flat.index_copy(0, selected, changed if compact else changed[selected]).reshape(h1.shape)
@@ -235,19 +252,34 @@ def _batch(adapter, cache, positions, config):
     return h1, target
 
 
-def _ce(adapter, h1, target, branch=None, mask=None, work=None, compact=True):
-    if branch is not None:_check_config_deadline(branch.scale_config)
-    changed = h1 if branch is None else branch(adapter, h1, mask=mask, work=work,compact=compact)
+def _ce(adapter, h1, target, branch=None, mask=None, work=None, compact=True, config=None, trace=None):
+    if config is not None and branch is not None and config.r2_precision!=branch.scale_config.r2_precision:
+        raise ValueError('readout and branch precision protocols differ')
+    config=config or (branch.scale_config if branch is not None else None)
+    if config is not None:_check_config_deadline(config)
+    changed = h1 if branch is None else branch(adapter, h1, mask=mask, work=work,compact=compact,trace=trace)
     if work is not None:
         work['head_forward_attempts']=work.get('head_forward_attempts',0)+1
         work['head_supervised_position_visits']=work.get('head_supervised_position_visits',0)+len(target)
-    logits = differentiable_readout(adapter, changed)
+    if config is not None and config.r2_precision=='fp32_canonical32':
+        from .canonical_execution import readout
+        logits=readout(adapter,changed,config,work=work,trace=trace)
+    else:
+        handle=None
+        if trace is not None:
+            def record_norm(module,args,out):trace['readout_normalized']=out.detach().clone()
+            handle=adapter.model.model.norm.register_forward_hook(record_norm)
+        try:logits=differentiable_readout(adapter,changed)
+        finally:
+            if handle is not None:handle.remove()
+    if trace is not None:trace['logits']=logits.detach().clone()
     if work is not None:
         work['head_forward_completed']=work.get('head_forward_completed',0)+1
     if branch is not None:_check_config_deadline(branch.scale_config)
     ce = F.cross_entropy(logits.reshape(-1, logits.shape[-1]).float(), target.to(logits.device), reduction='none')
     if not bool(torch.isfinite(ce).all()):
         raise FloatingPointError('nonfinite cross entropy')
+    if config is not None:_check_config_deadline(config)
     return ce
 
 
@@ -344,6 +376,8 @@ def evaluate(adapter, caches, branch=None, *, gate=None, threshold=None, mode='f
     """Streaming cached-prefix evaluation, immutable evidence per completed document."""
     config = config or (branch.scale_config if branch is not None else ScaleConfig())
     config.validate()
+    if branch is not None and config.r2_precision!=branch.scale_config.r2_precision:
+        raise ValueError('evaluation and branch precision protocols differ')
     if role == 'final_test' and not allow_final_test:
         raise ValueError('sealed final test requires separate explicit finalized command')
     if role not in ('train', 'gate_fit', 'calibration', 'development', 'final_test'):
@@ -406,7 +440,7 @@ def evaluate(adapter, caches, branch=None, *, gate=None, threshold=None, mode='f
             for offset in range(0,len(positions),config.positions_per_update):
                 selected=positions[offset:offset+config.positions_per_update]
                 h1,target=_batch(adapter,cache,selected,config)
-                base=_ce(adapter,h1,target,work=work)
+                base=_ce(adapter,h1,target,work=work,config=config)
                 local=mask[offset:offset+len(selected)].to(adapter.device)
                 values=base if mode=='native' or branch is None else _ce(adapter,h1,target,branch,local,work)
                 native.extend(base.double().cpu().tolist());candidate.extend(values.double().cpu().tolist())
@@ -650,7 +684,7 @@ def run_cell(adapter, train_caches, gate_caches, dev_caches, config, identity, o
                         positions=positions[torch.randperm(len(positions),generator=gen)][offset:offset+length]
                         h1,target=_batch(adapter,cache,positions,config)
                         with torch.no_grad():
-                            gain=(_ce(adapter,h1,target,work=state['work'])-_ce(adapter,h1,target,candidate,work=state['work'])).detach().to(adapter.device)
+                            gain=(_ce(adapter,h1,target,work=state['work'],config=config)-_ce(adapter,h1,target,candidate,work=state['work'])).detach().to(adapter.device)
                         state['work']['gate_forward_attempts']=state['work'].get('gate_forward_attempts',0)+1
                         state['work']['gate_position_visits']=state['work'].get('gate_position_visits',0)+length
                         prediction=gate(h1).reshape(-1)
@@ -746,7 +780,7 @@ def load_selected(output, config, identity, device='cpu', *, which='gated'):
     return branch,gate,selection
 
 
-def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, expert_probe_budget=None, gradient_checks=None, diagnostics=True):
+def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, expert_probe_budget=None, gradient_checks=None, diagnostics=True, path_probe_budget=None):
     """Actual-backend gradient plus full/compacted native and R2 CE audit.
 
     Run on the real target GPUs before accepting throughput. A failure is an
@@ -761,8 +795,8 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, exp
     branch=ScaleBranch(adapter.hidden_size,config,'r2',amplitude,adapter.device)
     work={}
     if gradient_checks is None:
-        gradient_checks = config.r2_precision == 'fp32_experts'
-    if config.r2_precision == 'fp32_experts':
+        gradient_checks = config.r2_precision in ('fp32_experts','fp32_canonical32')
+    if config.r2_precision in ('fp32_experts','fp32_canonical32'):
         gradient_checks = True
         diagnostics = False  # Old observer hooks observe only native moe.experts.
     with torch.no_grad():
@@ -770,12 +804,12 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, exp
         _check_config_deadline(config)
         reference_native=document_losses(native_logits,cache)[positions.to(native_logits.device)]
         full=_ce(adapter,h1,cache.targets.to(adapter.device),branch,work=work)
-        full_native=_ce(adapter,h1,cache.targets.to(adapter.device))
+        full_native=_ce(adapter,h1,cache.targets.to(adapter.device),config=config)
         compact=[];compact_native=[]
         for start in range(0,len(positions),config.positions_per_update):
             _check_config_deadline(config)
             hh,tt=_batch(adapter,cache,positions[start:start+config.positions_per_update],config)
-            compact.append(_ce(adapter,hh,tt,branch,work=work));compact_native.append(_ce(adapter,hh,tt))
+            compact.append(_ce(adapter,hh,tt,branch,work=work));compact_native.append(_ce(adapter,hh,tt,config=config))
         compact=torch.cat(compact);compact_native=torch.cat(compact_native)
         metrics=dict(native_hidden=_comparison(h1,native_hidden,atol,rtol),
                      native_ce=_comparison(compact_native,reference_native,atol,rtol),
@@ -784,7 +818,7 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, exp
         mask=torch.zeros(h1.shape[-2],dtype=torch.bool,device=adapter.device)
         before=dict(work);stopped=branch(adapter,h1,mask,work=work)
         stop_ok=torch.equal(stopped,h1) and work==before
-    conditional_before=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=diagnostics,expert_probe_budget=expert_probe_budget)
+    conditional_before=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=diagnostics,expert_probe_budget=expert_probe_budget,path_probe_budget=path_probe_budget)
     gradients_before=verify_gradient_parity(adapter,cache,branch,atol=atol,rtol=rtol,work=work) if gradient_checks else None
     branch.train();hh,tt=_batch(adapter,cache,positions[:config.positions_per_update],config)
     ce=_ce(adapter,hh,tt,branch,work=work)
@@ -796,7 +830,10 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, exp
     gradient=branch.correction.up.grad
     gradient_ok=gradient is not None and bool(torch.isfinite(gradient).all()) and float(gradient.abs().sum())>0
     with torch.no_grad():
-        xx=adapter.layer.post_attention_layernorm(hh.reshape(-1,adapter.hidden_size))
+        if config.r2_precision=='fp32_canonical32':
+            from .canonical_execution import tiled
+            xx=tiled(hh.reshape(-1,adapter.hidden_size),adapter.layer.post_attention_layernorm,deadline=config.absolute_deadline_utc)
+        else:xx=adapter.layer.post_attention_layernorm(hh.reshape(-1,adapter.hidden_size))
         before_input=_effective_expert_input(branch,xx).clone()
         before_hidden=branch(adapter,hh,work=work).clone()
     opt=torch.optim.AdamW(branch.parameters(),lr=config.learning_rate,weight_decay=0.)
@@ -809,7 +846,7 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, exp
         after_hidden=branch(adapter,hh,work=work)
     effective=int((before_input!=after_input).sum())
     hidden_changes=int((before_hidden!=after_hidden).sum())
-    conditional=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=diagnostics,expert_probe_budget=expert_probe_budget)
+    conditional=verify_conditional(adapter,[cache],branch,atol=atol,rtol=rtol,work=work,diagnostics=diagnostics,expert_probe_budget=expert_probe_budget,path_probe_budget=path_probe_budget)
     gradients_after=verify_gradient_parity(adapter,cache,branch,atol=atol,rtol=rtol,work=work) if gradient_checks else None
     _assert_frozen(adapter)
     with torch.no_grad():
@@ -820,7 +857,7 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, exp
     return dict(status='complete',passed=backbone_gradients_absent and gradient_parity_ok and stop_ok and gradient_ok and effective>0 and unchanged and conditional_before['passed'] and conditional['passed'] and all(x['mismatched_elements']==0 for x in metrics.values()),
                 comparisons=metrics,stop_zero_experts=stop_ok,up_gradient_norm=None if gradient is None else float(gradient.norm()),
                 backbone_gradients_absent=backbone_gradients_absent,
-                r2_precision=config.r2_precision,
+                r2_precision=config.r2_precision,canonical_tile_rows=32 if config.r2_precision=='fp32_canonical32' else None,
                 train_document_loss_snapshot=dict(native=float(full_native[positions.to(full_native.device)].mean()),
                     r2_before_update=float(full[positions.to(full.device)].mean()),
                     r2_after_update=None if post_ce is None else float(post_ce[positions.to(post_ce.device)].mean()),
@@ -837,7 +874,7 @@ def preflight(adapter, cache, config, *, amplitude=.1, atol=1e-4, rtol=1e-4, exp
 
 
 @torch.no_grad()
-def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None,diagnostics=False,expert_probe_budget=None):
+def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None,diagnostics=False,expert_probe_budget=None,path_probe_budget=None):
     """Full-shape masked versus genuinely compacted trained STOP/mixed/all R2."""
     from .document_training import _comparison
     records=[]
@@ -858,8 +895,8 @@ def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None,dia
             before={} if work is None else dict(work)
             compact=branch(adapter,h1,mask,compact=True,work=work)
             dense=branch(adapter,h1,mask,compact=False,work=work)
-            ce1=_ce(adapter,compact,cache.targets.to(adapter.device),work=work)
-            ce2=_ce(adapter,dense,cache.targets.to(adapter.device),work=work)
+            ce1=_ce(adapter,compact,cache.targets.to(adapter.device),work=work,config=branch.scale_config)
+            ce2=_ce(adapter,dense,cache.targets.to(adapter.device),work=work,config=branch.scale_config)
             metrics=dict(hidden=_comparison(compact,dense,atol,rtol),
                          ce=_comparison(ce1[positions.to(ce1.device)],ce2[positions.to(ce2.device)],atol,rtol))
             stop_ok=(name!='stop' or (torch.equal(compact,h1) and (work is None or work.get('extra_expert_token_calls',0)==before.get('extra_expert_token_calls',0))))
@@ -870,12 +907,29 @@ def verify_conditional(adapter,caches,branch,*,atol=1e-4,rtol=1e-4,work=None,dia
                 from .loop_parity_diagnostics import diagnose_compaction
                 records[-1]['layer_diagnostic']=diagnose_compaction(adapter,cache,branch,mask,atol=atol,rtol=rtol,work=work,expert_probe_budget=expert_probe_budget)
                 diagnostic_used=True
+            if path_probe_budget is not None and name.startswith('singleton'):
+                if any(m['mismatched_elements'] for m in metrics.values()):
+                    if path_probe_budget['remaining']>0:
+                        path_probe_budget['remaining']-=1
+                        from .canonical_execution import diagnose_path
+                        try:
+                            records[-1]['path_diagnostic']=diagnose_path(adapter,cache,branch,mask,atol=atol,rtol=rtol,work=work)
+                        except Exception as error:
+                            error.diagnostic_evidence=dict(phase='singleton_path',mask=name,r2_precision=branch.scale_config.r2_precision,
+                                work=dict(work or {}),conditional_records=records)
+                            raise
+                    else:records[-1]['path_diagnostic']={'status':'skipped_probe_budget_exhausted'}
     return dict(status='complete',passed=all(r['stop_zero_experts'] and all(m['mismatched_elements']==0 for m in r['comparisons'].values()) for r in records),
                 documents=records,tolerances=dict(atol=atol,rtol=rtol),scope='STOP/all/even/odd/singleton-first/singleton-last; compact versus compute-all then mask')
 
 
 def _effective_expert_input(branch, x):
-    if branch.scale_config.r2_precision == 'fp32_experts':
+    if branch.scale_config.r2_precision=='fp32_canonical32':
+        from .canonical_execution import tiled
+        from .fp32_experts import correction_fp32
+        return x.float()+tiled(x,lambda z:correction_fp32(branch.correction,z,deadline=branch.scale_config.absolute_deadline_utc),
+            deadline=branch.scale_config.absolute_deadline_utc)
+    if branch.scale_config.r2_precision in ('fp32_experts','fp32_canonical32'):
         from .fp32_experts import correction_fp32
         return x.float()+correction_fp32(branch.correction,x,deadline=branch.scale_config.absolute_deadline_utc)
     return (x.float()+branch.correction(x)).to(x.dtype)

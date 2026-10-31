@@ -49,7 +49,7 @@ def validate_config(raw):
         raise ValueError('BF16 eager protocol required')
     if c.get('device_map') != 'balanced' or c.get('max_memory') != {str(i):'44GiB' for i in range(4)}:
         raise ValueError('four resident A6000 placement budgets required')
-    if c.get('r2_precision','native_bf16') not in ('native_bf16','fp32_experts'):
+    if c.get('r2_precision','native_bf16') not in ('native_bf16','fp32_experts','fp32_canonical32'):
         raise ValueError('unknown R2 precision protocol')
     if c.get('allow_tf32') is not False: raise ValueError('TF32 must remain disabled')
     for key in ('cell_wall_seconds', 'suite_wall_seconds', 'cache_wall_seconds', 'preflight_wall_seconds'):
@@ -155,7 +155,8 @@ def gpu_adapter(c, index):
     identity['runtime']={**runtime_versions(), 'python':platform.python_version(),
         'gpu_names':[torch.cuda.get_device_name(i) for i in range(4)],
         'float32_matmul_precision':torch.get_float32_matmul_precision(),
-        'matmul_tf32':torch.backends.cuda.matmul.allow_tf32,'cudnn_tf32':torch.backends.cudnn.allow_tf32}
+        'matmul_tf32':torch.backends.cuda.matmul.allow_tf32,'cudnn_tf32':torch.backends.cudnn.allow_tf32,
+        'bf16_reduced_precision_reduction':torch.backends.cuda.matmul.allow_bf16_reduced_precision_reduction}
     return adapter, identity
 
 
@@ -282,8 +283,8 @@ def execute_prepared(args,c,code):
     if args.stage=='fit' and cell_output(c,args.budget,args.cell,args.seed,args.matched_exposure).exists() and not args.resume:
         raise FileExistsError('cell already exists; use --resume for incomplete matching state')
     if args.stage=='precision-screen':
-        if c.get('r2_precision')!='fp32_experts':
-            raise ValueError('precision-screen requires explicit fp32_experts candidate config')
+        if c.get('r2_precision') not in ('fp32_experts','fp32_canonical32'):
+            raise ValueError('precision-screen requires explicit FP32 candidate config')
         if any((Path(c['run_root'])/name).exists() for name in ('precision_screen.json','precision_screen_progress.json')):
             raise FileExistsError('precision screen already attempted; preserve evidence and use a new run_id')
     adapter,model=gpu_adapter(c,index)
@@ -690,11 +691,14 @@ def precision_screen(adapter, model, c, code, path, index):
     rows=load_manifest(path,role='adapter_train_100000')
     if len(rows)<c['preflight_documents']:
         raise ValueError('insufficient documents for precision screen')
+    modes_all=('native_bf16','fp32_experts','fp32_canonical32') if c.get('r2_precision')=='fp32_canonical32' else ('native_bf16','fp32_experts')
+    path_probe_budget={'remaining':12} if len(modes_all)==3 else None
     records=[];attempt=None
     def publish(status, **extra):
         value=dict(status=status,code=code,model=model,freeze_sha256=index['freeze_sha256'],
-            config_sha256=digest(c),protocol='fp32-r2-screen-v1',absolute_deadline_utc=deadline,
-            results=records,completed_cases=len(records),expected_cases=c['preflight_documents']*len(c['amplitudes'])*2,
+            config_sha256=digest(c),protocol='canonical32-r2-screen-v1' if len(modes_all)==3 else 'fp32-r2-screen-v1',absolute_deadline_utc=deadline,
+            canonical_tile_rows=32 if len(modes_all)==3 else None,
+            results=records,completed_cases=len(records),expected_cases=c['preflight_documents']*len(c['amplitudes'])*len(modes_all),
             attempted_case=attempt,scope='numerical candidate screen only; no preflight certificate or training authority',**extra)
         _atomic_json(root/'precision_screen_progress.json',value)
         return value
@@ -709,7 +713,8 @@ def precision_screen(adapter, model, c, code, path, index):
             publish('incomplete')
             cache=cache_documents(adapter,[rows[i]],max_cache_bytes=c['max_document_bytes'])[0]
             for j,amplitude in enumerate(c['amplitudes']):
-                modes=('native_bf16','fp32_experts') if (i+j)%2==0 else ('fp32_experts','native_bf16')
+                shift=(i+j)%len(modes_all)
+                modes=modes_all[shift:]+modes_all[:shift]
                 for mode in modes:
                     check();sync()
                     for device in range(torch.cuda.device_count()):torch.cuda.reset_peak_memory_stats(device)
@@ -719,17 +724,22 @@ def precision_screen(adapter, model, c, code, path, index):
                     publish('incomplete')
                     config=replace(scale_config(c,17),r2_precision=mode,absolute_deadline_utc=deadline)
                     t=time.perf_counter()
-                    result=core.preflight(adapter,cache,config,amplitude=amplitude,gradient_checks=True,diagnostics=False)
+                    result=core.preflight(adapter,cache,config,amplitude=amplitude,gradient_checks=True,diagnostics=False,path_probe_budget=path_probe_budget)
                     sync()
+                    elapsed=time.perf_counter()-t
+                    diagnostic_seconds=result.get('work',{}).get('path_diagnostic_seconds',0.)
                     result.update(document_index=i,document_id=cache.document_id,
-                        seconds=time.perf_counter()-t,peak_memory=memory_peaks(),baseline_memory=baseline,
-                        cost_scope='synchronized correctness+gradient screen, NOT isolated inference throughput')
+                        seconds=elapsed,path_diagnostic_seconds=diagnostic_seconds,
+                        seconds_excluding_path_diagnostics=max(0.,elapsed-diagnostic_seconds),
+                        peak_memory_includes_path_diagnostics=bool(result.get('work',{}).get('path_diagnostic_attempts',0)),
+                        peak_memory=memory_peaks(),baseline_memory=baseline,
+                        cost_scope='synchronized correctness+gradient screen; conditional diagnostic costs separated; NOT inference throughput')
                     records.append(result);publish('incomplete')
                     if not result['backbone_gradients_absent'] or not result['backbone_parameter_versions_unchanged']:
                         raise ValueError('backbone integrity failed during precision screen')
                     check()
         expected=c['preflight_documents']*len(c['amplitudes'])
-        by_mode={mode:[r for r in records if r['r2_precision']==mode] for mode in ('native_bf16','fp32_experts')}
+        by_mode={mode:[r for r in records if r['r2_precision']==mode] for mode in modes_all}
         acceptance={mode:len(values)==expected and all(r['passed'] for r in values) for mode,values in by_mode.items()}
         value=publish('complete',numerical_checks_passed=acceptance,seconds=time.time()-started,
             conclusion='candidate still requires separate bound preflight and explicit operator decision before training')
